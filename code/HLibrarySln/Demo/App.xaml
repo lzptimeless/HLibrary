@@ -20,7 +20,7 @@
         <!--Text-->
         <Color x:Key="color-text">#E6E6E6</Color>
         <Color x:Key="color-text-weak">#ABABAB</Color>
-        <Color x:Key="color-text-highlight">#ABABAB</Color>
+        <Color x:Key="color-text-highlight">#FFFFFF</Color>
         <SolidColorBrush x:Key="brush-text" Color="{StaticResource color-text}"></SolidColorBrush>
         <SolidColorBrush x:Key="brush-text-weak" Color="{StaticResource color-text-weak}"></SolidColorBrush>
         <SolidColorBrush x:Key="brush-text-highlight" Color="{StaticResource color-text-highlight}"></SolidColorBrush>
@@ -28,27 +28,27 @@
         <Style x:Key="text" TargetType="TextBlock">
             <Setter Property="FontSize" Value="13"/>
             <Setter Property="FontFamily" Value="{StaticResource font}"/>
-            <Setter Property="Foreground" Value="{StaticResource color-text}"/>
+            <Setter Property="Foreground" Value="{StaticResource brush-text}"/>
         </Style>
         <Style x:Key="text-h1" TargetType="TextBlock">
             <Setter Property="FontSize" Value="18"/>
             <Setter Property="FontFamily" Value="{StaticResource font}"/>
-            <Setter Property="Foreground" Value="{StaticResource color-text-highlight}"/>
+            <Setter Property="Foreground" Value="{StaticResource brush-text-highlight}"/>
         </Style>
         <Style x:Key="text-h2" TargetType="TextBlock">
             <Setter Property="FontSize" Value="16"/>
             <Setter Property="FontFamily" Value="{StaticResource font}"/>
-            <Setter Property="Foreground" Value="{StaticResource color-text-highlight}"/>
+            <Setter Property="Foreground" Value="{StaticResource brush-text-highlight}"/>
         </Style>
         <Style x:Key="text-h3" TargetType="TextBlock">
             <Setter Property="FontSize" Value="14"/>
             <Setter Property="FontFamily" Value="{StaticResource font}"/>
-            <Setter Property="Foreground" Value="{StaticResource color-text-highlight}"/>
+            <Setter Property="Foreground" Value="{StaticResource brush-text-highlight}"/>
         </Style>
         <Style x:Key="text-weak" TargetType="TextBlock">
             <Setter Property="FontSize" Value="12"/>
             <Setter Property="FontFamily" Value="{StaticResource font}"/>
-            <Setter Property="Foreground" Value="{StaticResource color-text-weak}"/>
+            <Setter Property="Foreground" Value="{StaticResource brush-text-weak}"/>
         </Style>
 
         <!--Button colors-->
@@ -68,13 +68,15 @@
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
                         <Border
-                            Padding="{TemplateBinding Padding}"
                             BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}"
                             Background="{TemplateBinding Background}">
-                            <Border x:Name="HoverBg">
+                            <Border 
+                                x:Name="HoverBg"
+                                Padding="{TemplateBinding Padding}">
                                 <TextBlock
                                     x:Name="Text"
+                                    Text="{TemplateBinding Content}"
                                     Style="{StaticResource text}"
                                     Foreground="{TemplateBinding Foreground}"
                                     HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"

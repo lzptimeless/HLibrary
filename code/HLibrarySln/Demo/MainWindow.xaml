@@ -10,6 +10,20 @@
         Title="HLibrary" Height="700" Width="1000"
         Style="{StaticResource win-shell}"
         Background="{StaticResource brush-win-bg}">
+    <Window.Tag>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="30"/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <!--窗口图标-->
+            <Image 
+                Source="icon-app.ico"
+                Margin="1"
+                Stretch="Uniform"/>
+        </Grid>
+    </Window.Tag>
     <Grid>
+        <local:LocalMangaView/>
     </Grid>
 </Window>
