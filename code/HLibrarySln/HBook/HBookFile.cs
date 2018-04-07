@@ -13,5 +13,14 @@ namespace HBook
         public HBookIndex Index { get; set; }
         public IList<HBookPage> Pages { get; private set; }
         public IList<HBookVirtualPage> VirtualPages { get; private set; }
+
+        public void Load(string path)
+        { }
+
+        public void Save()
+        { }
+
+        public void SaveAs(string path)
+        { }
     }
 }

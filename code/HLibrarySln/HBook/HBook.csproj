@@ -49,7 +49,9 @@
     <Compile Include="HBookPage.cs" />
     <Compile Include="HBookPageContent.cs" />
     <Compile Include="HBookPageHeader.cs" />
+    <Compile Include="HBookStream.cs" />
     <Compile Include="HBookVirtualPage.cs" />
+    <Compile Include="HBookPartStream.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
