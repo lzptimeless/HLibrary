@@ -9,7 +9,14 @@ namespace HBook
 {
     public class HBookPartStream : Stream
     {
-        public HBookPartStream(HBookStream parentStream, long partPosition, long partLength)
+        /// <summary>
+        /// 在<see cref="HBookStream"/>创建<see cref="HBookPartStream"/>时，会传入
+        /// parentOperateCode用以之后对创建者的读写操作，其他不通过parentOperateCode
+        /// 的读写操作都会抛出异常
+        /// </summary>
+        private long _parentOperateCode;
+
+        internal HBookPartStream(HBookStream parentStream, long partPosition, long partLength, long parentOperateCode)
         {
             if (parentStream == null)
                 throw new ArgumentNullException("parentStream");
@@ -23,6 +30,7 @@ namespace HBook
             ParentStream = parentStream;
             PartPosition = partPosition;
             PartLength = partLength;
+            _parentOperateCode = parentOperateCode;
         }
 
         public HBookStream ParentStream { get; private set; }
