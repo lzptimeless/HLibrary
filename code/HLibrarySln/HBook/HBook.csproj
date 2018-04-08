@@ -49,6 +49,7 @@
     <Compile Include="HBookPage.cs" />
     <Compile Include="HBookPageContent.cs" />
     <Compile Include="HBookPageHeader.cs" />
+    <Compile Include="HBookPartStreamIsDisposedChangedArgs.cs" />
     <Compile Include="HBookStream.cs" />
     <Compile Include="HBookVirtualPage.cs" />
     <Compile Include="HBookPartStream.cs" />
