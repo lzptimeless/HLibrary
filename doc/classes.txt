@@ -1,0 +1,14 @@
+HBook
+	Header
+	PageHeaders
+	
+	WriteHeader(Header hd)
+	Stream ReadCover()
+	WriteCover(Stream thumb, Stream image)
+	Stream ReadPage(int index)
+	Stream ReadPageThumb(int index)
+	AddPage(int index, PageHeader ph, Stream thumb, Stream image)
+	DeletePage(int index)
+	ReplacePage(int index, PageHeader ph, Stream thumb, Stream image)
+	
+    
