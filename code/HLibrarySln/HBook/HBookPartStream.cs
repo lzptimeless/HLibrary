@@ -3,62 +3,51 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace HBook
 {
     public class HBookPartStream : Stream
     {
-        /// <summary>
-        /// 在<see cref="HBookStream"/>创建<see cref="HBookPartStream"/>时，会传入
-        /// parentOperateCode用以之后对创建者的读写操作，其他不通过parentOperateCode
-        /// 的读写操作都会抛出异常
-        /// </summary>
-        private long _parentOperateCode;
+        #region fields
+        internal Func<bool> ParentCanRead;
+        internal Func<bool> ParentCanSeek;
+        internal Func<long> ParentGetPosition;
+        internal Action<long> ParentSetPosition;
+        internal Action ParentFlush;
+        internal Func<byte[], int, int, int> ParentRead;
+        internal Func<long, SeekOrigin, long> ParentSeek;
+        #endregion
 
-        internal HBookPartStream(HBookStream parentStream, long partPosition, long partLength, long parentOperateCode)
+        internal HBookPartStream(long partPosition, long partLength)
         {
-            if (parentStream == null)
-                throw new ArgumentNullException("parentStream");
-
-            if (partPosition < 0 || partPosition >= parentStream.Length)
-                throw new ArgumentOutOfRangeException("partPosition", $"parentStream length:{parentStream.Length}, partPosition:{partPosition}");
-
-            if (partLength <= 0 || partLength > parentStream.Length - partPosition)
-                throw new ArgumentOutOfRangeException("partLength", $"parentStream length:{parentStream.Length}, partPosition:{partPosition}, partLength:{partLength}");
-
-            ParentStream = parentStream;
             PartPosition = partPosition;
             PartLength = partLength;
-            _parentOperateCode = parentOperateCode;
         }
 
-        public HBookStream ParentStream { get; private set; }
+        #region properties
         public long PartPosition { get; private set; }
         public long PartLength { get; private set; }
         public bool IsDisposed { get; private set; }
-
         public override bool CanRead
         {
             get
             {
-                return ParentStream != null && ParentStream.CanRead && !IsDisposed;
+                return ParentCanRead != null && ParentCanRead.Invoke() && !IsDisposed;
             }
         }
-
         public override bool CanSeek
         {
             get
             {
-                return ParentStream != null && ParentStream.CanSeek && !IsDisposed;
+                return ParentCanSeek != null && ParentCanSeek.Invoke() && !IsDisposed;
             }
         }
-
         public override bool CanWrite
         {
             get { return false; }
         }
-
         public override long Length
         {
             get
@@ -66,86 +55,94 @@ namespace HBook
                 return PartLength;
             }
         }
-
         public override long Position
         {
             get
             {
-                if (ParentStream == null || IsDisposed)
+                if (ParentGetPosition == null || IsDisposed)
                     return 0;
 
-                return ParentStream.Position - PartPosition;
+                return ParentGetPosition.Invoke() - PartPosition;
             }
 
             set
             {
-                if (ParentStream == null)
-                    ThrowParentStreamIsNull();
-
                 if (IsDisposed)
                     ThrowIsDisposed();
+
+                if (ParentSetPosition == null)
+                    ThrowNotInitialized();
 
                 if (value < 0 || value >= PartLength)
                     throw new ArgumentOutOfRangeException("value", $"PartLength:{PartLength}, value:{value}");
 
-                ParentStream.Position = value + PartPosition;
+                ParentSetPosition.Invoke(value + PartPosition);
             }
         }
+        #endregion
+
+        #region events
+        public event EventHandler<HBookPartStreamIsDisposedChangedArgs> IsDisposedChanged;
+        private void OnIsDisposedChanged(HBookPartStreamIsDisposedChangedArgs e)
+        {
+            Volatile.Read(ref IsDisposedChanged)?.Invoke(this, e);
+        }
+        #endregion
 
         public override void Flush()
         {
-            if (ParentStream == null)
-                ThrowParentStreamIsNull();
-
             if (IsDisposed)
                 ThrowIsDisposed();
 
-            ParentStream.Flush();
+            if (ParentFlush == null)
+                ThrowNotInitialized();
+
+            ParentFlush.Invoke();
         }
 
         public override int Read(byte[] buffer, int offset, int count)
         {
-            if (ParentStream == null)
-                ThrowParentStreamIsNull();
-
             if (IsDisposed)
                 ThrowIsDisposed();
+
+            if (ParentRead == null)
+                ThrowNotInitialized();
 
             // 防止读取数据超过尾部
             if (count > PartLength - Position)
                 count = (int)(PartLength - Position);
 
-            return ParentStream.Read(buffer, offset, count);
+            return ParentRead.Invoke(buffer, offset, count);
         }
 
         public override long Seek(long offset, SeekOrigin origin)
         {
-            if (ParentStream == null)
-                ThrowParentStreamIsNull();
-
             if (IsDisposed)
                 ThrowIsDisposed();
+
+            if (ParentSeek == null)
+                ThrowNotInitialized();
 
             if (origin == SeekOrigin.Current)
             {
                 if (Position + offset < 0 || Position + offset >= PartLength)
                     throw new ArgumentOutOfRangeException("offset", $"Position:{Position}, PartLength:{PartLength}, offset:{offset}, origin:Current");
 
-                return ParentStream.Seek(offset, SeekOrigin.Current);
+                return ParentSeek.Invoke(offset, SeekOrigin.Current);
             }
             else if (origin == SeekOrigin.Begin)
             {
                 if (offset < 0 || offset >= PartLength)
                     throw new ArgumentOutOfRangeException("offset", $"PartLength:{PartLength}, offset:{offset}, origin:Begin");
 
-                return ParentStream.Seek(offset + PartPosition, SeekOrigin.Begin);
+                return ParentSeek.Invoke(offset + PartPosition, SeekOrigin.Begin);
             }
             else
             {
                 if (offset < 0 || offset >= PartLength)
                     throw new ArgumentOutOfRangeException("offset", $"PartLength:{PartLength}, offset:{offset}, origin:End");
 
-                return ParentStream.Seek(PartPosition + PartLength - 1 - offset, SeekOrigin.Begin);
+                return ParentSeek.Invoke(PartPosition + PartLength - 1 - offset, SeekOrigin.Begin);
             }
         }
 
@@ -162,12 +159,20 @@ namespace HBook
         protected override void Dispose(bool disposing)
         {
             base.Dispose(disposing);
+            ParentCanRead = null;
+            ParentCanSeek = null;
+            ParentGetPosition = null;
+            ParentSetPosition = null;
+            ParentFlush = null;
+            ParentRead = null;
+            ParentSeek = null;
             IsDisposed = true;
+            OnIsDisposedChanged(new HBookPartStreamIsDisposedChangedArgs(IsDisposed));
         }
 
-        private static void ThrowParentStreamIsNull()
+        private static void ThrowNotInitialized()
         {
-            throw new ApplicationException("ParentStream is null");
+            throw new ApplicationException("Not initialized.");
         }
 
         private static void ThrowNotSupportWrite()

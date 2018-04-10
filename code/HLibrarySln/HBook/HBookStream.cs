@@ -14,20 +14,59 @@ namespace HBook
         /// 整个<see cref="HBookStream"/>的锁
         /// </summary>
         private static object _lockObj = new object();
-        /// <summary>
-        /// 在创建<see cref="HBookPartStream"/>时会同时生成一个操作码，并将这个操作码传入创建
-        /// 的<see cref="HBookPartStream"/>，之后所有对本对象的读取和写入操作都必须通过这个操
-        /// 作码（对外部来说就必须通过唯一的<see cref="HBookPartStream"/>对象访问），否则就会
-        /// 抛出异常，这种限制可以强制外部操作代码必须简洁
-        /// </summary>
-        private long _operateCode;
+        private Stream _stream;
         #endregion
+
+        public HBookStream(string path, FileMode mode)
+        {
+            _stream = new FileStream(path, mode, FileAccess.ReadWrite, FileShare.None);
+        }
+
+        #region properties
+        #region CurrentPartStream
+        private HBookPartStream _currentPartStream;
+        /// <summary>
+        /// Get or set <see cref="CurrentPartStream"/>
+        /// </summary>
+        public HBookPartStream CurrentPartStream
+        {
+            get { return _currentPartStream; }
+        }
+        #endregion
+
+        public HBookPartStream ReadPart(long partPosition, long partLength)
+        {
+            HBookPartStream partStream;
+            lock (_currentPartStream)
+            {
+                ThrowCanOnlyAccessCurrentPartStream();
+
+                if (partPosition < 0 || partPosition >= _stream.Length)
+                    throw new ArgumentOutOfRangeException("partPosition", $"origin stream length:{_stream.Length}, partPosition:{partPosition}");
+
+                if (partLength <= 0 || partLength > _stream.Length - partPosition)
+                    throw new ArgumentOutOfRangeException("partLength", $"origin stream length:{_stream.Length}, partPosition:{partPosition}, partLength:{partLength}");
+
+                partStream = new HBookPartStream(partPosition, partLength);
+                partStream.ParentCanRead = PartStreamCanRead;
+                partStream.ParentCanSeek = PartStreamCanSeek;
+                partStream.ParentGetPosition = PartStreamGetPosition;
+                partStream.ParentSetPosition = PartStreamSetPosition;
+                partStream.ParentFlush = PartStreamFlush;
+                partStream.ParentRead = PartStreamRead;
+                partStream.ParentSeek = PartStreamSeek;
+                partStream.IsDisposedChanged += PartStream_IsDisposedChanged;
+                _currentPartStream = partStream;
+            }
+
+            return partStream;
+        }
 
         public override bool CanRead
         {
             get
             {
-                throw new NotImplementedException();
+                return _stream.CanRead;
             }
         }
 
@@ -35,7 +74,7 @@ namespace HBook
         {
             get
             {
-                throw new NotImplementedException();
+                return _stream.CanSeek;
             }
         }
 
@@ -43,7 +82,7 @@ namespace HBook
         {
             get
             {
-                throw new NotImplementedException();
+                return _stream.CanWrite;
             }
         }
 
@@ -51,7 +90,7 @@ namespace HBook
         {
             get
             {
-                throw new NotImplementedException();
+                return _stream.Length;
             }
         }
 
@@ -59,44 +98,150 @@ namespace HBook
         {
             get
             {
-                throw new NotImplementedException();
+                return _stream.Position;
             }
 
             set
             {
-                throw new NotImplementedException();
+                lock (_lockObj)
+                {
+                    ThrowCanOnlyAccessCurrentPartStream();
+                    _stream.Position = value;
+                }
             }
         }
-
-        public long SetPosition(long newPosition, long operateCode)
-        {
-            _operateCode = operateCode;
-            return 0;
-        }
+        #endregion
 
         public override void Flush()
         {
-            throw new NotImplementedException();
+            lock (_lockObj)
+            {
+                ThrowCanOnlyAccessCurrentPartStream();
+                _stream.Flush();
+            }
         }
 
         public override int Read(byte[] buffer, int offset, int count)
         {
-            throw new NotImplementedException();
+            int readCount;
+            lock (_lockObj)
+            {
+                ThrowCanOnlyAccessCurrentPartStream();
+                readCount = _stream.Read(buffer, offset, count);
+            }
+
+            return readCount;
         }
 
         public override long Seek(long offset, SeekOrigin origin)
         {
-            throw new NotImplementedException();
+            long newPosition;
+            lock (_lockObj)
+            {
+                ThrowCanOnlyAccessCurrentPartStream();
+                newPosition = _stream.Seek(offset, origin);
+            }
+
+            return newPosition;
         }
 
         public override void SetLength(long value)
         {
-            throw new NotImplementedException();
+            lock (_lockObj)
+            {
+                ThrowCanOnlyAccessCurrentPartStream();
+                _stream.SetLength(value);
+            }
         }
 
         public override void Write(byte[] buffer, int offset, int count)
         {
-            throw new NotImplementedException();
+            lock (_lockObj)
+            {
+                ThrowCanOnlyAccessCurrentPartStream();
+                _stream.Write(buffer, offset, count);
+            }
+        }
+
+        private void PartStream_IsDisposedChanged(object sender, HBookPartStreamIsDisposedChangedArgs e)
+        {
+            lock (_lockObj)
+            {
+                if (_currentPartStream != null)
+                {
+                    _currentPartStream.IsDisposedChanged -= PartStream_IsDisposedChanged;
+                    _currentPartStream = null;
+                }
+            }
+        }
+
+        private bool PartStreamCanRead()
+        {
+            return _stream.CanRead;
+        }
+
+        private bool PartStreamCanSeek()
+        {
+            return _stream.CanSeek;
+        }
+
+        private long PartStreamGetPosition()
+        {
+            return _stream.Position;
+        }
+
+        private void PartStreamSetPosition(long position)
+        {
+            lock (_lockObj)
+            {
+                ThrowCurrentPartStreamIsNullOrDisposed();
+                _stream.Position = position;
+            }
+        }
+
+        private void PartStreamFlush()
+        {
+            lock (_lockObj)
+            {
+                ThrowCurrentPartStreamIsNullOrDisposed();
+                _stream.Flush();
+            }
+        }
+
+        private int PartStreamRead(byte[] buffer, int offset, int count)
+        {
+            int readCount;
+            lock (_lockObj)
+            {
+                ThrowCurrentPartStreamIsNullOrDisposed();
+                readCount = _stream.Read(buffer, offset, count);
+            }
+
+            return readCount;
+        }
+
+        private long PartStreamSeek(long offset, SeekOrigin origin)
+        {
+            long newPosition;
+            lock (_lockObj)
+            {
+                ThrowCurrentPartStreamIsNullOrDisposed();
+                newPosition = _stream.Seek(offset, origin);
+            }
+
+            return newPosition;
+        }
+
+        private void ThrowCurrentPartStreamIsNullOrDisposed()
+        {
+            if (_currentPartStream == null || _currentPartStream.IsDisposed)
+                throw new ApplicationException("CurrentPartStream is null or disposed");
+        }
+
+        private void ThrowCanOnlyAccessCurrentPartStream()
+        {
+            if (_currentPartStream != null && !_currentPartStream.IsDisposed)
+                throw new ApplicationException("Can only access CurrentPartStream");
         }
     }
 }
