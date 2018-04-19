@@ -40,11 +40,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="HBookConstant.cs" />
-    <Compile Include="HBookControlCodes.cs" />
+    <Compile Include="HBook.cs" />
+    <Compile Include="HBookHeader.cs" />
+    <Compile Include="HMetadataConstant.cs" />
+    <Compile Include="HMetadataControlCodes.cs" />
     <Compile Include="HBookCover.cs" />
     <Compile Include="HBookFile.cs" />
-    <Compile Include="HBookHeader.cs" />
+    <Compile Include="HMetadataBookHeader.cs" />
     <Compile Include="HBookIndex.cs" />
     <Compile Include="HBookPage.cs" />
     <Compile Include="HBookPageContent.cs" />

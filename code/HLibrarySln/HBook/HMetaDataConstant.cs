@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace HBook
 {
-    public static class HBookConstant
+    public static class HMetadataConstant
     {
         /// <summary>
         /// HBOOK的ASCII码
