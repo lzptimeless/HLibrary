@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HBook
+namespace H.Book
 {
-    public class HBookPageHeader
+    public class HMetadataPageHeader : HMetadataBase
     {
         public UInt32 ContentPosition { get; set; }
         public string Artist { get; set; }

@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HBook
+namespace H.Book
 {
-    public class HBookPageContent
+    public class HMetadataBookCover : HMetadataBase
     {
         public UInt32 ThumbnailLength { get; set; }
         public UInt32 ImageLength { get; set; }

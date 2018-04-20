@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{A081DD30-6AED-41DB-8216-2AD260EFB19A}</ProjectGuid>
+    <ProjectGuid>{183B7D64-DD84-4E35-A0FE-AD000ACBB74A}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>H.Book</RootNamespace>
-    <AssemblyName>HBook</AssemblyName>
+    <AssemblyName>H.Book</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -42,19 +42,19 @@
   <ItemGroup>
     <Compile Include="HBook.cs" />
     <Compile Include="HBookHeader.cs" />
-    <Compile Include="HMetadataConstant.cs" />
-    <Compile Include="HMetadataControlCodes.cs" />
-    <Compile Include="HMetadataBookCover.cs" />
-    <Compile Include="HBookFile.cs" />
-    <Compile Include="HMetadataBookHeader.cs" />
-    <Compile Include="HMetadataIndex.cs" />
-    <Compile Include="HMetadataPage.cs" />
-    <Compile Include="HMetadataPageContent.cs" />
-    <Compile Include="HMetadataPageHeader.cs" />
+    <Compile Include="HBookPartStream.cs" />
     <Compile Include="HBookPartStreamIsDisposedChangedArgs.cs" />
     <Compile Include="HBookStream.cs" />
-    <Compile Include="HMetadataVirtualPage.cs" />
-    <Compile Include="HBookPartStream.cs" />
+    <Compile Include="Metadata\HMetadataSegment.cs" />
+    <Compile Include="Metadata\HMetadataBookCover.cs" />
+    <Compile Include="Metadata\HMetadataBookHeader.cs" />
+    <Compile Include="Metadata\HMetadataConstant.cs" />
+    <Compile Include="Metadata\HMetadataControlCodes.cs" />
+    <Compile Include="Metadata\HMetadataIndex.cs" />
+    <Compile Include="Metadata\HMetadataPage.cs" />
+    <Compile Include="Metadata\HMetadataPageContent.cs" />
+    <Compile Include="Metadata\HMetadataPageHeader.cs" />
+    <Compile Include="Metadata\HMetadataVirtualPage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

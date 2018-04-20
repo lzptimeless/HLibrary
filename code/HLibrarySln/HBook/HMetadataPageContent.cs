@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace HBook
 {
-    public class HBookVirtualPage
+    public class HMetadataPageContent
     {
-        public Guid BookID { get; set; }
-        public UInt16 PageNum { get; set; }
+        public UInt32 ThumbnailLength { get; set; }
+        public UInt32 ImageLength { get; set; }
     }
 }

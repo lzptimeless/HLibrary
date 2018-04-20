@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace HBook
 {
-    public class HBookPage
+    public class HMetadataPage
     {
-        public HBookPageHeader Header { get; set; }
-        public HBookPageContent Content { get; set; }
+        public HMetadataPageHeader Header { get; set; }
+        public HMetadataPageContent Content { get; set; }
     }
 }
