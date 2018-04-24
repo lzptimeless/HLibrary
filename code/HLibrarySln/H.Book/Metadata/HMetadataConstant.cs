@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HBook
+namespace H.Book
 {
-    public static class HBookConstant
+    public static class HMetadataConstant
     {
         /// <summary>
         /// HBOOK的ASCII码

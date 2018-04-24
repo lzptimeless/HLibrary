@@ -8,11 +8,11 @@ namespace HBook
 {
     public class HBookFile
     {
-        public HBookHeader Header { get; set; }
-        public HBookCover Cover { get; set; }
-        public HBookIndex Index { get; set; }
-        public IList<HBookPage> Pages { get; private set; }
-        public IList<HBookVirtualPage> VirtualPages { get; private set; }
+        public HMetadataBookHeader Header { get; set; }
+        public HMetadataBookCover Cover { get; set; }
+        public HMetadataIndex Index { get; set; }
+        public IList<HMetadataPage> Pages { get; private set; }
+        public IList<HMetadataVirtualPage> VirtualPages { get; private set; }
 
         public void Load(string path)
         { }

@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HBook
+namespace H.Book
 {
-    public static class HBookControlCodes
+    public static class HMetadataControlCodes
     {
         /// <summary>
         /// 转义码，这不是一个控制码，程序需要忽略这个字节

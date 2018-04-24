@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HBook
+namespace H.Book
 {
     public class HBookHeader : IHBookHeaderReadOnly
     {

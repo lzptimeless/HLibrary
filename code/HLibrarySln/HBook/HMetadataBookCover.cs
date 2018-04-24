@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace HBook
 {
-    public class HBookIndex
+    public class HMetadataBookCover
     {
-        public UInt16 PageCount { get; set; }
-        public IList<UInt32> PagePositions { get; private set; }
+        public UInt32 ThumbnailLength { get; set; }
+        public UInt32 ImageLength { get; set; }
     }
 }
