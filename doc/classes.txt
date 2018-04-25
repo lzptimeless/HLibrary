@@ -1,14 +1,27 @@
-HBook
-	Header
-	PageHeaders
+方法定义：增Add删Delete查Get改Update
+
+IBookHeader 只提供Get属性
+
+IPageHeader 只提供Get属性
+
+IHBook
+	IBookHeader Header
+	IPageHeader[] PageHeaders
 	
-	WriteHeader(Header hd)
-	Stream ReadCover()
-	WriteCover(Stream thumb, Stream image)
-	Stream ReadPage(int index)
-	Stream ReadPageThumb(int index)
-	AddPage(int index, PageHeader ph, Stream thumb, Stream image)
-	DeletePage(int index)
-	ReplacePage(int index, PageHeader ph, Stream thumb, Stream image)
+	void SetHeader(Header hd)
+	Stream GetCover()
+	void SetCover(Stream thumb, Stream image)
+	Stream GetPage(int index)
+	Stream GetPageThumb(int index)
+	void AddPage(int index, PageHeader ph, Stream thumb, Stream image)
+	void DeletePage(int index)
+	
+IHLibrary
+	IList<IHBook> GetBooks()
+	IList<IPage> GetPages()
+	IHBook AddBook(HBookHeader header)
+	void DeleteBook()
+	void SetBookHeader()
+	
 	
     
