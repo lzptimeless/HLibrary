@@ -46,6 +46,7 @@
     <Compile Include="HBookPartStream.cs" />
     <Compile Include="HBookPartStreamIsDisposedChangedArgs.cs" />
     <Compile Include="HBookStream.cs" />
+    <Compile Include="Metadata\HMetadataHelper.cs" />
     <Compile Include="Metadata\HMetadataSegment.cs" />
     <Compile Include="Metadata\HMetadataBookCover.cs" />
     <Compile Include="Metadata\HMetadataBookHeader.cs" />
