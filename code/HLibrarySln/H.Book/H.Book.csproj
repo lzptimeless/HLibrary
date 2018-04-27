@@ -41,6 +41,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ExceptionFactory.cs" />
+    <Compile Include="Exception\InvalidBufferException.cs" />
+    <Compile Include="Exception\InvalidPropertyException.cs" />
+    <Compile Include="Exception\ReadPropertyException.cs" />
+    <Compile Include="Exception\WritePropertyException.cs" />
     <Compile Include="HBook.cs" />
     <Compile Include="HBookHeader.cs" />
     <Compile Include="HBookPartStream.cs" />

@@ -30,18 +30,25 @@ namespace H.Book
         /// 数据段控制码，参见<see cref="HMetadataControlCodes"/>
         /// </summary>
         public abstract byte ControlCode { get; }
+        public const string ControlCodePropertyName = "ControlCode";
+
         /// <summary>
         /// 数据段在整个<see cref="HBook"/>中的起始位置
         /// </summary>
         public long Position { get; set; }
+        public const string PositionPropertyName = "Position";
+
         /// <summary>
         /// 数据大小 4B 包括除了控制码，本字段本身，保留区大小字段，保留区的所有数据的长度，用以快速定位下一个数据段
         /// </summary>
         public int DataLength { get; set; }
+        public const string DataLengthPropertyName = "DataLength";
+
         /// <summary>
         /// 保留区大小 4B 保留区长度，用以快速定位下一个数据段
         /// </summary>
         public int ReserveLength { get; set; }
+        public const string ReserveLengthPropertyName = "ReserveLength";
 
         /// <summary>
         /// 获取保存这个数据段所需的大小，不包括保留区，会调用<see cref="GetDataLength"/>
@@ -59,10 +66,8 @@ namespace H.Book
         /// <param name="space">stream中可用以保存数据的空间大小，用剩的空间会以<see cref="HMetadataConstant.ControlCodeFlag"/>填充</param>
         public void Save(Stream stream, int space)
         {
-            if (stream == null)
-                throw new ArgumentNullException("stream");
-
-            // 总数据长度：控制码长度+数据长度的长度+保留区长度的长度+数据长度
+            ExceptionFactory.CheckArgNull("stream", stream);
+            
             long position = stream.Position;
             int dataLen = GetDataLength();
             long desiredLen = GetDesiredLengthInner(dataLen);
