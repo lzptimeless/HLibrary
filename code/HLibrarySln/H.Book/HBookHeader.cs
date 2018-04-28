@@ -6,39 +6,32 @@ using System.Threading.Tasks;
 
 namespace H.Book
 {
-    public class HBookHeader : IHBookHeaderReadOnly
+    public class HBookHeader : IHBookHeader
     {
         public HBookHeader()
         {
-            Names = new List<string>();
-            Artists = new List<string>();
-            Groups = new List<string>();
-            Series = new List<string>();
-            Categories = new List<string>();
-            Characters = new List<string>();
-            Tags = new List<string>();
+            Metadata = new HMetadataBookHeader();
         }
 
-        public Guid ID { get; set; }
-        public byte Version { get; set; }
-        public string IetfLanguageTag { get; set; }
-        public List<string> Names { get; private set; }
-        IReadOnlyList<string> IHBookHeaderReadOnly.Names { get { return Names; } }
-        public List<string> Artists { get; private set; }
-        IReadOnlyList<string> IHBookHeaderReadOnly.Artists { get { return Artists; } }
-        public List<string> Groups { get; private set; }
-        IReadOnlyList<string> IHBookHeaderReadOnly.Groups { get { return Groups; } }
-        public List<string> Series { get; private set; }
-        IReadOnlyList<string> IHBookHeaderReadOnly.Series { get { return Series; } }
-        public List<string> Categories { get; private set; }
-        IReadOnlyList<string> IHBookHeaderReadOnly.Categories { get { return Categories; } }
-        public List<string> Characters { get; private set; }
-        IReadOnlyList<string> IHBookHeaderReadOnly.Characters { get { return Characters; } }
-        public List<string> Tags { get; private set; }
-        IReadOnlyList<string> IHBookHeaderReadOnly.Tags { get { return Tags; } }
+        public HBookHeader(HMetadataBookHeader metadata)
+        {
+            Metadata = metadata;
+        }
+
+        public HMetadataBookHeader Metadata { get; private set; }
+        public Guid ID { get { return Metadata.ID; } }
+        public byte Version { get { return Metadata.Version; } }
+        public string IetfLanguageTag { get { return Metadata.IetfLanguageTag; } }
+        public IReadOnlyList<string> Names { get { return Metadata.Names; } }
+        public IReadOnlyList<string> Artists { get { return Metadata.Artists; } }
+        public IReadOnlyList<string> Groups { get { return Metadata.Groups; } }
+        public IReadOnlyList<string> Series { get { return Metadata.Series; } }
+        public IReadOnlyList<string> Categories { get { return Metadata.Categories; } }
+        public IReadOnlyList<string> Characters { get { return Metadata.Characters; } }
+        public IReadOnlyList<string> Tags { get { return Metadata.Tags; } }
     }
 
-    public interface IHBookHeaderReadOnly
+    public interface IHBookHeader
     {
         Guid ID { get; }
         byte Version { get; }

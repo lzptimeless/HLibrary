@@ -10,23 +10,6 @@ namespace H.Book
     public abstract class HMetadataSegment
     {
         /// <summary>
-        /// 空数据,长度1024，以<see cref="HMetadataConstant.ControlCodeFlag"/>填充,用以加快
-        /// 填充空白数据的效率
-        /// </summary>
-        protected static readonly byte[] EmptyData;
-
-        static HMetadataSegment()
-        {
-            // 初始化EmptyData
-            byte[] emptyData = new byte[1024];
-            for (int i = 0; i < emptyData.Length; i++)
-            {
-                emptyData[i] = HMetadataConstant.ControlCodeFlag;
-            }
-            EmptyData = emptyData;
-        }
-
-        /// <summary>
         /// 数据段控制码，参见<see cref="HMetadataControlCodes"/>
         /// </summary>
         public abstract byte ControlCode { get; }
@@ -60,6 +43,16 @@ namespace H.Book
         }
 
         /// <summary>
+        /// 获取这个数据段在文件中的总大小,用以在更新数据段时防止数据溢出
+        /// </summary>
+        /// <returns>数据段在文件中的总大小</returns>
+        public int GetSpace()
+        {
+            int space = GetDesiredLengthInner(DataLength) + ReserveLength;
+            return space;
+        }
+
+        /// <summary>
         /// 保存数据，会调用<see cref="GetDataLength"/>，<see cref="GetData"/>
         /// </summary>
         /// <param name="stream">用以保存数据的<see cref="Stream"/></param>
@@ -67,22 +60,17 @@ namespace H.Book
         public void Save(Stream stream, int space)
         {
             ExceptionFactory.CheckArgNull("stream", stream);
-            
+
             long position = stream.Position;
             int dataLen = GetDataLength();
             long desiredLen = GetDesiredLengthInner(dataLen);
             int reserveLen = space - (int)desiredLen;
-            if (desiredLen > space)
-                throw new ArgumentOutOfRangeException("space", $"The space is not enough to save data: desiredLen={desiredLen}, space={space}");
+            ExceptionFactory.CheckArgRange("space", space, desiredLen, int.MaxValue, "The space is not enough to save data");
 
             byte[] buffer;
             byte[] data = GetData();
-            if (data == null)
-                throw new ApplicationException("GetBytes return null");
-
-            if (dataLen != data.LongLength)
-                throw new ApplicationException($"GetBytes returned data length({data.LongLength}) not equal to GetDataLength({dataLen})");
-
+            ExceptionFactory.CheckBufferNull("data", data, "GetBytes return null");
+            ExceptionFactory.CheckBufferLength("data", data, dataLen, "GetBytes returned data");
             // 写入控制码
             stream.WriteByte(HMetadataConstant.ControlCodeFlag);
             stream.WriteByte(ControlCode);
@@ -96,7 +84,7 @@ namespace H.Book
             stream.Write(data, 0, data.Length);
             // 填充保留区
             if (reserveLen > 0)
-                FillEmptyData(stream, reserveLen);
+                HMetadataHelper.FillEmpty(stream, reserveLen);
 
             Position = position;
             DataLength = dataLen;
@@ -109,6 +97,8 @@ namespace H.Book
         /// <param name="stream">数据源</param>
         public void Load(Stream stream)
         {
+            ExceptionFactory.CheckArgNull("stream", stream);
+
             const int byteResultEnd = -1;
             int byteResult;
             // 数据段起始位置
@@ -164,21 +154,6 @@ namespace H.Book
             DataLength = dataLen;
             ReserveLength = reserveLen;
             LoadData(data);
-        }
-
-        /// <summary>
-        /// 用<see cref="HMetadataConstant.ControlCodeFlag"/>填充
-        /// </summary>
-        /// <param name="stream">填充的对象</param>
-        /// <param name="len">填充的长度</param>
-        protected void FillEmptyData(Stream stream, long len)
-        {
-            while (len > 0)
-            {
-                int writeLen = (int)Math.Min(EmptyData.Length, len);
-                stream.Write(EmptyData, 0, writeLen);
-                len = len - writeLen;
-            }
         }
 
         /// <summary>

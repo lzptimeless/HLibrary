@@ -14,7 +14,7 @@ namespace H.Book
                 throw new ArgumentNullException(argName, msg);
         }
 
-        public static void CheckArgRange(string argName, int arg, int min, int max, string msg = null)
+        public static void CheckArgRange(string argName, int arg, long min, long max, string msg = null)
         {
             if (arg < min || arg > max)
             {
@@ -28,7 +28,7 @@ namespace H.Book
             }
         }
 
-        public static void CheckArgCountRange<T>(string argName, IList<T> arg, int min, int max, string msg = null)
+        public static void CheckArgCountRange<T>(string argName, IList<T> arg, long min, long max, string msg = null)
         {
             if (arg == null)
                 return;
@@ -45,7 +45,7 @@ namespace H.Book
             }
         }
 
-        public static void CheckArgLengthRange(string argName, byte[] arg, int min, int max, string msg = null)
+        public static void CheckArgLengthRange(string argName, byte[] arg, long min, long max, string msg = null)
         {
             if (arg.Length < min || arg.Length > max)
             {
@@ -73,7 +73,7 @@ namespace H.Book
             }
         }
 
-        public static void CheckPropertyRange(string propertyName, int value, int min, int max, string msg = null)
+        public static void CheckPropertyRange(string propertyName, int value, long min, long max, string msg = null)
         {
             if (value < min || value > max)
             {
@@ -87,7 +87,7 @@ namespace H.Book
             }
         }
 
-        public static void CheckPropertyCountRange<T>(string propertyName, IList<T> property, int min, int max, string msg = null)
+        public static void CheckPropertyCountRange<T>(string propertyName, IList<T> property, long min, long max, string msg = null)
         {
             if (property == null)
                 return;
@@ -104,11 +104,11 @@ namespace H.Book
             }
         }
 
-        public static void CheckBufferLength(string bufferName, byte[] bytes, int len, string msg = null)
+        public static void CheckBufferNull(string bufferName, byte[] buffer, string msg = null)
         {
-            if (bytes.Length != len)
+            if (buffer == null)
             {
-                string append = $"Length error: expected={len}, value={bytes.Length}";
+                string append = $"Null error";
                 if (string.IsNullOrEmpty(msg))
                     msg = append;
                 else
@@ -118,9 +118,23 @@ namespace H.Book
             }
         }
 
-        public static void CheckBufferLengthRange(string bufferName, byte[] buffer, int min, int max, string msg = null)
+        public static void CheckBufferLength(string bufferName, byte[] buffer, long len, string msg = null)
         {
-            if (buffer.Length < min || buffer.Length > max)
+            if (buffer.LongLength != len)
+            {
+                string append = $"Length error: expected={len}, value={buffer.Length}";
+                if (string.IsNullOrEmpty(msg))
+                    msg = append;
+                else
+                    msg = msg + Environment.NewLine + append;
+
+                throw new InvalidBufferException(bufferName, msg, null);
+            }
+        }
+
+        public static void CheckBufferLengthRange(string bufferName, byte[] buffer, long min, long max, string msg = null)
+        {
+            if (buffer.LongLength < min || buffer.LongLength > max)
             {
                 string append = $"Length error: expected=[{min},{max}], value={buffer.Length}";
                 if (string.IsNullOrEmpty(msg))

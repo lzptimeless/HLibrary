@@ -6,9 +6,57 @@ using System.Threading.Tasks;
 
 namespace H.Book
 {
-    public class HMetadataPageContent : HMetadataBase
+    public class HMetadataPageContent : HMetadataSegment
     {
-        public UInt32 ThumbnailLength { get; set; }
-        public UInt32 ImageLength { get; set; }
+        public override byte ControlCode { get { return HMetadataControlCodes.PageContent; } }
+
+        public int ThumbnailLength { get; set; }
+        public const string ThumbnailLengthPropertyName = "ThumbnailLength";
+
+        public int ImageLength { get; set; }
+        public const string ImageLengthPropertyName = "ImageLength";
+
+        protected override int GetDataLength()
+        {
+            // 缩略图长度+图像长度
+            return 4 + 4;
+        }
+
+        protected override byte[] GetData()
+        {
+            ExceptionFactory.CheckPropertyRange(ThumbnailLengthPropertyName, ThumbnailLength, 0, int.MaxValue);
+            ExceptionFactory.CheckPropertyRange(ImageLengthPropertyName, ImageLength, 0, int.MaxValue);
+
+            int dataLen = GetDataLength();
+            byte[] data = new byte[dataLen];
+            int writePos = 0;
+
+            // 写入缩略图长度
+            writePos += HMetadataHelper.WritePropertyInt(ThumbnailLengthPropertyName, ThumbnailLength, data, writePos);
+            // 写入图像长度
+            writePos += HMetadataHelper.WritePropertyInt(ImageLengthPropertyName, ImageLength, data, writePos);
+
+            return data;
+        }
+
+        protected override void LoadData(byte[] data)
+        {
+            ExceptionFactory.CheckArgNull("data", data);
+
+            ThumbnailLength = 0;
+            ImageLength = 0;
+
+            int readPos = 0;
+            // 读取缩略图长度
+            int thumbLen;
+            readPos += HMetadataHelper.ReadPropertyInt(ThumbnailLengthPropertyName, out thumbLen, data, readPos);
+            ThumbnailLength = thumbLen;
+            ExceptionFactory.CheckPropertyRange(ThumbnailLengthPropertyName, thumbLen, 0, int.MaxValue);
+            // 读取图像长度
+            int imgLen;
+            readPos += HMetadataHelper.ReadPropertyInt(ThumbnailLengthPropertyName, out imgLen, data, readPos);
+            ImageLength = imgLen;
+            ExceptionFactory.CheckPropertyRange(ImageLengthPropertyName, imgLen, 0, int.MaxValue);
+        }
     }
 }

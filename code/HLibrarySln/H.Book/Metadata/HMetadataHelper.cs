@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,6 +15,23 @@ namespace H.Book
         private static readonly byte[] ZeroBuffer = new byte[1024];
 
         /// <summary>
+        /// 空数据,长度1024，以<see cref="HMetadataConstant.ControlCodeFlag"/>填充,用以加快
+        /// 填充空白数据的效率
+        /// </summary>
+        private static readonly byte[] EmptyData;
+
+        static HMetadataHelper()
+        {
+            // 初始化EmptyData
+            byte[] emptyData = new byte[1024];
+            for (int i = 0; i < emptyData.Length; i++)
+            {
+                emptyData[i] = HMetadataConstant.ControlCodeFlag;
+            }
+            EmptyData = emptyData;
+        }
+
+        /// <summary>
         /// 向buffer写入list类型的属性值，起始位置会写入1B的list数量
         /// </summary>
         /// <param name="propertyName">属性名</param>
@@ -22,7 +40,7 @@ namespace H.Book
         /// <param name="bufferStartIndex">写入起始位置</param>
         /// <param name="itemLen">list中每一项所占的固定长度</param>
         /// <returns></returns>
-        public static int WriteProperty(string propertyName, IList<string> value, byte[] buffer, int bufferStartIndex, int itemLen)
+        public static int WritePropertyList(string propertyName, IList<string> value, byte[] buffer, int bufferStartIndex, int itemLen)
         {
             try
             {
@@ -34,7 +52,7 @@ namespace H.Book
                 ExceptionFactory.CheckArgRange("itemLen", itemLen, 1, int.MaxValue);
 
                 int itemCount = value != null ? value.Count : 0;
-                ExceptionFactory.CheckArgLengthRange("buffer", buffer, itemCount * itemLen + 1, int.MaxValue);
+                ExceptionFactory.CheckArgLengthRange("buffer", buffer, bufferStartIndex + itemCount * itemLen + 1, int.MaxValue, $"bufferStartIndex={bufferStartIndex}, itemCount={itemCount}, itemLen={itemLen}");
 
                 int writePos = bufferStartIndex;
                 buffer[writePos] = (byte)itemCount;
@@ -61,19 +79,19 @@ namespace H.Book
         /// <summary>
         /// 向buffer中写入属性值
         /// </summary>
+        /// <param name="propertyName">属性名</param>
         /// <param name="value">属性值</param>
         /// <param name="buffer">buffer</param>
         /// <param name="bufferStartIndex">buffer写入起始位置</param>
-        /// <param name="len">写入数据长度，没有用到部分填入0</param>
         /// <returns></returns>
-        public static int WriteProperty(string propertyName, Guid value, byte[] buffer, int bufferStartIndex)
+        public static int WritePropertyGuid(string propertyName, Guid value, byte[] buffer, int bufferStartIndex)
         {
             const int len = 16;
             try
             {
                 ExceptionFactory.CheckArgNull("buffer", buffer);
                 ExceptionFactory.CheckArgRange("bufferStartIndex", bufferStartIndex, 0, buffer.Length - 1);
-                ExceptionFactory.CheckArgLengthRange("buffer", buffer, bufferStartIndex + len, int.MaxValue);
+                ExceptionFactory.CheckArgLengthRange("buffer", buffer, bufferStartIndex + len, int.MaxValue, $"bufferStartIndex={bufferStartIndex}, len={len}");
 
                 byte[] valueBuffer = value.ToByteArray();
                 ExceptionFactory.CheckBufferLength("valueBuffer", buffer, len);
@@ -90,18 +108,20 @@ namespace H.Book
         /// <summary>
         /// 向buffer中写入属性值
         /// </summary>
+        /// <param name="propertyName">属性名</param>
         /// <param name="value">属性值</param>
         /// <param name="buffer">buffer</param>
         /// <param name="bufferStartIndex">buffer写入起始位置</param>
         /// <param name="len">写入数据长度，没有用到部分填入0</param>
         /// <returns></returns>
-        public static int WriteProperty(string propertyName, string value, byte[] buffer, int bufferStartIndex, int len)
+        public static int WritePropertyString(string propertyName, string value, byte[] buffer, int bufferStartIndex, int len)
         {
             try
             {
                 ExceptionFactory.CheckArgNull("buffer", buffer);
                 ExceptionFactory.CheckArgRange("bufferStartIndex", bufferStartIndex, 0, buffer.Length - 1);
-                ExceptionFactory.CheckArgRange("len", len, 0, buffer.Length - bufferStartIndex);
+                ExceptionFactory.CheckArgRange("len", len, 1, int.MaxValue);
+                ExceptionFactory.CheckArgLengthRange("buffer", buffer, bufferStartIndex + len, int.MaxValue, $"bufferStartIndex={bufferStartIndex}, len={len}");
 
                 byte[] valueBuffer = StringToBytes(value, len);
                 Array.Copy(valueBuffer, 0, buffer, bufferStartIndex, valueBuffer.Length);
@@ -117,18 +137,19 @@ namespace H.Book
         /// <summary>
         /// 向buffer中写入属性值
         /// </summary>
+        /// <param name="propertyName">属性名</param>
         /// <param name="value">属性值</param>
         /// <param name="buffer">buffer</param>
         /// <param name="bufferStartIndex">buffer写入起始位置</param>
         /// <returns></returns>
-        public static int WriteProperty(string propertyName, int value, byte[] buffer, int bufferStartIndex)
+        public static int WritePropertyInt(string propertyName, int value, byte[] buffer, int bufferStartIndex)
         {
             const int len = 4;
             try
             {
                 ExceptionFactory.CheckArgNull("buffer", buffer);
                 ExceptionFactory.CheckArgRange("bufferStartIndex", bufferStartIndex, 0, buffer.Length - 1);
-                ExceptionFactory.CheckArgLengthRange("buffer", buffer, bufferStartIndex + len, int.MaxValue);
+                ExceptionFactory.CheckArgLengthRange("buffer", buffer, bufferStartIndex + len, int.MaxValue, $"bufferStartIndex={bufferStartIndex}, len={len}");
 
                 byte[] valueBuffer = BitConverter.GetBytes(value);
                 ExceptionFactory.CheckBufferLength("valueBuffer", valueBuffer, len);
@@ -143,31 +164,14 @@ namespace H.Book
         }
 
         /// <summary>
-        /// 向buffer中写入属性值
+        /// 从buffer中读取属性值
         /// </summary>
-        /// <param name="value">属性值</param>
-        /// <param name="buffer">buffer</param>
-        /// <param name="bufferStartIndex">buffer写入起始位置</param>
-        /// <returns></returns>
-        public static int WriteProperty(string propertyName, byte value, byte[] buffer, int bufferStartIndex)
-        {
-            const int len = 1;
-            try
-            {
-                ExceptionFactory.CheckArgNull("buffer", buffer);
-                ExceptionFactory.CheckArgRange("bufferStartIndex", bufferStartIndex, 0, buffer.Length - 1);
-
-                buffer[bufferStartIndex] = value;
-            }
-            catch (Exception ex)
-            {
-                throw ExceptionFactory.CreateWritePropertyException(propertyName, null, ex);
-            }
-
-            return len;
-        }
-
-        public static int ReadProperty(string propertyName, out int value, byte[] buffer, int bufferStartIndex)
+        /// <param name="propertyName">属性名</param>
+        /// <param name="value">读取到的属性值</param>
+        /// <param name="buffer">存有属性值的buffer</param>
+        /// <param name="bufferStartIndex">读取起始位置</param>
+        /// <returns>读取字节数</returns>
+        public static int ReadPropertyInt(string propertyName, out int value, byte[] buffer, int bufferStartIndex)
         {
             const int len = 4;
             value = 0;
@@ -176,7 +180,7 @@ namespace H.Book
             {
                 ExceptionFactory.CheckArgNull("buffer", buffer);
                 ExceptionFactory.CheckArgRange("bufferStartIndex", bufferStartIndex, 0, buffer.Length - 1);
-                ExceptionFactory.CheckBufferLengthRange("buffer", buffer, bufferStartIndex + len, int.MaxValue);
+                ExceptionFactory.CheckBufferLengthRange("buffer", buffer, bufferStartIndex + len, int.MaxValue, $"bufferStartIndex={bufferStartIndex}, len={len}");
 
                 value = BitConverter.ToInt32(buffer, bufferStartIndex);
             }
@@ -188,7 +192,15 @@ namespace H.Book
             return len;
         }
 
-        public static int ReadProperty(string propertyName, out Guid value, byte[] buffer, int bufferStartIndex)
+        /// <summary>
+        /// 从buffer中读取属性值
+        /// </summary>
+        /// <param name="propertyName">属性名</param>
+        /// <param name="value">读取到的属性值</param>
+        /// <param name="buffer">存有属性值的buffer</param>
+        /// <param name="bufferStartIndex">读取起始位置</param>
+        /// <returns>读取字节数</returns>
+        public static int ReadPropertyGuid(string propertyName, out Guid value, byte[] buffer, int bufferStartIndex)
         {
             const int len = 16;
             value = Guid.Empty;
@@ -197,7 +209,7 @@ namespace H.Book
             {
                 ExceptionFactory.CheckArgNull("buffer", buffer);
                 ExceptionFactory.CheckArgRange("bufferStartIndex", bufferStartIndex, 0, buffer.Length - 1);
-                ExceptionFactory.CheckBufferLengthRange("buffer", buffer, bufferStartIndex + len, int.MaxValue);
+                ExceptionFactory.CheckBufferLengthRange("buffer", buffer, bufferStartIndex + len, int.MaxValue, $"bufferStartIndex={bufferStartIndex}, len={len}");
 
                 value = new Guid(buffer);
             }
@@ -209,7 +221,16 @@ namespace H.Book
             return len;
         }
 
-        public static int ReadProperty(string propertyName, out string value, byte[] buffer, int bufferStartIndex, int len)
+        /// <summary>
+        /// 从buffer中读取属性值
+        /// </summary>
+        /// <param name="propertyName">属性名</param>
+        /// <param name="value">读取到的属性值</param>
+        /// <param name="buffer">存有属性值的buffer</param>
+        /// <param name="bufferStartIndex">读取起始位置</param>
+        /// <param name="len">读取字节数</param>
+        /// <returns>读取字节数</returns>
+        public static int ReadPropertyString(string propertyName, out string value, byte[] buffer, int bufferStartIndex, int len)
         {
             value = null;
 
@@ -217,7 +238,8 @@ namespace H.Book
             {
                 ExceptionFactory.CheckArgNull("buffer", buffer);
                 ExceptionFactory.CheckArgRange("bufferStartIndex", bufferStartIndex, 0, buffer.Length - 1);
-                ExceptionFactory.CheckArgRange("len", len, 1, buffer.Length - bufferStartIndex);
+                ExceptionFactory.CheckArgRange("len", len, 1, int.MaxValue);
+                ExceptionFactory.CheckBufferLengthRange("buffer", buffer, bufferStartIndex + len, int.MaxValue, $"bufferStartIndex={bufferStartIndex}, len={len}");
 
                 value = BytesToString(buffer, bufferStartIndex, len);
             }
@@ -229,7 +251,16 @@ namespace H.Book
             return len;
         }
 
-        public static int ReadProperty(string propertyName, out List<string> value, byte[] buffer, int bufferStartIndex, int itemLen)
+        /// <summary>
+        /// 从buffer中读取属性值
+        /// </summary>
+        /// <param name="propertyName">属性名</param>
+        /// <param name="value">读取到的属性值</param>
+        /// <param name="buffer">存有属性值的buffer</param>
+        /// <param name="bufferStartIndex">读取起始位置</param>
+        /// <param name="itemLen">list中每一个string所占的字节数</param>
+        /// <returns>读取字节数</returns>
+        public static int ReadPropertyList(string propertyName, out List<string> value, byte[] buffer, int bufferStartIndex, int itemLen)
         {
             value = null;
             int readPos = bufferStartIndex;
@@ -241,10 +272,9 @@ namespace H.Book
 
                 int count = buffer[readPos];
                 readPos++;
+                ExceptionFactory.CheckArgLengthRange("buffer", buffer, readPos + count * itemLen, int.MaxValue, $"bufferStartIndex={bufferStartIndex}, count={count}, itemLen={itemLen}");
 
-                ExceptionFactory.CheckArgLengthRange("buffer", buffer, readPos + count * itemLen, int.MaxValue);
-
-                value = new List<string>(count);
+                value = new List<string>();
                 for (int i = 0; i < count; i++)
                 {
                     string item = BytesToString(buffer, readPos, itemLen);
@@ -261,12 +291,27 @@ namespace H.Book
         }
 
         /// <summary>
+        /// 用<see cref="HMetadataConstant.ControlCodeFlag"/>填充
+        /// </summary>
+        /// <param name="stream">填充的对象</param>
+        /// <param name="len">填充的长度</param>
+        public static void FillEmpty(Stream stream, long len)
+        {
+            while (len > 0)
+            {
+                int writeLen = (int)Math.Min(EmptyData.Length, len);
+                stream.Write(EmptyData, 0, writeLen);
+                len = len - writeLen;
+            }
+        }
+
+        /// <summary>
         /// 获取字符串UTF8编码数据，buffer长度固定
         /// </summary>
         /// <param name="s">被编码的字符串</param>
         /// <param name="len">生成buffer的长度</param>
         /// <returns></returns>
-        public static byte[] StringToBytes(string s, int len)
+        private static byte[] StringToBytes(string s, int len)
         {
             ExceptionFactory.CheckArgRange("len", len, 1, int.MaxValue);
 

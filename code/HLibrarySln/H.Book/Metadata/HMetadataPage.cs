@@ -6,9 +6,18 @@ using System.Threading.Tasks;
 
 namespace H.Book
 {
-    public class HMetadataPage : HMetadataBase
+    public class HMetadataPage
     {
-        public HMetadataPageHeader Header { get; set; }
-        public HMetadataPageContent Content { get; set; }
+        public HMetadataPage()
+        { }
+
+        public HMetadataPage(HMetadataPageHeader headerMetadata, HMetadataPageContent contentMetadata)
+        {
+            HeaderMetadata = headerMetadata;
+            ContentMetadata = contentMetadata;
+        }
+
+        public HMetadataPageHeader HeaderMetadata { get; private set; }
+        public HMetadataPageContent ContentMetadata { get; private set; }
     }
 }

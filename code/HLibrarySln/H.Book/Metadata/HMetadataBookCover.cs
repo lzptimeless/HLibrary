@@ -10,8 +10,12 @@ namespace H.Book
     public class HMetadataBookCover : HMetadataSegment
     {
         public override byte ControlCode { get { return HMetadataControlCodes.BookCover; } }
+
         public int ThumbnailLength { get; set; }
+        public const string ThumbnailLengthPropertyName = "ThumbnailLength";
+
         public int ImageLength { get; set; }
+        public const string ImageLengthPropertyName = "ImageLength";
 
         protected override int GetDataLength()
         {
@@ -21,45 +25,39 @@ namespace H.Book
 
         protected override byte[] GetData()
         {
-            if (ThumbnailLength < 0)
-                throw new ApplicationException($"Invalid ThumbnailLength: expected=[0,{int.MaxValue}], value={ThumbnailLength}");
-
-            if (ImageLength < 0)
-                throw new ApplicationException($"Invalid ImageLength: expected=[0,{int.MaxValue}], value={ImageLength}");
+            ExceptionFactory.CheckPropertyRange(ThumbnailLengthPropertyName, ThumbnailLength, 0, int.MaxValue);
+            ExceptionFactory.CheckPropertyRange(ImageLengthPropertyName, ImageLength, 0, int.MaxValue);
 
             int dataLen = GetDataLength();
             byte[] data = new byte[dataLen];
-            byte[] buffer;
+            int writePos = 0;
 
             // 写入缩略图长度
-            buffer = BitConverter.GetBytes(ThumbnailLength);
-            Array.Copy(buffer, 0, data, 0, 4);
+            writePos += HMetadataHelper.WritePropertyInt(ThumbnailLengthPropertyName, ThumbnailLength, data, writePos);
             // 写入图像长度
-            buffer = BitConverter.GetBytes(ImageLength);
-            Array.Copy(buffer, 0, data, 4, 4);
+            writePos += HMetadataHelper.WritePropertyInt(ImageLengthPropertyName, ImageLength, data, writePos);
 
             return data;
         }
 
         protected override void LoadData(byte[] data)
         {
-            int expectedLength = GetDataLength();
-            if (data.Length != expectedLength)
-                throw new InvalidDataException($"data length error: expected={expectedLength}, value={data.Length}");
+            ExceptionFactory.CheckArgNull("data", data);
 
-            int thumbLen, imgLen;
+            ThumbnailLength = 0;
+            ImageLength = 0;
+
+            int readPos = 0;
             // 读取缩略图长度
-            thumbLen = BitConverter.ToInt32(data, 0);
-            if (thumbLen < 0)
-                throw new InvalidDataException($"ThumbnailLength error: expected=[0,{int.MaxValue}], value={thumbLen}");
-
-            // 读取图像长度
-            imgLen = BitConverter.ToInt32(data, 4);
-            if (imgLen < 0)
-                throw new InvalidDataException($"ImageLength error: expected=[0,{int.MaxValue}], value={imgLen}");
-
+            int thumbLen;
+            readPos += HMetadataHelper.ReadPropertyInt(ThumbnailLengthPropertyName, out thumbLen, data, readPos);
             ThumbnailLength = thumbLen;
+            ExceptionFactory.CheckPropertyRange(ThumbnailLengthPropertyName, thumbLen, 0, int.MaxValue);
+            // 读取图像长度
+            int imgLen;
+            readPos += HMetadataHelper.ReadPropertyInt(ThumbnailLengthPropertyName, out imgLen, data, readPos);
             ImageLength = imgLen;
+            ExceptionFactory.CheckPropertyRange(ImageLengthPropertyName, imgLen, 0, int.MaxValue);
         }
     }
 }

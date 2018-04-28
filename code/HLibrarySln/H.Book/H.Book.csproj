@@ -50,6 +50,11 @@
     <Compile Include="HBookPartStream.cs" />
     <Compile Include="HBookPartStreamIsDisposedChangedArgs.cs" />
     <Compile Include="HBookStream.cs" />
+    <Compile Include="Metadata\HMetadataPage.cs" />
+    <Compile Include="HMetadataPageCollection.cs" />
+    <Compile Include="HPageHeader.cs" />
+    <Compile Include="HPageHeaderCollection.cs" />
+    <Compile Include="Metadata\HMetadataDeletedPageHeader.cs" />
     <Compile Include="Metadata\HMetadataHelper.cs" />
     <Compile Include="Metadata\HMetadataSegment.cs" />
     <Compile Include="Metadata\HMetadataBookCover.cs" />
@@ -57,7 +62,6 @@
     <Compile Include="Metadata\HMetadataConstant.cs" />
     <Compile Include="Metadata\HMetadataControlCodes.cs" />
     <Compile Include="Metadata\HMetadataIndex.cs" />
-    <Compile Include="Metadata\HMetadataPage.cs" />
     <Compile Include="Metadata\HMetadataPageContent.cs" />
     <Compile Include="Metadata\HMetadataPageHeader.cs" />
     <Compile Include="Metadata\HMetadataVirtualPage.cs" />
