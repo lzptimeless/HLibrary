@@ -19,12 +19,6 @@ namespace H.Book
         public Guid ID { get; set; }
         public const string IDPropertyName = "ID";
 
-        public int CoverPosition { get; set; }
-        public const string CoverPositionPropertyName = "CoverPosition";
-
-        public int IndexPosition { get; set; }
-        public const string IndexPositionPropertyName = "IndexPosition";
-
         /// <summary>
         /// Length less than 32B
         /// </summary>
@@ -35,49 +29,49 @@ namespace H.Book
         /// <summary>
         /// Each name length less that 128B
         /// </summary>
-        public List<string> Names { get; private set; }
+        public SafeList<string> Names { get; private set; }
         public const string NamesPropertyName = "Names";
         protected const int NamesItemLen = 128;
 
         /// <summary>
         /// Each artist length less that 128B
         /// </summary>
-        public List<string> Artists { get; private set; }
+        public SafeList<string> Artists { get; private set; }
         public const string ArtistsPropertyName = "Artists";
         protected const int ArtistsItemLen = 128;
 
         /// <summary>
         /// Each group length less that 128B
         /// </summary>
-        public List<string> Groups { get; private set; }
+        public SafeList<string> Groups { get; private set; }
         public const string GroupsPropertyName = "Groups";
         protected const int GroupsItemLen = 128;
 
         /// <summary>
         /// Each series length less that 128B
         /// </summary>
-        public List<string> Series { get; private set; }
+        public SafeList<string> Series { get; private set; }
         public const string SeriesPropertyName = "Series";
         protected const int SeriesItemLen = 128;
 
         /// <summary>
         /// Each category length less that 128B
         /// </summary>
-        public List<string> Categories { get; private set; }
+        public SafeList<string> Categories { get; private set; }
         public const string CategoriesPropertyName = "Categories";
         protected const int CategoriesItemLen = 128;
 
         /// <summary>
         /// Each character length less that 128B
         /// </summary>
-        public List<string> Characters { get; private set; }
+        public SafeList<string> Characters { get; private set; }
         public const string CharactersPropertyName = "Characters";
         protected const int CharactersItemLen = 128;
 
         /// <summary>
         /// Each rag length less that 64B
         /// </summary>
-        public List<string> Tags { get; private set; }
+        public SafeList<string> Tags { get; private set; }
         public const string TagsPropertyName = "Tags";
         protected const int TagsItemLen = 64;
 
@@ -98,8 +92,6 @@ namespace H.Book
         protected override byte[] GetData()
         {
             ExceptionFactory.CheckPropertyEmpty(IDPropertyName, ID);
-            ExceptionFactory.CheckPropertyRange(CoverPositionPropertyName, CoverPosition, 0, int.MaxValue);
-            ExceptionFactory.CheckPropertyRange(IndexPositionPropertyName, IndexPosition, 0, int.MaxValue);
             ExceptionFactory.CheckArgCountRange(NamesPropertyName, Names, 0, byte.MaxValue);
             ExceptionFactory.CheckArgCountRange(ArtistsPropertyName, Artists, 0, byte.MaxValue);
             ExceptionFactory.CheckArgCountRange(GroupsPropertyName, Groups, 0, byte.MaxValue);
@@ -117,10 +109,6 @@ namespace H.Book
             writePos += 1;
             // 写入ID
             writePos += HMetadataHelper.WritePropertyGuid(IDPropertyName, ID, data, writePos);
-            // 写入封面位置
-            writePos += HMetadataHelper.WritePropertyInt(CoverPositionPropertyName, CoverPosition, data, writePos);
-            // 写入索引位置
-            writePos += HMetadataHelper.WritePropertyInt(IndexPositionPropertyName, IndexPosition, data, writePos);
             // 写入语言
             writePos += HMetadataHelper.WritePropertyString(IetfLanguageTagPropertyName, IetfLanguageTag, data, writePos, IetfLanguageTagLen);
             // 写入书名数,书名
@@ -147,8 +135,6 @@ namespace H.Book
 
             Version = 0;
             ID = Guid.Empty;
-            CoverPosition = 0;
-            IndexPosition = 0;
             IetfLanguageTag = string.Empty;
             Names = null;
             Artists = null;
@@ -167,46 +153,36 @@ namespace H.Book
             readPos += HMetadataHelper.ReadPropertyGuid(IDPropertyName, out id, data, readPos);
             ID = id;
             ExceptionFactory.CheckPropertyEmpty(IDPropertyName, id);
-            // 读取封面位置
-            int coverPosition;
-            readPos += HMetadataHelper.ReadPropertyInt(CoverPositionPropertyName, out coverPosition, data, readPos);
-            CoverPosition = coverPosition;
-            ExceptionFactory.CheckPropertyRange(CoverPositionPropertyName, CoverPosition, 0, int.MaxValue);
-            // 读取索引位置
-            int indexPosition;
-            readPos += HMetadataHelper.ReadPropertyInt(IndexPositionPropertyName, out indexPosition, data, readPos);
-            IndexPosition = indexPosition;
-            ExceptionFactory.CheckPropertyRange(IndexPositionPropertyName, IndexPosition, 0, int.MaxValue);
             // 读取语言
             string language;
             readPos += HMetadataHelper.ReadPropertyString(IetfLanguageTagPropertyName, out language, data, readPos, IetfLanguageTagLen);
             IetfLanguageTag = language;
             // 读取书名数,书名
-            List<string> names;
+            SafeList<string> names;
             readPos += HMetadataHelper.ReadPropertyList(NamesPropertyName, out names, data, readPos, NamesItemLen);
             Names = names;
             // 读取作者数,作者
-            List<string> artists;
+            SafeList<string> artists;
             readPos += HMetadataHelper.ReadPropertyList(ArtistsPropertyName, out artists, data, readPos, ArtistsItemLen);
             Artists = artists;
             // 读取分组数,分组
-            List<string> groups;
+            SafeList<string> groups;
             readPos += HMetadataHelper.ReadPropertyList(GroupsPropertyName, out groups, data, readPos, GroupsItemLen);
             Groups = groups;
             // 读取系列数,系列
-            List<string> series;
+            SafeList<string> series;
             readPos += HMetadataHelper.ReadPropertyList(SeriesPropertyName, out series, data, readPos, SeriesItemLen);
             Series = series;
             // 读取分类数,分类
-            List<string> categories;
+            SafeList<string> categories;
             readPos += HMetadataHelper.ReadPropertyList(CategoriesPropertyName, out categories, data, readPos, CategoriesItemLen);
             Categories = categories;
             // 读取角色数,角色
-            List<string> characters;
+            SafeList<string> characters;
             readPos += HMetadataHelper.ReadPropertyList(CharactersPropertyName, out characters, data, readPos, CharactersItemLen);
             Characters = characters;
             // 读取标签数,标签
-            List<string> tags;
+            SafeList<string> tags;
             readPos += HMetadataHelper.ReadPropertyList(TagsPropertyName, out tags, data, readPos, TagsItemLen);
             Tags = tags;
         }

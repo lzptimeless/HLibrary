@@ -260,7 +260,7 @@ namespace H.Book
         /// <param name="bufferStartIndex">读取起始位置</param>
         /// <param name="itemLen">list中每一个string所占的字节数</param>
         /// <returns>读取字节数</returns>
-        public static int ReadPropertyList(string propertyName, out List<string> value, byte[] buffer, int bufferStartIndex, int itemLen)
+        public static int ReadPropertyList(string propertyName, out SafeList<string> value, byte[] buffer, int bufferStartIndex, int itemLen)
         {
             value = null;
             int readPos = bufferStartIndex;
@@ -274,7 +274,7 @@ namespace H.Book
                 readPos++;
                 ExceptionFactory.CheckArgLengthRange("buffer", buffer, readPos + count * itemLen, int.MaxValue, $"bufferStartIndex={bufferStartIndex}, count={count}, itemLen={itemLen}");
 
-                value = new List<string>();
+                value = new SafeList<string>();
                 for (int i = 0; i < count; i++)
                 {
                     string item = BytesToString(buffer, readPos, itemLen);

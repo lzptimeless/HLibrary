@@ -11,7 +11,6 @@ namespace H.Book
     {
         private Stream _stream;
         private HBookHeader _header = new HBookHeader();
-        private HMetadataIndex _indexMetadata = new HMetadataIndex();
         private HMetadataBookCover _coverMetadata = new HMetadataBookCover();
         private HMetadataPageCollection _pages = new HMetadataPageCollection();
 
@@ -36,12 +35,6 @@ namespace H.Book
                 throw new InvalidDataException($"0 ControlCode is not Header: expected={HMetadataControlCodes.BookHeader}, value={cc}");
 
             _header.Metadata.Load(_stream);
-            // 读取索引
-            cc = ReadNextControlCode(_stream);
-            if (cc != HMetadataControlCodes.BookIndex)
-                throw new InvalidDataException($"1 ControlCode is not Index: expected={HMetadataControlCodes.BookIndex}, value={cc}");
-
-            _indexMetadata.Load(_stream);
             // 读取封面
             cc = ReadNextControlCode(_stream);
             if (cc == HMetadataControlCodes.BookCover)
@@ -57,6 +50,7 @@ namespace H.Book
                 {
                     HMetadataPage page = new HMetadataPage();
                     page.HeaderMetadata.Load(_stream);
+                    // 读取页面内容
                     cc = ReadNextControlCode(_stream);
                     if (cc != HMetadataControlCodes.PageContent)
                         throw new InvalidDataException($"Not found page content: pageIndex={_pages.Count}, controlCode={cc}");
@@ -91,11 +85,8 @@ namespace H.Book
             }// while (0 != (cc = ReadNextControlCode(_stream)))
         }
 
-        public void Save()
+        public void Create()
         {
-            if (_stream == null)
-                throw new InvalidOperationException("_stream is null");
-
             // 存储头
 
 

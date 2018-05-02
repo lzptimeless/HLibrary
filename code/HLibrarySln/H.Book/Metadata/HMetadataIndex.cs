@@ -10,7 +10,7 @@ namespace H.Book
     {
         public override byte ControlCode { get { return HMetadataControlCodes.BookIndex; } }
 
-        public IList<int> PagePositions { get; private set; }
+        public SafeList<int> PagePositions { get; private set; }
         public const string PagePositionsPropertyName = "PagePositions";
 
         protected override int GetDataLength()
@@ -52,7 +52,7 @@ namespace H.Book
         {
             ExceptionFactory.CheckArgNull("data", data);
 
-            var pp = new List<int>();
+            var pp = new SafeList<int>();
             PagePositions = pp;
             int readPos = 0;
             // 读取页数
