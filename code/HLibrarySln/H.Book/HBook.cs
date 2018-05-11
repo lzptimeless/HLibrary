@@ -17,12 +17,13 @@ namespace H.Book
         public IHBookHeader Header { get { return _header; } }
         public IReadOnlyList<IHPageHeader> PageHeaders { get { return _pages.Headers; } }
 
-        public void Load(string path)
+        public async Task LoadAsync(string path)
         {
-            _stream = new FileStream(path, FileMode.Open, FileAccess.ReadWrite, FileShare.None);
+            _stream = new FileStream(path, FileMode.Open, FileAccess.ReadWrite, FileShare.None, 1024, true);
+            int readedLen = 0;
             // 验证文件头
             byte[] startCode = new byte[HMetadataConstant.StartCode.Length];
-            _stream.Read(startCode, 0, startCode.Length);
+            readedLen = await _stream.ReadAsync(startCode, 0, startCode.Length);
             if (!startCode.SequenceEqual(HMetadataConstant.StartCode))
             {
                 _stream.Dispose();
@@ -30,32 +31,32 @@ namespace H.Book
                 throw new InvalidDataException("StartCode error, this is not a HBook");
             }
             // 读取头
-            byte cc = ReadNextControlCode(_stream);
+            byte cc = await ReadNextControlCode(_stream);
             if (cc != HMetadataControlCodes.BookHeader)
                 throw new InvalidDataException($"0 ControlCode is not Header: expected={HMetadataControlCodes.BookHeader}, value={cc}");
 
-            _header.Metadata.Load(_stream);
+            await _header.Metadata.LoadAsync(_stream, false);
             // 读取封面
-            cc = ReadNextControlCode(_stream);
+            cc = await ReadNextControlCode(_stream);
             if (cc == HMetadataControlCodes.BookCover)
                 throw new InvalidDataException($"2 ControlCode is not Cover: expected={HMetadataControlCodes.BookCover}, value={cc}");
 
-            _coverMetadata.Load(_stream);
+            await _coverMetadata.LoadAsync(_stream, false);
             // 跳过封面图像数据
             _stream.Seek(_coverMetadata.ThumbnailLength + _coverMetadata.ImageLength, SeekOrigin.Current);
             // 读取页面
-            while (0 != (cc = ReadNextControlCode(_stream)))
+            while (0 != (cc = await ReadNextControlCode(_stream)))
             {
                 if (cc == HMetadataControlCodes.PageHeader)
                 {
                     HMetadataPage page = new HMetadataPage();
-                    page.HeaderMetadata.Load(_stream);
+                    await page.HeaderMetadata.LoadAsync(_stream, false);
                     // 读取页面内容
-                    cc = ReadNextControlCode(_stream);
+                    cc = await ReadNextControlCode(_stream);
                     if (cc != HMetadataControlCodes.PageContent)
                         throw new InvalidDataException($"Not found page content: pageIndex={_pages.Count}, controlCode={cc}");
 
-                    page.ContentMetadata.Load(_stream);
+                    await page.ContentMetadata.LoadAsync(_stream, false);
                     // 跳过图像数据
                     _stream.Seek(page.ContentMetadata.ThumbnailLength + page.ContentMetadata.ImageLength, SeekOrigin.Current);
                     // 添加到集合
@@ -65,19 +66,19 @@ namespace H.Book
                 {
                     // 忽略虚拟页面
                     HMetadataVirtualPage virtualPage = new HMetadataVirtualPage();
-                    virtualPage.Load(_stream);
+                    await virtualPage.LoadAsync(_stream, false);
                 }
                 else if (cc == HMetadataControlCodes.DeletedPageHeader)
                 {
                     // 忽略被删除的页面头
                     HMetadataDeletedPageHeader deletedPage = new HMetadataDeletedPageHeader();
-                    deletedPage.Load(_stream);
+                    await deletedPage.LoadAsync(_stream, false);
                 }
                 else if (cc == HMetadataControlCodes.PageContent)
                 {
                     // 忽略被删除的页面内容或没有页头的内容
                     HMetadataPageContent pageContent = new HMetadataPageContent();
-                    pageContent.Load(_stream);
+                    await pageContent.LoadAsync(_stream, false);
                     _stream.Seek(pageContent.ThumbnailLength + pageContent.ImageLength, SeekOrigin.Current);
                 }
                 else
@@ -85,14 +86,13 @@ namespace H.Book
             }// while (0 != (cc = ReadNextControlCode(_stream)))
         }
 
-        public void Create()
+        public async Task CreateAsync(string path)
         {
+            _stream = new FileStream(path, FileMode.Open, FileAccess.ReadWrite, FileShare.None, 1024, true);
             // 存储头
-
-
+            await _header.Metadata.CreateAsync(_stream);
             // 存储封面
-            // 存储页面
-            // 存储索引
+            await _coverMetadata.CreateAsync(_stream);
         }
 
         // void ReadCover()
@@ -118,7 +118,7 @@ namespace H.Book
             if (stream.Position != segment.Position)
                 stream.Seek(segment.Position, SeekOrigin.Begin);
 
-            segment.Save(stream, space);
+            segment.SaveAsync(stream, space);
         }
 
         /// <summary>
@@ -127,23 +127,43 @@ namespace H.Book
         /// <param name="stream">用以读取的Stream</param>
         /// <returns>控制码，0表示已经读到结尾了</returns>
         /// <exception cref="InvalidDataException">没有找到控制码标志<see cref="HMetadataConstant.ControlCodeFlag"/></exception>
-        private static byte ReadNextControlCode(Stream stream)
+        private static async Task<byte> ReadNextControlCode(Stream stream)
         {
-            bool isReadedFlag = false;
+            int readLen = 0;
+            if (stream.Position >= stream.Length)
+                return 0;
+
+            // 假设接下来的两个字节就是控制码，直接读出
+            byte[] two = new byte[2];
+            readLen = await stream.ReadAsync(two, 0, two.Length);
+
+            if (two[0] != HMetadataConstant.ControlCodeFlag)
+                throw new InvalidDataException("Not found ControlCodeFlag");
+
+            // 返回控制码或者0（初始值）
+            if (readLen < 2 || two[1] != HMetadataConstant.ControlCodeFlag)
+                return two[1];
+
+            if (stream.Position >= stream.Length)
+                return 0;
+
+            // 控制码位置不确定，可能比较远，用Buffer减少IO请求次数
+            byte[] buffer = new byte[1024];
             while (stream.Position < stream.Length)
             {
-                byte b = (byte)stream.ReadByte();
-                if (!isReadedFlag)
+                readLen = await stream.ReadAsync(buffer, 0, buffer.Length);
+                // 如果没有读取到数据则证明已经读完了，直接退出
+                if (readLen == 0)
+                    break;
+
+                for (int i = 0; i < readLen; i++)
                 {
-                    if (b == HMetadataConstant.ControlCodeFlag)
-                        isReadedFlag = true;
-                    else
-                        throw new InvalidDataException("Not found ControlCodeFlag");
-                }
-                else
-                {
-                    if (b != HMetadataConstant.ControlCodeFlag)
-                        return b;
+                    if (buffer[i] != HMetadataConstant.ControlCodeFlag)
+                    {
+                        // 调整Position到控制码后的数据起始位
+                        stream.Seek(readLen - i - 1, SeekOrigin.Current);
+                        return buffer[i];
+                    }
                 }
             }
 

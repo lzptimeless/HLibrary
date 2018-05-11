@@ -14,11 +14,11 @@ namespace H.Book
         public const string ArtistPropertyName = "Artist";
         public const int ArtistLen = 128;
 
-        public SafeList<string> Characters { get; private set; }
+        public string[] Characters { get; private set; }
         public const string CharactersPropertyName = "Characters";
         public const int CharactersItemLen = 128;
 
-        public SafeList<string> Tags { get; private set; }
+        public string[] Tags { get; private set; }
         public const string TagsPropertyName = "Tags";
         public const int TagsItemLen = 64;
 
@@ -26,8 +26,8 @@ namespace H.Book
         {
             // 页内容位置+作者名+角色数+角色+标签数+标签
             return 4 + ArtistLen +
-                1 + (Characters != null ? Characters.Count : 0) * CharactersItemLen +
-                1 + (Tags != null ? Tags.Count : 0) * TagsItemLen;
+                1 + (Characters != null ? Characters.Length : 0) * CharactersItemLen +
+                1 + (Tags != null ? Tags.Length : 0) * TagsItemLen;
         }
 
         protected override byte[] GetData()
@@ -63,11 +63,11 @@ namespace H.Book
             readPos += HMetadataHelper.ReadPropertyString(ArtistPropertyName, out artist, data, readPos, ArtistLen);
             Artist = artist;
             // 读取角色
-            SafeList<string> characters;
+            string[] characters;
             readPos += HMetadataHelper.ReadPropertyList(CharactersPropertyName, out characters, data, readPos, CharactersItemLen);
             Characters = characters;
             // 读取标签
-            SafeList<string> tags;
+            string[] tags;
             readPos += HMetadataHelper.ReadPropertyList(TagsPropertyName, out tags, data, readPos, TagsItemLen);
             Tags = tags;
         }

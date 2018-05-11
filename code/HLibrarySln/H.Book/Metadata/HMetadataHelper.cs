@@ -260,7 +260,7 @@ namespace H.Book
         /// <param name="bufferStartIndex">读取起始位置</param>
         /// <param name="itemLen">list中每一个string所占的字节数</param>
         /// <returns>读取字节数</returns>
-        public static int ReadPropertyList(string propertyName, out SafeList<string> value, byte[] buffer, int bufferStartIndex, int itemLen)
+        public static int ReadPropertyList(string propertyName, out string[] value, byte[] buffer, int bufferStartIndex, int itemLen)
         {
             value = null;
             int readPos = bufferStartIndex;
@@ -274,12 +274,12 @@ namespace H.Book
                 readPos++;
                 ExceptionFactory.CheckArgLengthRange("buffer", buffer, readPos + count * itemLen, int.MaxValue, $"bufferStartIndex={bufferStartIndex}, count={count}, itemLen={itemLen}");
 
-                value = new SafeList<string>();
+                value = new string[count];
                 for (int i = 0; i < count; i++)
                 {
                     string item = BytesToString(buffer, readPos, itemLen);
                     readPos += itemLen;
-                    value.Add(item);
+                    value[i] = item;
                 }
             }
             catch (Exception ex)
@@ -295,12 +295,12 @@ namespace H.Book
         /// </summary>
         /// <param name="stream">填充的对象</param>
         /// <param name="len">填充的长度</param>
-        public static void FillEmpty(Stream stream, long len)
+        public static async Task FillEmptyAsync(Stream stream, long len)
         {
             while (len > 0)
             {
                 int writeLen = (int)Math.Min(EmptyData.Length, len);
-                stream.Write(EmptyData, 0, writeLen);
+                await stream.WriteAsync(EmptyData, 0, writeLen);
                 len = len - writeLen;
             }
         }

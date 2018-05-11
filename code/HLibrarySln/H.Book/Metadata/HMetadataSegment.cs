@@ -16,6 +16,12 @@ namespace H.Book
         public const string ControlCodePropertyName = "ControlCode";
 
         /// <summary>
+        /// 初始化保留区长度
+        /// </summary>
+        protected abstract int InitReserveLength { get; }
+        public const string InitReserveLengthPropertyName = "InitReserveLength";
+
+        /// <summary>
         /// 数据段在整个<see cref="HBook"/>中的起始位置
         /// </summary>
         public long Position { get; set; }
@@ -53,11 +59,23 @@ namespace H.Book
         }
 
         /// <summary>
+        /// 创建数据段
+        /// </summary>
+        /// <param name="stream">文件流</param>
+        /// <returns></returns>
+        public Task CreateAsync(Stream stream)
+        {
+            ExceptionFactory.CheckPropertyRange(InitReserveLengthPropertyName, InitReserveLength, 0, int.MaxValue);
+            int space = GetDesiredLength() + InitReserveLength;
+            return SaveAsync(stream, space);
+        }
+
+        /// <summary>
         /// 保存数据，会调用<see cref="GetDataLength"/>，<see cref="GetData"/>
         /// </summary>
         /// <param name="stream">用以保存数据的<see cref="Stream"/></param>
         /// <param name="space">stream中可用以保存数据的空间大小，用剩的空间会以<see cref="HMetadataConstant.ControlCodeFlag"/>填充</param>
-        public void Save(Stream stream, int space)
+        public async Task SaveAsync(Stream stream, int space)
         {
             ExceptionFactory.CheckArgNull("stream", stream);
 
@@ -72,19 +90,19 @@ namespace H.Book
             ExceptionFactory.CheckBufferNull("data", data, "GetBytes return null");
             ExceptionFactory.CheckBufferLength("data", data, dataLen, "GetBytes returned data");
             // 写入控制码
-            stream.WriteByte(HMetadataConstant.ControlCodeFlag);
-            stream.WriteByte(ControlCode);
+            await stream.WriteByteAsync(HMetadataConstant.ControlCodeFlag);
+            await stream.WriteByteAsync(ControlCode);
             // 写入数据长度
             buffer = BitConverter.GetBytes(dataLen);
-            stream.Write(buffer, 0, buffer.Length);
+            await stream.WriteAsync(buffer, 0, buffer.Length);
             // 写入保留区长度
             buffer = BitConverter.GetBytes(reserveLen);
-            stream.Write(buffer, 0, buffer.Length);
+            await stream.WriteAsync(buffer, 0, buffer.Length);
             // 写入数据
-            stream.Write(data, 0, data.Length);
+            await stream.WriteAsync(data, 0, data.Length);
             // 填充保留区
             if (reserveLen > 0)
-                HMetadataHelper.FillEmpty(stream, reserveLen);
+                await HMetadataHelper.FillEmptyAsync(stream, reserveLen);
 
             Position = position;
             DataLength = dataLen;
@@ -95,7 +113,8 @@ namespace H.Book
         /// 从stream中的读取数据，会调用<see cref="LoadData(byte[])"/>
         /// </summary>
         /// <param name="stream">数据源</param>
-        public void Load(Stream stream)
+        /// <param name="hasControlCode">数据源包涵控制码，需要检测控制码</param>
+        public async Task LoadAsync(Stream stream, bool hasControlCode)
         {
             ExceptionFactory.CheckArgNull("stream", stream);
 
@@ -110,23 +129,25 @@ namespace H.Book
             // 数据缓存
             byte[] data = null;
             // 验证控制码
-            byteResult = stream.ReadByte();
-            if (byteResult == byteResultEnd)
-                throw new EndOfStreamException("Stream ended when read control code flag");
+            if (hasControlCode)
+            {
+                byteResult = await stream.ReadByteAsync();
+                if (byteResult == byteResultEnd)
+                    throw new EndOfStreamException("Stream ended when read control code flag");
 
-            if (HMetadataConstant.ControlCodeFlag != byteResult)
-                throw new InvalidDataException($"Invalid control code flag: expected={HMetadataConstant.ControlCodeFlag}, value={byteResult}");
+                if (HMetadataConstant.ControlCodeFlag != byteResult)
+                    throw new InvalidDataException($"Invalid control code flag: expected={HMetadataConstant.ControlCodeFlag}, value={byteResult}");
 
-            byteResult = stream.ReadByte();
-            if (byteResult == byteResultEnd)
-                throw new EndOfStreamException("Stream ended when read control code");
+                byteResult = await stream.ReadByteAsync();
+                if (byteResult == byteResultEnd)
+                    throw new EndOfStreamException("Stream ended when read control code");
 
-            if (ControlCode != byteResult)
-                throw new InvalidDataException($"Invalid control code: expected={ControlCode}, value={byteResult}");
-
+                if (ControlCode != byteResult)
+                    throw new InvalidDataException($"Invalid control code: expected={ControlCode}, value={byteResult}");
+            }
             // 读取数据长度
             byte[] dataLenBuffer = new byte[4];
-            if (dataLenBuffer.Length != stream.Read(dataLenBuffer, 0, dataLenBuffer.Length))
+            if (dataLenBuffer.Length != await stream.ReadAsync(dataLenBuffer, 0, dataLenBuffer.Length))
                 throw new EndOfStreamException("Stream ended when read data len");
 
             dataLen = BitConverter.ToInt32(dataLenBuffer, 0);
@@ -135,7 +156,7 @@ namespace H.Book
 
             // 读取保留区长度
             byte[] reserveLenBuffer = new byte[4];
-            if (reserveLenBuffer.Length != stream.Read(reserveLenBuffer, 0, reserveLenBuffer.Length))
+            if (reserveLenBuffer.Length != await stream.ReadAsync(reserveLenBuffer, 0, reserveLenBuffer.Length))
                 throw new EndOfStreamException("Stream ended when read reserve len");
 
             reserveLen = BitConverter.ToInt32(reserveLenBuffer, 0);
@@ -146,7 +167,7 @@ namespace H.Book
             if (dataLen > 0)
             {
                 data = new byte[dataLen];
-                if (dataLen != stream.Read(data, 0, data.Length))
+                if (dataLen != await stream.ReadAsync(data, 0, data.Length))
                     throw new EndOfStreamException("Stream ended when read data");
             }
 

@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{183B7D64-DD84-4E35-A0FE-AD000ACBB74A}</ProjectGuid>
+    <ProjectGuid>{4F653FE5-95A5-4019-BE70-25C6F2B48C02}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>H.Book</RootNamespace>
-    <AssemblyName>H.Book</AssemblyName>
+    <RootNamespace>CLRTools</RootNamespace>
+    <AssemblyName>CLRTools</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -32,46 +32,18 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ExceptionFactory.cs" />
-    <Compile Include="Exception\InvalidBufferException.cs" />
-    <Compile Include="Exception\InvalidPropertyException.cs" />
-    <Compile Include="Exception\ReadPropertyException.cs" />
-    <Compile Include="Exception\WritePropertyException.cs" />
-    <Compile Include="HBook.cs" />
-    <Compile Include="HBookHeader.cs" />
-    <Compile Include="HBookPartStream.cs" />
-    <Compile Include="HBookPartStreamIsDisposedChangedArgs.cs" />
-    <Compile Include="HBookStream.cs" />
-    <Compile Include="Metadata\HMetadataPage.cs" />
-    <Compile Include="HMetadataPageCollection.cs" />
-    <Compile Include="HPageHeader.cs" />
-    <Compile Include="HPageHeaderCollection.cs" />
-    <Compile Include="Metadata\HMetadataDeletedPageHeader.cs" />
-    <Compile Include="Metadata\HMetadataHelper.cs" />
-    <Compile Include="Metadata\HMetadataSegment.cs" />
-    <Compile Include="Metadata\HMetadataBookCover.cs" />
-    <Compile Include="Metadata\HMetadataBookHeader.cs" />
-    <Compile Include="Metadata\HMetadataConstant.cs" />
-    <Compile Include="Metadata\HMetadataControlCodes.cs" />
-    <Compile Include="Metadata\HMetadataIndex.cs" />
-    <Compile Include="Metadata\HMetadataPageContent.cs" />
-    <Compile Include="Metadata\HMetadataPageHeader.cs" />
-    <Compile Include="Metadata\HMetadataVirtualPage.cs" />
+    <Compile Include="IO\StreamExtension.cs" />
+    <Compile Include="IO\ThreadIO.cs" />
+    <Compile Include="Locks\AsyncOneManyLock.cs" />
+    <Compile Include="Locks\OneManyLock.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\CLRTools\CLRTools.csproj">
-      <Project>{4f653fe5-95a5-4019-be70-25c6f2b48c02}</Project>
-      <Name>CLRTools</Name>
-    </ProjectReference>
+    <Compile Include="Tasks\TaskExtensions.cs" />
+    <Compile Include="Tasks\TaskLogger.cs" />
+    <Compile Include="TaskSchedulers\LimitedConcurrencyLevelTaskScheduler.cs" />
+    <Compile Include="TaskSchedulers\OrderedTaskScheduler.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

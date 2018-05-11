@@ -10,13 +10,13 @@ namespace H.Book
     {
         public override byte ControlCode { get { return HMetadataControlCodes.BookIndex; } }
 
-        public SafeList<int> PagePositions { get; private set; }
+        public int[] PagePositions { get; private set; }
         public const string PagePositionsPropertyName = "PagePositions";
 
         protected override int GetDataLength()
         {
             // 页面数4B + 页面位置
-            int pageCount = PagePositions != null ? PagePositions.Count : 0;
+            int pageCount = PagePositions != null ? PagePositions.Length : 0;
             return 4 + pageCount * 4;
         }
 
@@ -27,7 +27,7 @@ namespace H.Book
             int dataLen = GetDataLength();
             byte[] data = new byte[dataLen];
             int writePos = 0;
-            int pageCount = PagePositions != null ? PagePositions.Count : 0;
+            int pageCount = PagePositions != null ? PagePositions.Length : 0;
 
             // 写入页数
             writePos += HMetadataHelper.WritePropertyInt("PageCount", pageCount, data, writePos);
@@ -52,8 +52,8 @@ namespace H.Book
         {
             ExceptionFactory.CheckArgNull("data", data);
 
-            var pp = new SafeList<int>();
-            PagePositions = pp;
+            PagePositions = null;
+
             int readPos = 0;
             // 读取页数
             int pageCount;
@@ -61,12 +61,14 @@ namespace H.Book
             ExceptionFactory.CheckPropertyRange("PageCount", pageCount, 0, int.MaxValue);
             // 读取页位置
             const int posLen = 4;
+            int[] pp = new int[pageCount];
             for (int i = 0; i < pageCount; i++)
             {
                 int pos = BitConverter.ToInt32(data, readPos);
-                pp.Add(pos);
+                pp[i]=pos;
                 readPos += posLen;
             }
+            PagePositions = pp;
         }
     }
 }
