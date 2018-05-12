@@ -11,6 +11,8 @@ namespace H.Book
     {
         public override byte ControlCode { get { return HMetadataControlCodes.BookCover; } }
 
+        protected override int InitReserveLength { get { return 1024 * 1024; } }
+
         public int ThumbnailLength { get; set; }
         public const string ThumbnailLengthPropertyName = "ThumbnailLength";
 

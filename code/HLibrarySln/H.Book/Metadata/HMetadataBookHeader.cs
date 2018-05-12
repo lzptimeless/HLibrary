@@ -10,6 +10,8 @@ namespace H.Book
     {
         public override byte ControlCode { get { return HMetadataControlCodes.BookHeader; } }
 
+        protected override int InitReserveLength { get { return 10 * 1024; } }
+
         public byte Version { get; set; }
         public const string VersionPropertyName = "Version";
 

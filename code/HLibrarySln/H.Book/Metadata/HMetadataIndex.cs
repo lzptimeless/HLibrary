@@ -10,6 +10,8 @@ namespace H.Book
     {
         public override byte ControlCode { get { return HMetadataControlCodes.BookIndex; } }
 
+        protected override int InitReserveLength { get { return 10 * 1024; } }
+
         public int[] PagePositions { get; private set; }
         public const string PagePositionsPropertyName = "PagePositions";
 

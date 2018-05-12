@@ -9,7 +9,9 @@ namespace H.Book
     public class HMetadataPageHeader : HMetadataSegment
     {
         public override byte ControlCode { get { return HMetadataControlCodes.PageHeader; } }
-        
+
+        protected override int InitReserveLength { get { return 2 * 1024; } }
+
         public string Artist { get; set; }
         public const string ArtistPropertyName = "Artist";
         public const int ArtistLen = 128;

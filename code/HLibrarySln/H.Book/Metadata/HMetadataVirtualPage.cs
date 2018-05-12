@@ -10,6 +10,8 @@ namespace H.Book
     {
         public override byte ControlCode { get { return HMetadataControlCodes.VirtualPage; } }
 
+        protected override int InitReserveLength { get { return 0; } }
+
         public Guid BookID { get; set; }
         public string BookIDPropertyName = "BookID";
 
