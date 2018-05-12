@@ -24,7 +24,7 @@ namespace H.Book
         public const string TagsPropertyName = "Tags";
         public const int TagsItemLen = 64;
 
-        protected override int GetDataLength()
+        protected override int GetFieldsLength()
         {
             // 页内容位置+作者名+角色数+角色+标签数+标签
             return 4 + ArtistLen +
@@ -32,12 +32,17 @@ namespace H.Book
                 1 + (Tags != null ? Tags.Length : 0) * TagsItemLen;
         }
 
-        protected override byte[] GetData()
+        protected override int GetAppendixLength()
+        {
+            return 0;
+        }
+
+        protected override byte[] GetFields()
         {
             ExceptionFactory.CheckPropertyCountRange(CharactersPropertyName, Characters, 0, byte.MaxValue);
             ExceptionFactory.CheckPropertyCountRange(TagsPropertyName, Tags, 0, byte.MaxValue);
 
-            int dataLen = GetDataLength();
+            int dataLen = GetFieldsLength();
             byte[] data = new byte[dataLen];
             int writePos = 0;
             
@@ -51,9 +56,9 @@ namespace H.Book
             return data;
         }
 
-        protected override void LoadData(byte[] data)
+        protected override void SetFields(byte[] buffer)
         {
-            ExceptionFactory.CheckArgNull("data", data);
+            ExceptionFactory.CheckArgNull("buffer", buffer);
             
             Artist = null;
             Characters = null;
@@ -62,15 +67,15 @@ namespace H.Book
             int readPos = 0;
             // 读取作者
             string artist;
-            readPos += HMetadataHelper.ReadPropertyString(ArtistPropertyName, out artist, data, readPos, ArtistLen);
+            readPos += HMetadataHelper.ReadPropertyString(ArtistPropertyName, out artist, buffer, readPos, ArtistLen);
             Artist = artist;
             // 读取角色
             string[] characters;
-            readPos += HMetadataHelper.ReadPropertyList(CharactersPropertyName, out characters, data, readPos, CharactersItemLen);
+            readPos += HMetadataHelper.ReadPropertyList(CharactersPropertyName, out characters, buffer, readPos, CharactersItemLen);
             Characters = characters;
             // 读取标签
             string[] tags;
-            readPos += HMetadataHelper.ReadPropertyList(TagsPropertyName, out tags, data, readPos, TagsItemLen);
+            readPos += HMetadataHelper.ReadPropertyList(TagsPropertyName, out tags, buffer, readPos, TagsItemLen);
             Tags = tags;
         }
     }

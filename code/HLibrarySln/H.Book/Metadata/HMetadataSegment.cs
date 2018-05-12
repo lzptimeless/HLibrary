@@ -9,6 +9,7 @@ namespace H.Book
 {
     public abstract class HMetadataSegment
     {
+        #region fields
         /// <summary>
         /// 数据段控制码，参见<see cref="HMetadataControlCodes"/>
         /// </summary>
@@ -16,62 +17,44 @@ namespace H.Book
         public const string ControlCodePropertyName = "ControlCode";
 
         /// <summary>
-        /// 初始化保留区长度
+        /// 初始化时保留区长度
         /// </summary>
         protected abstract int InitReserveLength { get; }
-        public const string InitReserveLengthPropertyName = "InitReserveLength";
+        protected const string InitReserveLengthPropertyName = "InitReserveLength";
 
         /// <summary>
-        /// 数据段在整个<see cref="HBook"/>中的起始位置
+        /// 在文件中的状态
         /// </summary>
-        public long Position { get; set; }
-        public const string PositionPropertyName = "Position";
+        private HMetadataSegmentFileStatus _fileStatus;
+        public HMetadataSegmentFileStatus FileStatus { get { return _fileStatus; } }
+        public const string FileStatusPropertyName = "FileStatus";
+        #endregion
 
+        #region methods
         /// <summary>
-        /// 数据大小 4B 包括除了控制码，本字段本身，保留区大小字段，保留区的所有数据的长度，用以快速定位下一个数据段
-        /// </summary>
-        public int DataLength { get; set; }
-        public const string DataLengthPropertyName = "DataLength";
-
-        /// <summary>
-        /// 保留区大小 4B 保留区长度，用以快速定位下一个数据段
-        /// </summary>
-        public int ReserveLength { get; set; }
-        public const string ReserveLengthPropertyName = "ReserveLength";
-
-        /// <summary>
-        /// 获取保存这个数据段所需的大小，不包括保留区，会调用<see cref="GetDataLength"/>
+        /// 获取保存这个数据段所需的大小，不包括保留区，会调用<see cref="GetFieldsLength"/>和<see cref="GetAppendixLength"/>
         /// </summary>
         public int GetDesiredLength()
         {
-            int dataLen = GetDataLength();
-            return GetDesiredLengthInner(dataLen);
+            int dataLen = GetFieldsLength();
+            int appenLen = GetAppendixLength();
+            return GetDesiredLengthInner(dataLen, appenLen);
         }
 
         /// <summary>
-        /// 获取这个数据段在文件中的总大小,用以在更新数据段时防止数据溢出
-        /// </summary>
-        /// <returns>数据段在文件中的总大小</returns>
-        public int GetSpace()
-        {
-            int space = GetDesiredLengthInner(DataLength) + ReserveLength;
-            return space;
-        }
-
-        /// <summary>
-        /// 创建数据段
+        /// 在文件中创建数据段
         /// </summary>
         /// <param name="stream">文件流</param>
         /// <returns></returns>
         public Task CreateAsync(Stream stream)
         {
             ExceptionFactory.CheckPropertyRange(InitReserveLengthPropertyName, InitReserveLength, 0, int.MaxValue);
-            int space = GetDesiredLength() + InitReserveLength;
+            int space = checked(GetDesiredLength() + InitReserveLength);
             return SaveAsync(stream, space);
         }
 
         /// <summary>
-        /// 保存数据，会调用<see cref="GetDataLength"/>，<see cref="GetData"/>
+        /// 保存数据，会调用<see cref="GetFieldsLength"/>，<see cref="GetAppendixLength"/>，<see cref="GetFields"/>
         /// </summary>
         /// <param name="stream">用以保存数据的<see cref="Stream"/></param>
         /// <param name="space">stream中可用以保存数据的空间大小，用剩的空间会以<see cref="HMetadataConstant.ControlCodeFlag"/>填充</param>
@@ -80,37 +63,44 @@ namespace H.Book
             ExceptionFactory.CheckArgNull("stream", stream);
 
             long position = stream.Position;
-            int dataLen = GetDataLength();
-            long desiredLen = GetDesiredLengthInner(dataLen);
+            int fieldsLen = GetFieldsLength();
+            int appendixLen = GetAppendixLength();
+            int desiredLen = GetDesiredLengthInner(fieldsLen, appendixLen);
             int reserveLen = space - (int)desiredLen;
             ExceptionFactory.CheckArgRange("space", space, desiredLen, int.MaxValue, "The space is not enough to save data");
 
             byte[] buffer;
-            byte[] data = GetData();
-            ExceptionFactory.CheckBufferNull("data", data, "GetBytes return null");
-            ExceptionFactory.CheckBufferLength("data", data, dataLen, "GetBytes returned data");
+            byte[] fields = GetFields();
+            ExceptionFactory.CheckBufferNull("fields", fields, "GetFields return null");
+            ExceptionFactory.CheckBufferLength("fields", fields, fieldsLen, "GetFields returned data");
             // 写入控制码
             await stream.WriteByteAsync(HMetadataConstant.ControlCodeFlag);
             await stream.WriteByteAsync(ControlCode);
-            // 写入数据长度
-            buffer = BitConverter.GetBytes(dataLen);
+            // 写入字段长度
+            buffer = BitConverter.GetBytes(fieldsLen);
+            await stream.WriteAsync(buffer, 0, buffer.Length);
+            // 写入附加数据长度
+            buffer = BitConverter.GetBytes(appendixLen);
             await stream.WriteAsync(buffer, 0, buffer.Length);
             // 写入保留区长度
             buffer = BitConverter.GetBytes(reserveLen);
             await stream.WriteAsync(buffer, 0, buffer.Length);
-            // 写入数据
-            await stream.WriteAsync(data, 0, data.Length);
+            // 写入字段
+            await stream.WriteAsync(fields, 0, fields.Length);
+            // 填充附加数据
+            if (appendixLen > 0) await stream.FillAsync(0, appendixLen);
             // 填充保留区
-            if (reserveLen > 0)
-                await HMetadataHelper.FillEmptyAsync(stream, reserveLen);
+            if (reserveLen > 0) await stream.FillAsync(HMetadataConstant.ControlCodeFlag, reserveLen);
 
-            Position = position;
-            DataLength = dataLen;
-            ReserveLength = reserveLen;
+            // 更新文件状态
+            _fileStatus.Position = position;
+            _fileStatus.FieldsLength = fieldsLen;
+            _fileStatus.AppendixLength = appendixLen;
+            _fileStatus.ReserveLength = reserveLen;
         }
 
         /// <summary>
-        /// 从stream中的读取数据，会调用<see cref="LoadData(byte[])"/>
+        /// 从stream中的读取数据，会调用<see cref="SetFields(byte[])"/>
         /// </summary>
         /// <param name="stream">数据源</param>
         /// <param name="hasControlCode">数据源包涵控制码，需要检测控制码</param>
@@ -122,12 +112,14 @@ namespace H.Book
             int byteResult;
             // 数据段起始位置
             long position = stream.Position;
-            // 数据长度
-            int dataLen;
+            // 字段数据长度
+            int fieldsLen;
+            // 附加数据长度
+            int appendixLen;
             // 保留区长度
             int reserveLen;
-            // 数据缓存
-            byte[] data = null;
+            // 字段缓存
+            byte[] fields = null;
             // 验证控制码
             if (hasControlCode)
             {
@@ -145,70 +137,80 @@ namespace H.Book
                 if (ControlCode != byteResult)
                     throw new InvalidDataException($"Invalid control code: expected={ControlCode}, value={byteResult}");
             }
-            // 读取数据长度
-            byte[] dataLenBuffer = new byte[4];
-            if (dataLenBuffer.Length != await stream.ReadAsync(dataLenBuffer, 0, dataLenBuffer.Length))
-                throw new EndOfStreamException("Stream ended when read data len");
+            byte[] intBuffer = new byte[4];
+            // 读取字段数据长度
+            if (intBuffer.Length != await stream.ReadAsync(intBuffer, 0, intBuffer.Length))
+                throw new EndOfStreamException("Stream ended when read fields len");
 
-            dataLen = BitConverter.ToInt32(dataLenBuffer, 0);
-            if (dataLen < 0)
-                throw new InvalidDataException($"Invalid data len: expected=[0,{int.MaxValue}] value={dataLen}");
+            fieldsLen = BitConverter.ToInt32(intBuffer, 0);
+            if (fieldsLen < 0)
+                throw new InvalidDataException($"Invalid fields len: expected=[0,{int.MaxValue}] value={fieldsLen}");
 
+            // 读取附加数据长度
+            if (intBuffer.Length!=await stream.ReadAsync(intBuffer, 0, intBuffer.Length))
+                throw new EndOfStreamException("Stream ended when read appendix len");
+
+            appendixLen = BitConverter.ToInt32(intBuffer, 0);
+            if (fieldsLen < 0)
+                throw new InvalidDataException($"Invalid appendix len: expected=[0,{int.MaxValue}] value={fieldsLen}");
             // 读取保留区长度
-            byte[] reserveLenBuffer = new byte[4];
-            if (reserveLenBuffer.Length != await stream.ReadAsync(reserveLenBuffer, 0, reserveLenBuffer.Length))
+            if (intBuffer.Length != await stream.ReadAsync(intBuffer, 0, intBuffer.Length))
                 throw new EndOfStreamException("Stream ended when read reserve len");
 
-            reserveLen = BitConverter.ToInt32(reserveLenBuffer, 0);
+            reserveLen = BitConverter.ToInt32(intBuffer, 0);
             if (reserveLen < 0)
                 throw new InvalidDataException($"Invalid reserve len: expected=[0,{int.MaxValue}] value={reserveLen}");
 
             // 读取数据
-            if (dataLen > 0)
+            if (fieldsLen > 0)
             {
-                data = new byte[dataLen];
-                if (dataLen != await stream.ReadAsync(data, 0, data.Length))
-                    throw new EndOfStreamException("Stream ended when read data");
+                fields = new byte[fieldsLen];
+                if (fieldsLen != await stream.ReadAsync(fields, 0, fields.Length))
+                    throw new EndOfStreamException("Stream ended when read fields");
             }
+            // 更新文件状态
+            _fileStatus.Position = position;
+            _fileStatus.FieldsLength = fieldsLen;
+            _fileStatus.AppendixLength = appendixLen;
+            _fileStatus.ReserveLength = reserveLen;
 
-            Position = position;
-            DataLength = dataLen;
-            ReserveLength = reserveLen;
-            LoadData(data);
+            SetFields(fields);
         }
 
         /// <summary>
         /// 获取保存这个数据段所需的大小，不包括保留区
         /// </summary>
-        /// <param name="dataLen">数据长度</param>
+        /// <param name="fieldsLen">字段数据长度</param>
+        /// <param name="appendixLen">附加数据长度</param>
         /// <returns></returns>
-        protected int GetDesiredLengthInner(int dataLen)
+        protected int GetDesiredLengthInner(int fieldsLen, int appendixLen)
         {
-            //控制码长度+数据长度的长度+保留区长度的长度+数据长度
-            int headerLen = 2 + 4 + 4;
-            if (int.MaxValue - headerLen < dataLen)
-                throw new ArgumentOutOfRangeException($"dataLen is too big: expected=[0,{int.MaxValue - headerLen}], value={dataLen}");
-
-            int totalLen = headerLen + dataLen;
-            return totalLen;
+            return checked(_fileStatus.GetHeaderLength() + fieldsLen + appendixLen);
         }
 
         /// <summary>
-        /// 获取数据，不包括控制码+数据长度+保留区长度+保留区
+        /// 获取字段数据长度
         /// </summary>
-        /// <returns>数据</returns>
-        protected abstract byte[] GetData();
+        /// <returns>字段数据长度</returns>
+        protected abstract int GetFieldsLength();
 
         /// <summary>
-        /// 获取数据长度，不包括控制码的长度+数据长度的长度+保留区长度的长度+保留区的长度
+        /// 获取附加数据长度
         /// </summary>
-        /// <returns>数据长度</returns>
-        protected abstract int GetDataLength();
+        /// <returns>附加数据长度</returns>
+        protected abstract int GetAppendixLength();
 
         /// <summary>
-        /// 加载数据，不包括控制码+数据长度+保留区长度+保留区
+        /// 获取字段数据
         /// </summary>
-        /// <param name="data">数据</param>
-        protected abstract void LoadData(byte[] data);
+        /// <returns>字段数据</returns>
+        protected abstract byte[] GetFields();
+
+        /// <summary>
+        /// 设置字段数据
+        /// </summary>
+        /// <param name="buffer">字段数据</param>
+        protected abstract void SetFields(byte[] buffer);
+        #endregion
     }
 }

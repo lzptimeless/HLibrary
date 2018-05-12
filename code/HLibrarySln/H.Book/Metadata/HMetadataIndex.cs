@@ -15,18 +15,23 @@ namespace H.Book
         public int[] PagePositions { get; private set; }
         public const string PagePositionsPropertyName = "PagePositions";
 
-        protected override int GetDataLength()
+        protected override int GetFieldsLength()
         {
             // 页面数4B + 页面位置
             int pageCount = PagePositions != null ? PagePositions.Length : 0;
             return 4 + pageCount * 4;
         }
 
-        protected override byte[] GetData()
+        protected override int GetAppendixLength()
+        {
+            return 0;
+        }
+
+        protected override byte[] GetFields()
         {
             ExceptionFactory.CheckPropertyCountRange(PagePositionsPropertyName, PagePositions, 0, int.MaxValue);
 
-            int dataLen = GetDataLength();
+            int dataLen = GetFieldsLength();
             byte[] data = new byte[dataLen];
             int writePos = 0;
             int pageCount = PagePositions != null ? PagePositions.Length : 0;
@@ -50,23 +55,23 @@ namespace H.Book
             return data;
         }
 
-        protected override void LoadData(byte[] data)
+        protected override void SetFields(byte[] buffer)
         {
-            ExceptionFactory.CheckArgNull("data", data);
+            ExceptionFactory.CheckArgNull("buffer", buffer);
 
             PagePositions = null;
 
             int readPos = 0;
             // 读取页数
             int pageCount;
-            readPos += HMetadataHelper.ReadPropertyInt("PageCount", out pageCount, data, readPos);
+            readPos += HMetadataHelper.ReadPropertyInt("PageCount", out pageCount, buffer, readPos);
             ExceptionFactory.CheckPropertyRange("PageCount", pageCount, 0, int.MaxValue);
             // 读取页位置
             const int posLen = 4;
             int[] pp = new int[pageCount];
             for (int i = 0; i < pageCount; i++)
             {
-                int pos = BitConverter.ToInt32(data, readPos);
+                int pos = BitConverter.ToInt32(buffer, readPos);
                 pp[i]=pos;
                 readPos += posLen;
             }

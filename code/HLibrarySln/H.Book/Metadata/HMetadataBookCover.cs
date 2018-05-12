@@ -19,18 +19,23 @@ namespace H.Book
         public int ImageLength { get; set; }
         public const string ImageLengthPropertyName = "ImageLength";
 
-        protected override int GetDataLength()
+        protected override int GetFieldsLength()
         {
             // 缩略图长度+图像长度
             return 4 + 4;
         }
 
-        protected override byte[] GetData()
+        protected override int GetAppendixLength()
+        {
+            return 0;
+        }
+
+        protected override byte[] GetFields()
         {
             ExceptionFactory.CheckPropertyRange(ThumbnailLengthPropertyName, ThumbnailLength, 0, int.MaxValue);
             ExceptionFactory.CheckPropertyRange(ImageLengthPropertyName, ImageLength, 0, int.MaxValue);
 
-            int dataLen = GetDataLength();
+            int dataLen = GetFieldsLength();
             byte[] data = new byte[dataLen];
             int writePos = 0;
 
@@ -42,9 +47,9 @@ namespace H.Book
             return data;
         }
 
-        protected override void LoadData(byte[] data)
+        protected override void SetFields(byte[] buffer)
         {
-            ExceptionFactory.CheckArgNull("data", data);
+            ExceptionFactory.CheckArgNull("buffer", buffer);
 
             ThumbnailLength = 0;
             ImageLength = 0;
@@ -52,12 +57,12 @@ namespace H.Book
             int readPos = 0;
             // 读取缩略图长度
             int thumbLen;
-            readPos += HMetadataHelper.ReadPropertyInt(ThumbnailLengthPropertyName, out thumbLen, data, readPos);
+            readPos += HMetadataHelper.ReadPropertyInt(ThumbnailLengthPropertyName, out thumbLen, buffer, readPos);
             ThumbnailLength = thumbLen;
             ExceptionFactory.CheckPropertyRange(ThumbnailLengthPropertyName, thumbLen, 0, int.MaxValue);
             // 读取图像长度
             int imgLen;
-            readPos += HMetadataHelper.ReadPropertyInt(ThumbnailLengthPropertyName, out imgLen, data, readPos);
+            readPos += HMetadataHelper.ReadPropertyInt(ThumbnailLengthPropertyName, out imgLen, buffer, readPos);
             ImageLength = imgLen;
             ExceptionFactory.CheckPropertyRange(ImageLengthPropertyName, imgLen, 0, int.MaxValue);
         }

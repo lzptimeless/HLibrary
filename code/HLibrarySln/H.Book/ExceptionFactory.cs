@@ -59,6 +59,11 @@ namespace H.Book
             }
         }
 
+        internal static void CheckArgNull(string v, object data)
+        {
+            throw new NotImplementedException();
+        }
+
         public static void CheckPropertyEmpty(string propertyName, Guid value, string msg = null)
         {
             if (value == Guid.Empty)

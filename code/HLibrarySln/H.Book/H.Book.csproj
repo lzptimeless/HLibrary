@@ -64,6 +64,7 @@
     <Compile Include="Metadata\HMetadataIndex.cs" />
     <Compile Include="Metadata\HMetadataPageContent.cs" />
     <Compile Include="Metadata\HMetadataPageHeader.cs" />
+    <Compile Include="Metadata\HMetadataSegmentFileStatus.cs" />
     <Compile Include="Metadata\HMetadataVirtualPage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

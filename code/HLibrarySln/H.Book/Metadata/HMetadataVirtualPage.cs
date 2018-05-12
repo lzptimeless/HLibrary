@@ -18,18 +18,23 @@ namespace H.Book
         public int PageIndex { get; set; }
         public string PageIndexPropertyName = "PageIndex";
 
-        protected override int GetDataLength()
+        protected override int GetFieldsLength()
         {
             // 书ID，页面索引
             return 16 + 4;
         }
 
-        protected override byte[] GetData()
+        protected override int GetAppendixLength()
+        {
+            return 0;
+        }
+
+        protected override byte[] GetFields()
         {
             ExceptionFactory.CheckPropertyEmpty(BookIDPropertyName, BookID);
             ExceptionFactory.CheckPropertyRange(PageIndexPropertyName, PageIndex, 0, int.MaxValue);
 
-            int dataLen = GetDataLength();
+            int dataLen = GetFieldsLength();
             byte[] data = new byte[dataLen];
             int writePos = 0;
 
@@ -41,19 +46,19 @@ namespace H.Book
             return data;
         }
 
-        protected override void LoadData(byte[] data)
+        protected override void SetFields(byte[] buffer)
         {
-            ExceptionFactory.CheckArgNull("data", data);
+            ExceptionFactory.CheckArgNull("buffer", buffer);
 
             int readPos = 0;
             // 读取ID
             Guid bookId;
-            readPos += HMetadataHelper.ReadPropertyGuid(BookIDPropertyName, out bookId, data, readPos);
+            readPos += HMetadataHelper.ReadPropertyGuid(BookIDPropertyName, out bookId, buffer, readPos);
             BookID = bookId;
             ExceptionFactory.CheckPropertyEmpty(BookIDPropertyName, bookId);
             // 读取页面索引
             int pageIndex;
-            readPos += HMetadataHelper.ReadPropertyInt(PageIndexPropertyName, out pageIndex, data, readPos);
+            readPos += HMetadataHelper.ReadPropertyInt(PageIndexPropertyName, out pageIndex, buffer, readPos);
             PageIndex = pageIndex;
             ExceptionFactory.CheckPropertyRange(PageIndexPropertyName, pageIndex, 0, int.MaxValue);
         }

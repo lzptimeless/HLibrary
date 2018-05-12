@@ -77,7 +77,7 @@ namespace H.Book
         public const string TagsPropertyName = "Tags";
         protected const int TagsItemLen = 64;
 
-        protected override int GetDataLength()
+        protected override int GetFieldsLength()
         {
             // 版本+ID+封面位置+索引位置+语言+书名数+书名+作者数+作者+分组数+分组+系列数+系列+分类数+分类+角色数+角色+标签数+标签
             int dataLen = 1 + 16 + 4 + 4 + IetfLanguageTagLen +
@@ -91,7 +91,12 @@ namespace H.Book
             return dataLen;
         }
 
-        protected override byte[] GetData()
+        protected override int GetAppendixLength()
+        {
+            return 0;
+        }
+
+        protected override byte[] GetFields()
         {
             ExceptionFactory.CheckPropertyEmpty(IDPropertyName, ID);
             ExceptionFactory.CheckArgCountRange(NamesPropertyName, Names, 0, byte.MaxValue);
@@ -102,7 +107,7 @@ namespace H.Book
             ExceptionFactory.CheckArgCountRange(CharactersPropertyName, Characters, 0, byte.MaxValue);
             ExceptionFactory.CheckArgCountRange(TagsPropertyName, Tags, 0, byte.MaxValue);
 
-            int dataLen = GetDataLength();
+            int dataLen = GetFieldsLength();
             byte[] data = new byte[dataLen];
             int writePos = 0;
 
@@ -131,9 +136,9 @@ namespace H.Book
             return data;
         }
 
-        protected override void LoadData(byte[] data)
+        protected override void SetFields(byte[] buffer)
         {
-            ExceptionFactory.CheckArgNull("data", data);
+            ExceptionFactory.CheckArgNull("buffer", buffer);
 
             Version = 0;
             ID = Guid.Empty;
@@ -148,44 +153,44 @@ namespace H.Book
 
             int readPos = 0;
             // 读取版本
-            Version = data[readPos];
+            Version = buffer[readPos];
             readPos++;
             // 读取ID
             Guid id;
-            readPos += HMetadataHelper.ReadPropertyGuid(IDPropertyName, out id, data, readPos);
+            readPos += HMetadataHelper.ReadPropertyGuid(IDPropertyName, out id, buffer, readPos);
             ID = id;
             ExceptionFactory.CheckPropertyEmpty(IDPropertyName, id);
             // 读取语言
             string language;
-            readPos += HMetadataHelper.ReadPropertyString(IetfLanguageTagPropertyName, out language, data, readPos, IetfLanguageTagLen);
+            readPos += HMetadataHelper.ReadPropertyString(IetfLanguageTagPropertyName, out language, buffer, readPos, IetfLanguageTagLen);
             IetfLanguageTag = language;
             // 读取书名数,书名
             string[] names;
-            readPos += HMetadataHelper.ReadPropertyList(NamesPropertyName, out names, data, readPos, NamesItemLen);
+            readPos += HMetadataHelper.ReadPropertyList(NamesPropertyName, out names, buffer, readPos, NamesItemLen);
             Names = names;
             // 读取作者数,作者
             string[] artists;
-            readPos += HMetadataHelper.ReadPropertyList(ArtistsPropertyName, out artists, data, readPos, ArtistsItemLen);
+            readPos += HMetadataHelper.ReadPropertyList(ArtistsPropertyName, out artists, buffer, readPos, ArtistsItemLen);
             Artists = artists;
             // 读取分组数,分组
             string[] groups;
-            readPos += HMetadataHelper.ReadPropertyList(GroupsPropertyName, out groups, data, readPos, GroupsItemLen);
+            readPos += HMetadataHelper.ReadPropertyList(GroupsPropertyName, out groups, buffer, readPos, GroupsItemLen);
             Groups = groups;
             // 读取系列数,系列
             string[] series;
-            readPos += HMetadataHelper.ReadPropertyList(SeriesPropertyName, out series, data, readPos, SeriesItemLen);
+            readPos += HMetadataHelper.ReadPropertyList(SeriesPropertyName, out series, buffer, readPos, SeriesItemLen);
             Series = series;
             // 读取分类数,分类
             string[] categories;
-            readPos += HMetadataHelper.ReadPropertyList(CategoriesPropertyName, out categories, data, readPos, CategoriesItemLen);
+            readPos += HMetadataHelper.ReadPropertyList(CategoriesPropertyName, out categories, buffer, readPos, CategoriesItemLen);
             Categories = categories;
             // 读取角色数,角色
             string[] characters;
-            readPos += HMetadataHelper.ReadPropertyList(CharactersPropertyName, out characters, data, readPos, CharactersItemLen);
+            readPos += HMetadataHelper.ReadPropertyList(CharactersPropertyName, out characters, buffer, readPos, CharactersItemLen);
             Characters = characters;
             // 读取标签数,标签
             string[] tags;
-            readPos += HMetadataHelper.ReadPropertyList(TagsPropertyName, out tags, data, readPos, TagsItemLen);
+            readPos += HMetadataHelper.ReadPropertyList(TagsPropertyName, out tags, buffer, readPos, TagsItemLen);
             Tags = tags;
         }
     }

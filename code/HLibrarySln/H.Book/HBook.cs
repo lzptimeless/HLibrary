@@ -108,15 +108,15 @@ namespace H.Book
 
         private static void UpdateSegment(HMetadataSegment segment, Stream stream)
         {
-            if (segment.Position < 0)
-                throw new ArgumentException("segment", $"Position error: expected=[0,{int.MaxValue}], value={segment.Position}");
+            if (segment.FileStatus.Position < 0)
+                throw new ArgumentException("segment", $"Position error: expected=[0,{int.MaxValue}], value={segment.FileStatus.Position}");
 
-            int space = segment.GetSpace();
-            if (stream.Length < segment.Position + space)
-                throw new ArgumentException("stream", $"stream is not contains old segment: segment-pos={segment.Position}, segment-space={space}, stream-len={stream.Length}");
+            int space = segment.FileStatus.GetSpace();
+            if (stream.Length < segment.FileStatus.Position + space)
+                throw new ArgumentException("stream", $"stream is not contains old segment: segment-pos={segment.FileStatus.Position}, segment-space={space}, stream-len={stream.Length}");
 
-            if (stream.Position != segment.Position)
-                stream.Seek(segment.Position, SeekOrigin.Begin);
+            if (stream.Position != segment.FileStatus.Position)
+                stream.Seek(segment.FileStatus.Position, SeekOrigin.Begin);
 
             segment.SaveAsync(stream, space);
         }
