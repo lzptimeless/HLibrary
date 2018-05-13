@@ -11,23 +11,16 @@ namespace H.Book
     {
         public override byte ControlCode { get { return HMetadataControlCodes.BookCover; } }
 
-        protected override int InitReserveLength { get { return 1024 * 1024; } }
-
         public int ThumbnailLength { get; set; }
         public const string ThumbnailLengthPropertyName = "ThumbnailLength";
 
         public int ImageLength { get; set; }
         public const string ImageLengthPropertyName = "ImageLength";
 
-        protected override int GetFieldsLength()
+        public override int GetFieldsLength()
         {
             // 缩略图长度+图像长度
             return 4 + 4;
-        }
-
-        protected override int GetAppendixLength()
-        {
-            return 0;
         }
 
         protected override byte[] GetFields()

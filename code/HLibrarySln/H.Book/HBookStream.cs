@@ -19,7 +19,7 @@ namespace H.Book
 
         public HBookStream(string path, FileMode mode)
         {
-            _stream = new FileStream(path, mode, FileAccess.ReadWrite, FileShare.None);
+            _stream = new FileStream(path, mode, FileAccess.ReadWrite, FileShare.None, 1024, true);
         }
 
         #region properties

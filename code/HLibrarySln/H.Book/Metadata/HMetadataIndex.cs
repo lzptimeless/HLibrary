@@ -9,22 +9,15 @@ namespace H.Book
     public class HMetadataIndex : HMetadataSegment
     {
         public override byte ControlCode { get { return HMetadataControlCodes.BookIndex; } }
-
-        protected override int InitReserveLength { get { return 10 * 1024; } }
-
+        
         public int[] PagePositions { get; private set; }
         public const string PagePositionsPropertyName = "PagePositions";
 
-        protected override int GetFieldsLength()
+        public override int GetFieldsLength()
         {
             // 页面数4B + 页面位置
             int pageCount = PagePositions != null ? PagePositions.Length : 0;
             return 4 + pageCount * 4;
-        }
-
-        protected override int GetAppendixLength()
-        {
-            return 0;
         }
 
         protected override byte[] GetFields()

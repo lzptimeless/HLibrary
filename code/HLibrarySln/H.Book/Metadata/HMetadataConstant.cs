@@ -18,5 +18,28 @@ namespace H.Book
         /// The flag of control code
         /// </summary>
         public const byte ControlCodeFlag = 0xFF;
+
+        /// <summary>
+        /// 获取默认的保留区大小
+        /// </summary>
+        /// <param name="controlCode">来自<see cref="HMetadataControlCodes"/></param>
+        /// <returns></returns>
+        public static int GetDefaultReserveLength(int controlCode)
+        {
+            switch (controlCode)
+            {
+                case HMetadataControlCodes.BookHeader:
+                    return 10 * 1024;
+                case HMetadataControlCodes.BookIndex:
+                    return 10 * 1024;
+                case HMetadataControlCodes.BookCover:
+                    return 1024 * 1024;
+                case HMetadataControlCodes.PageHeader:
+                case HMetadataControlCodes.DeletedPageHeader:
+                    return 2 * 1024;
+                default:
+                    return 0;
+            }
+        }
     }
 }

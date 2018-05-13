@@ -9,7 +9,7 @@ namespace H.Book
 {
     public class HBook : IHBook
     {
-        private Stream _stream;
+        private HBookStream _stream;
         private HBookHeader _header = new HBookHeader();
         private HMetadataBookCover _coverMetadata = new HMetadataBookCover();
         private HMetadataPageCollection _pages = new HMetadataPageCollection();
@@ -19,7 +19,7 @@ namespace H.Book
 
         public async Task LoadAsync(string path)
         {
-            _stream = new FileStream(path, FileMode.Open, FileAccess.ReadWrite, FileShare.None, 1024, true);
+            _stream = new HBookStream(path, FileMode.Open);
             int readedLen = 0;
             // 验证文件头
             byte[] startCode = new byte[HMetadataConstant.StartCode.Length];
@@ -42,8 +42,6 @@ namespace H.Book
                 throw new InvalidDataException($"2 ControlCode is not Cover: expected={HMetadataControlCodes.BookCover}, value={cc}");
 
             await _coverMetadata.LoadAsync(_stream, false);
-            // 跳过封面图像数据
-            _stream.Seek(_coverMetadata.ThumbnailLength + _coverMetadata.ImageLength, SeekOrigin.Current);
             // 读取页面
             while (0 != (cc = await ReadNextControlCode(_stream)))
             {
@@ -57,12 +55,10 @@ namespace H.Book
                         throw new InvalidDataException($"Not found page content: pageIndex={_pages.Count}, controlCode={cc}");
 
                     await page.ContentMetadata.LoadAsync(_stream, false);
-                    // 跳过图像数据
-                    _stream.Seek(page.ContentMetadata.ThumbnailLength + page.ContentMetadata.ImageLength, SeekOrigin.Current);
                     // 添加到集合
                     _pages.Add(page);
                 }
-                else if (cc == HMetadataControlCodes.VirtualPage)
+                else if (cc == HMetadataControlCodes.VirtualPageHeader)
                 {
                     // 忽略虚拟页面
                     HMetadataVirtualPage virtualPage = new HMetadataVirtualPage();
@@ -79,7 +75,6 @@ namespace H.Book
                     // 忽略被删除的页面内容或没有页头的内容
                     HMetadataPageContent pageContent = new HMetadataPageContent();
                     await pageContent.LoadAsync(_stream, false);
-                    _stream.Seek(pageContent.ThumbnailLength + pageContent.ImageLength, SeekOrigin.Current);
                 }
                 else
                     throw new InvalidDataException($"Not support control code: {cc}");
@@ -88,37 +83,182 @@ namespace H.Book
 
         public async Task CreateAsync(string path)
         {
-            _stream = new FileStream(path, FileMode.Open, FileAccess.ReadWrite, FileShare.None, 1024, true);
+            _stream = new HBookStream(path, FileMode.Open);
+
+            int reserveLen = 0;
             // 存储头
-            await _header.Metadata.CreateAsync(_stream);
+            reserveLen = HMetadataConstant.GetDefaultReserveLength(HMetadataControlCodes.BookHeader);
+            await _header.Metadata.SaveAsync(_stream, null, reserveLen);
             // 存储封面
-            await _coverMetadata.CreateAsync(_stream);
+            reserveLen = HMetadataConstant.GetDefaultReserveLength(HMetadataControlCodes.BookCover);
+            await _coverMetadata.SaveAsync(_stream, null, reserveLen);
         }
 
-        // void ReadCover()
-        // Stream GetCoverCopy()
-        // void ReadCoverThumbnail(Action<Stream> reader)
-        // Stream GetCoverThumbnailCopy() 
-        // void ReadPage(int index, Action<Stream> reader)
-        // Stream GetPageCopy(int index)
-        // void ReadThumbnail(int index, Action<Stream> reader)
-        // Stream GetThumbnailCopy(int index)
-        // void AddPage(int index, PageHeader header, Stream page, Stream thumbnial)
-        // void DeletePage(int index)
-
-        private static void UpdateSegment(HMetadataSegment segment, Stream stream)
+        public async void ReadCover(Func<Stream, Task> readAction)
         {
-            if (segment.FileStatus.Position < 0)
-                throw new ArgumentException("segment", $"Position error: expected=[0,{int.MaxValue}], value={segment.FileStatus.Position}");
+            if (_coverMetadata.ImageLength == 0)
+            {
+                await readAction.Invoke(null);
+                return;
+            }
 
-            int space = segment.FileStatus.GetSpace();
-            if (stream.Length < segment.FileStatus.Position + space)
-                throw new ArgumentException("stream", $"stream is not contains old segment: segment-pos={segment.FileStatus.Position}, segment-space={space}, stream-len={stream.Length}");
+            using (Stream partStream = _stream.ReadPart(_coverMetadata.FileStatus.GetAppendixPosition() + _coverMetadata.ThumbnailLength, _coverMetadata.ImageLength))
+                await readAction.Invoke(partStream);
+        }
 
-            if (stream.Position != segment.FileStatus.Position)
-                stream.Seek(segment.FileStatus.Position, SeekOrigin.Begin);
+        public async Task<Stream> GetCoverCopy()
+        {
+            if (_coverMetadata.ImageLength == 0)
+                return null;
 
-            segment.SaveAsync(stream, space);
+            MemoryStream memStream = new MemoryStream(_coverMetadata.ImageLength);
+            using (Stream partStream = _stream.ReadPart(_coverMetadata.FileStatus.GetAppendixPosition() + _coverMetadata.ThumbnailLength, _coverMetadata.ImageLength))
+                await partStream.CopyToAsync(memStream);
+
+            return memStream;
+        }
+
+        public async void ReadCoverThumbnail(Func<Stream, Task> readerAction)
+        {
+            if (_coverMetadata.ThumbnailLength == 0)
+            {
+                await readerAction.Invoke(null);
+                return;
+            }
+
+            using (Stream partStream = _stream.ReadPart(_coverMetadata.FileStatus.GetAppendixPosition(), _coverMetadata.ThumbnailLength))
+                await readerAction.Invoke(partStream);
+        }
+
+        public async Task<Stream> GetCoverThumbnailCopy()
+        {
+            if (_coverMetadata.ThumbnailLength == 0)
+                return null;
+
+            MemoryStream memStream = new MemoryStream(_coverMetadata.ThumbnailLength);
+            using (Stream partStream = _stream.ReadPart(_coverMetadata.FileStatus.GetAppendixPosition(), _coverMetadata.ThumbnailLength))
+                await partStream.CopyToAsync(memStream);
+
+            return memStream;
+        }
+
+        public async void ReadPage(int index, Func<Stream, Task> readerAction)
+        {
+            var page = _pages[index];
+            var metadata = page.ContentMetadata;
+            var fileStatus = metadata.FileStatus;
+
+            if (metadata.ImageLength == 0)
+            {
+                await readerAction.Invoke(null);
+                return;
+            }
+
+            using (Stream partStream = _stream.ReadPart(fileStatus.GetAppendixPosition() + metadata.ThumbnailLength, metadata.ImageLength))
+                await readerAction.Invoke(partStream);
+        }
+
+        public async Task<Stream> GetPageCopy(int index)
+        {
+            var page = _pages[index];
+            var metadata = page.ContentMetadata;
+            var fileStatus = metadata.FileStatus;
+
+            if (metadata.ImageLength == 0)
+                return null;
+
+            MemoryStream memStream = new MemoryStream(metadata.ImageLength);
+            using (Stream partStream = _stream.ReadPart(fileStatus.GetAppendixPosition() + metadata.ThumbnailLength, metadata.ImageLength))
+                await partStream.CopyToAsync(memStream);
+
+            return memStream;
+        }
+
+        public async void ReadThumbnail(int index, Func<Stream, Task> readerAction)
+        {
+            var page = _pages[index];
+            var metadata = page.ContentMetadata;
+            var fileStatus = metadata.FileStatus;
+
+            if (metadata.ThumbnailLength == 0)
+            {
+                await readerAction.Invoke(null);
+                return;
+            }
+
+            using (Stream partStream = _stream.ReadPart(fileStatus.GetAppendixPosition(), metadata.ThumbnailLength))
+                await readerAction.Invoke(partStream);
+        }
+
+        public async Task<Stream> GetThumbnailCopy(int index)
+        {
+            var page = _pages[index];
+            var metadata = page.ContentMetadata;
+            var fileStatus = metadata.FileStatus;
+
+            if (metadata.ThumbnailLength == 0)
+                return null;
+
+            MemoryStream memStream = new MemoryStream(metadata.ThumbnailLength);
+            using (Stream partStream = _stream.ReadPart(fileStatus.GetAppendixPosition(), metadata.ThumbnailLength))
+                await partStream.CopyToAsync(memStream);
+
+            return memStream;
+        }
+
+        public async Task AddPage(int index, HMetadataPageHeader header, Stream content, Stream thumbnial)
+        {
+            if (content != null && content.Length > int.MaxValue)
+                throw new ArgumentException($"content is too big:max={int.MaxValue}, value={content.Length}", "content");
+
+            if (thumbnial != null && thumbnial.Length > int.MaxValue)
+                throw new ArgumentException($"thumbnial is too big:max={int.MaxValue}, value={thumbnial.Length}", "thumbnial");
+
+            _stream.Seek(0, SeekOrigin.End);
+
+            int reserveLen = HMetadataConstant.GetDefaultReserveLength(HMetadataControlCodes.PageHeader);
+            await header.SaveAsync(_stream, null, reserveLen);
+
+            reserveLen = HMetadataConstant.GetDefaultReserveLength(HMetadataControlCodes.PageContent);
+
+            HMetadataPageContent contentMetadata = new HMetadataPageContent();
+            contentMetadata.ImageLength = content != null ? (int)content.Length : 0;
+            contentMetadata.ThumbnailLength = thumbnial != null ? (int)thumbnial.Length : 0;
+
+            List<Stream> appendixes = new List<Stream>();
+            if (thumbnial != null) appendixes.Add(thumbnial);
+            if (content != null) appendixes.Add(content);
+
+            await contentMetadata.SaveAsync(_stream, appendixes.ToArray(), reserveLen);
+        }
+
+        public async Task DeletePage(int index)
+        {
+            var page = _pages[index];
+            var headerFS = page.HeaderMetadata.FileStatus;
+
+            _pages.RemoveAt(index);
+            _stream.Seek(headerFS.Position + 1, SeekOrigin.Begin);
+            await _stream.WriteByteAsync(HMetadataControlCodes.DeletedPageHeader);
+        }
+
+        public async Task SetPageHeader(int index, HMetadataPageHeader header)
+        {
+            var page = _pages[index];
+            var headerMetadata = page.HeaderMetadata;
+            var headerFS = headerMetadata.FileStatus;
+
+            // 更新属性
+
+            // 保存
+            int space = headerFS.GetSpace();
+            int segHeaderLen = headerFS.GetHeaderLength();
+            int fieldsLen = headerMetadata.GetFieldsLength();
+            int reserveLen = space - segHeaderLen - fieldsLen;
+            if (space < segHeaderLen + fieldsLen)
+                throw new ArgumentException($"header is too big: space={space}, fieldsLen={fieldsLen}, segHeaderLen={segHeaderLen}", "header");
+
+            await headerMetadata.SaveAsync(_stream, null, reserveLen);
         }
 
         /// <summary>

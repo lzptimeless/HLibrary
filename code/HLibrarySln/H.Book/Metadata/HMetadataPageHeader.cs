@@ -9,9 +9,7 @@ namespace H.Book
     public class HMetadataPageHeader : HMetadataSegment
     {
         public override byte ControlCode { get { return HMetadataControlCodes.PageHeader; } }
-
-        protected override int InitReserveLength { get { return 2 * 1024; } }
-
+        
         public string Artist { get; set; }
         public const string ArtistPropertyName = "Artist";
         public const int ArtistLen = 128;
@@ -24,17 +22,12 @@ namespace H.Book
         public const string TagsPropertyName = "Tags";
         public const int TagsItemLen = 64;
 
-        protected override int GetFieldsLength()
+        public override int GetFieldsLength()
         {
             // 页内容位置+作者名+角色数+角色+标签数+标签
             return 4 + ArtistLen +
                 1 + (Characters != null ? Characters.Length : 0) * CharactersItemLen +
                 1 + (Tags != null ? Tags.Length : 0) * TagsItemLen;
-        }
-
-        protected override int GetAppendixLength()
-        {
-            return 0;
         }
 
         protected override byte[] GetFields()

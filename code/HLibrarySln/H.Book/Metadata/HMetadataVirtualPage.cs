@@ -8,9 +8,7 @@ namespace H.Book
 {
     public class HMetadataVirtualPage : HMetadataSegment
     {
-        public override byte ControlCode { get { return HMetadataControlCodes.VirtualPage; } }
-
-        protected override int InitReserveLength { get { return 0; } }
+        public override byte ControlCode { get { return HMetadataControlCodes.VirtualPageHeader; } }
 
         public Guid BookID { get; set; }
         public string BookIDPropertyName = "BookID";
@@ -18,15 +16,10 @@ namespace H.Book
         public int PageIndex { get; set; }
         public string PageIndexPropertyName = "PageIndex";
 
-        protected override int GetFieldsLength()
+        public override int GetFieldsLength()
         {
             // 书ID，页面索引
             return 16 + 4;
-        }
-
-        protected override int GetAppendixLength()
-        {
-            return 0;
         }
 
         protected override byte[] GetFields()

@@ -9,7 +9,7 @@ namespace H.Book
     /// <summary>
     /// <see cref="HMetadataSegment"/>在文件中的状态
     /// </summary>
-    public struct HMetadataSegmentFileStatus
+    public class HMetadataSegmentFileStatus
     {
         #region properties
         /// <summary>
@@ -53,6 +53,16 @@ namespace H.Book
         {
             // 头 + 字段大小 + 附加数据长度 + 保留区长度
             return checked(GetHeaderLength() + FieldsLength + AppendixLength + ReserveLength);
+        }
+
+        /// <summary>
+        /// 获取附加数据的位置
+        /// </summary>
+        /// <returns></returns>
+        public long GetAppendixPosition()
+        {
+            long p = checked(Position + FieldsLength);
+            return p;
         }
         #endregion
     }

@@ -10,8 +10,6 @@ namespace H.Book
     {
         public override byte ControlCode { get { return HMetadataControlCodes.BookHeader; } }
 
-        protected override int InitReserveLength { get { return 10 * 1024; } }
-
         public byte Version { get; set; }
         public const string VersionPropertyName = "Version";
 
@@ -77,7 +75,7 @@ namespace H.Book
         public const string TagsPropertyName = "Tags";
         protected const int TagsItemLen = 64;
 
-        protected override int GetFieldsLength()
+        public override int GetFieldsLength()
         {
             // 版本+ID+封面位置+索引位置+语言+书名数+书名+作者数+作者+分组数+分组+系列数+系列+分类数+分类+角色数+角色+标签数+标签
             int dataLen = 1 + 16 + 4 + 4 + IetfLanguageTagLen +
@@ -89,11 +87,6 @@ namespace H.Book
                 1 + (Characters != null ? Characters.Length * CharactersItemLen : 0) +
                 1 + (Tags != null ? Tags.Length * TagsItemLen : 0);
             return dataLen;
-        }
-
-        protected override int GetAppendixLength()
-        {
-            return 0;
         }
 
         protected override byte[] GetFields()

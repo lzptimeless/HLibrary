@@ -10,28 +10,6 @@ namespace H.Book
     internal static class HMetadataHelper
     {
         /// <summary>
-        /// 空字节，用以加快填充空数据
-        /// </summary>
-        private static readonly byte[] ZeroBuffer = new byte[1024];
-
-        /// <summary>
-        /// 空数据,长度1024，以<see cref="HMetadataConstant.ControlCodeFlag"/>填充,用以加快
-        /// 填充空白数据的效率
-        /// </summary>
-        private static readonly byte[] EmptyData;
-
-        static HMetadataHelper()
-        {
-            // 初始化EmptyData
-            byte[] emptyData = new byte[1024];
-            for (int i = 0; i < emptyData.Length; i++)
-            {
-                emptyData[i] = HMetadataConstant.ControlCodeFlag;
-            }
-            EmptyData = emptyData;
-        }
-
-        /// <summary>
         /// 向buffer写入list类型的属性值，起始位置会写入1B的list数量
         /// </summary>
         /// <param name="propertyName">属性名</param>
@@ -291,21 +269,6 @@ namespace H.Book
         }
 
         /// <summary>
-        /// 用<see cref="HMetadataConstant.ControlCodeFlag"/>填充
-        /// </summary>
-        /// <param name="stream">填充的对象</param>
-        /// <param name="len">填充的长度</param>
-        public static async Task FillEmptyAsync(Stream stream, long len)
-        {
-            while (len > 0)
-            {
-                int writeLen = (int)Math.Min(EmptyData.Length, len);
-                await stream.WriteAsync(EmptyData, 0, writeLen);
-                len = len - writeLen;
-            }
-        }
-
-        /// <summary>
         /// 获取字符串UTF8编码数据，buffer长度固定
         /// </summary>
         /// <param name="s">被编码的字符串</param>
@@ -326,22 +289,6 @@ namespace H.Book
         {
             string s = Encoding.UTF8.GetString(buffer, bufferStartIndex, len);
             return s;
-        }
-
-        private static int FillZero(byte[] buffer, int startIndex, int len)
-        {
-            // 由于是内部用函数，为了增加效率，就不检测参数了
-            int count = len;
-            int writePos = startIndex;
-            while (count > 0)
-            {
-                int currentCopyCount = Math.Min(count, ZeroBuffer.Length);
-                Array.Copy(ZeroBuffer, 0, buffer, writePos, currentCopyCount);
-                count -= currentCopyCount;
-                writePos += currentCopyCount;
-            }
-
-            return len;
         }
     }
 }

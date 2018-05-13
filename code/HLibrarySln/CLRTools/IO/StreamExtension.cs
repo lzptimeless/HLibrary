@@ -9,6 +9,10 @@ namespace System.IO
 {
     public static class StreamExtension
     {
+        #region fields
+        public const int DefaultBufferSize = 4 * 1024;
+        #endregion
+
         public static async Task<int> ReadByteAsync(this Stream stream)
         {
             byte[] buffer = new byte[1];
@@ -33,7 +37,7 @@ namespace System.IO
             byte[] buffer = null;
             if (!_fillBuffers.TryGetValue(b, out buffer))
             {
-                buffer = new byte[1024];
+                buffer = new byte[DefaultBufferSize];
                 if (b != 0)
                 {
                     for (int i = 0; i < buffer.Length; i++)
@@ -82,5 +86,6 @@ namespace System.IO
             }
         }
         #endregion
+        
     }
 }
