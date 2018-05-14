@@ -234,6 +234,9 @@ namespace H.Book
 
         public async Task DeletePage(int index)
         {
+            if (_pages.Count <= index)
+                return;
+
             var page = _pages[index];
             var headerFS = page.HeaderMetadata.FileStatus;
 
