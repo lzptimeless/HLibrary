@@ -83,15 +83,46 @@ namespace H.Book
 
         public async Task CreateAsync(string path)
         {
-            _stream = new HBookStream(path, FileMode.Open);
+            _stream = new HBookStream(path, FileMode.CreateNew);
 
             int reserveLen = 0;
+
+            // 初始化
+            var headerMetadata = _header.Metadata;
+            headerMetadata.ID = Guid.NewGuid();
+            headerMetadata.Version = 1;
             // 存储头
             reserveLen = HMetadataConstant.GetDefaultReserveLength(HMetadataControlCodes.BookHeader);
-            await _header.Metadata.SaveAsync(_stream, null, reserveLen);
+            await headerMetadata.SaveAsync(_stream, null, reserveLen);
             // 存储封面
             reserveLen = HMetadataConstant.GetDefaultReserveLength(HMetadataControlCodes.BookCover);
             await _coverMetadata.SaveAsync(_stream, null, reserveLen);
+        }
+
+        public async Task SetHeader(HBookHeaderArgs header)
+        {
+            var metadata = _header.Metadata;
+            var fs = metadata.FileStatus;
+            // 更新
+            if (header.Selected.HasFlag(HBookHeaderFieldSelections.IetfLanguageTag)) metadata.IetfLanguageTag = header.IetfLanguageTag;
+            if (header.Selected.HasFlag(HBookHeaderFieldSelections.Names)) metadata.Names = header.Names;
+            if (header.Selected.HasFlag(HBookHeaderFieldSelections.Artists)) metadata.Artists = header.Artists;
+            if (header.Selected.HasFlag(HBookHeaderFieldSelections.Groups)) metadata.Groups = header.Groups;
+            if (header.Selected.HasFlag(HBookHeaderFieldSelections.Series)) metadata.Series = header.Series;
+            if (header.Selected.HasFlag(HBookHeaderFieldSelections.Categories)) metadata.Categories = header.Categories;
+            if (header.Selected.HasFlag(HBookHeaderFieldSelections.Characters)) metadata.Characters = header.Characters;
+            if (header.Selected.HasFlag(HBookHeaderFieldSelections.Tags)) metadata.Tags = header.Tags;
+
+            // 保存
+            int space = fs.GetSpace();
+            int segHeaderLen = fs.GetHeaderLength();
+            int fieldsLen = metadata.GetFieldsLength();
+            int reserveLen = checked(space - segHeaderLen - fieldsLen);
+            if (reserveLen < 0)
+                throw new ArgumentException($"header is too big: space={space}, fieldsLen={fieldsLen}, segHeaderLen={segHeaderLen}", "header");
+
+            _stream.Seek(fs.Position, SeekOrigin.Current);
+            await metadata.SaveAsync(_stream, null, reserveLen);
         }
 
         public async void ReadCover(Func<Stream, Task> readAction)
@@ -206,9 +237,11 @@ namespace H.Book
             return memStream;
         }
 
-        public async Task AddPage(int index, HMetadataPageHeader header, Stream content, Stream thumbnial)
+        public async Task AddPage(int index, HPageHeaderArgs header, Stream content, Stream thumbnial)
         {
-            if (content != null && content.Length > int.MaxValue)
+            ExceptionFactory.CheckArgNull("content", content);
+
+            if (content.Length > int.MaxValue)
                 throw new ArgumentException($"content is too big:max={int.MaxValue}, value={content.Length}", "content");
 
             if (thumbnial != null && thumbnial.Length > int.MaxValue)
@@ -216,20 +249,27 @@ namespace H.Book
 
             _stream.Seek(0, SeekOrigin.End);
 
-            int reserveLen = HMetadataConstant.GetDefaultReserveLength(HMetadataControlCodes.PageHeader);
-            await header.SaveAsync(_stream, null, reserveLen);
+            HMetadataPageHeader headerMetadata = new HMetadataPageHeader();
+            if (header.Selected.HasFlag(HPageHeaderFieldSelections.Artist)) headerMetadata.Artist = header.Artist;
+            if (header.Selected.HasFlag(HPageHeaderFieldSelections.Characters)) headerMetadata.Characters = header.Characters;
+            if (header.Selected.HasFlag(HPageHeaderFieldSelections.Tags)) headerMetadata.Tags = header.Tags;
 
-            reserveLen = HMetadataConstant.GetDefaultReserveLength(HMetadataControlCodes.PageContent);
+            int reserveLen = HMetadataConstant.GetDefaultReserveLength(HMetadataControlCodes.PageHeader);
+            await headerMetadata.SaveAsync(_stream, null, reserveLen);
 
             HMetadataPageContent contentMetadata = new HMetadataPageContent();
-            contentMetadata.ImageLength = content != null ? (int)content.Length : 0;
             contentMetadata.ThumbnailLength = thumbnial != null ? (int)thumbnial.Length : 0;
+            contentMetadata.ImageLength = content != null ? (int)content.Length : 0;
 
             List<Stream> appendixes = new List<Stream>();
             if (thumbnial != null) appendixes.Add(thumbnial);
             if (content != null) appendixes.Add(content);
 
+            reserveLen = HMetadataConstant.GetDefaultReserveLength(HMetadataControlCodes.PageContent);
             await contentMetadata.SaveAsync(_stream, appendixes.ToArray(), reserveLen);
+
+            HMetadataPage pageMetadata = new HMetadataPage(headerMetadata, contentMetadata);
+            _pages.Add(pageMetadata);
         }
 
         public async Task DeletePage(int index)
@@ -245,25 +285,30 @@ namespace H.Book
             await _stream.WriteByteAsync(HMetadataControlCodes.DeletedPageHeader);
         }
 
-        public async Task SetPageHeader(int index, HMetadataPageHeader header)
+        public async Task SetPageHeader(int index, HPageHeaderArgs header)
         {
             var page = _pages[index];
             var headerMetadata = page.HeaderMetadata;
             var headerFS = headerMetadata.FileStatus;
 
             // 更新属性
+            if (header.Selected.HasFlag(HPageHeaderFieldSelections.Artist)) headerMetadata.Artist = header.Artist;
+            if (header.Selected.HasFlag(HPageHeaderFieldSelections.Characters)) headerMetadata.Characters = header.Characters;
+            if (header.Selected.HasFlag(HPageHeaderFieldSelections.Tags)) headerMetadata.Tags = header.Tags;
 
             // 保存
             int space = headerFS.GetSpace();
             int segHeaderLen = headerFS.GetHeaderLength();
             int fieldsLen = headerMetadata.GetFieldsLength();
-            int reserveLen = space - segHeaderLen - fieldsLen;
-            if (space < segHeaderLen + fieldsLen)
+            int reserveLen = checked(space - segHeaderLen - fieldsLen);
+            if (reserveLen < 0)
                 throw new ArgumentException($"header is too big: space={space}, fieldsLen={fieldsLen}, segHeaderLen={segHeaderLen}", "header");
 
+            _stream.Seek(headerFS.Position, SeekOrigin.Begin);
             await headerMetadata.SaveAsync(_stream, null, reserveLen);
         }
 
+        #region private methods
         /// <summary>
         /// 读取下一个控制码
         /// </summary>
@@ -312,11 +357,27 @@ namespace H.Book
 
             return 0;
         }
+        #endregion
     }
 
     public interface IHBook
     {
         IHBookHeader Header { get; }
         IReadOnlyList<IHPageHeader> PageHeaders { get; }
+
+        Task LoadAsync(string path);
+        Task CreateAsync(string path);
+        Task SetHeader(HBookHeaderArgs header);
+        void ReadCover(Func<Stream, Task> readAction);
+        Task<Stream> GetCoverCopy();
+        void ReadCoverThumbnail(Func<Stream, Task> readerAction);
+        Task<Stream> GetCoverThumbnailCopy();
+        void ReadPage(int index, Func<Stream, Task> readerAction);
+        Task<Stream> GetPageCopy(int index);
+        void ReadThumbnail(int index, Func<Stream, Task> readerAction);
+        Task<Stream> GetThumbnailCopy(int index);
+        Task AddPage(int index, HPageHeaderArgs header, Stream content, Stream thumbnial);
+        Task DeletePage(int index);
+        Task SetPageHeader(int index, HPageHeaderArgs header);
     }
 }

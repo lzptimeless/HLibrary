@@ -10,7 +10,7 @@ namespace H.Book
     {
         public override byte ControlCode { get { return HMetadataControlCodes.BookIndex; } }
         
-        public int[] PagePositions { get; private set; }
+        public int[] PagePositions { get; set; }
         public const string PagePositionsPropertyName = "PagePositions";
 
         public override int GetFieldsLength()

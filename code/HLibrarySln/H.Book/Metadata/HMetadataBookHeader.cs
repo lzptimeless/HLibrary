@@ -29,49 +29,49 @@ namespace H.Book
         /// <summary>
         /// Each name length less that 128B
         /// </summary>
-        public string[] Names { get; private set; }
+        public string[] Names { get; set; }
         public const string NamesPropertyName = "Names";
         protected const int NamesItemLen = 128;
 
         /// <summary>
         /// Each artist length less that 128B
         /// </summary>
-        public string[] Artists { get; private set; }
+        public string[] Artists { get; set; }
         public const string ArtistsPropertyName = "Artists";
         protected const int ArtistsItemLen = 128;
 
         /// <summary>
         /// Each group length less that 128B
         /// </summary>
-        public string[] Groups { get; private set; }
+        public string[] Groups { get; set; }
         public const string GroupsPropertyName = "Groups";
         protected const int GroupsItemLen = 128;
 
         /// <summary>
         /// Each series length less that 128B
         /// </summary>
-        public string[] Series { get; private set; }
+        public string[] Series { get; set; }
         public const string SeriesPropertyName = "Series";
         protected const int SeriesItemLen = 128;
 
         /// <summary>
         /// Each category length less that 128B
         /// </summary>
-        public string[] Categories { get; private set; }
+        public string[] Categories { get; set; }
         public const string CategoriesPropertyName = "Categories";
         protected const int CategoriesItemLen = 128;
 
         /// <summary>
         /// Each character length less that 128B
         /// </summary>
-        public string[] Characters { get; private set; }
+        public string[] Characters { get; set; }
         public const string CharactersPropertyName = "Characters";
         protected const int CharactersItemLen = 128;
 
         /// <summary>
         /// Each rag length less that 64B
         /// </summary>
-        public string[] Tags { get; private set; }
+        public string[] Tags { get; set; }
         public const string TagsPropertyName = "Tags";
         protected const int TagsItemLen = 64;
 

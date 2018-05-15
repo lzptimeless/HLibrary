@@ -14,11 +14,11 @@ namespace H.Book
         public const string ArtistPropertyName = "Artist";
         public const int ArtistLen = 128;
 
-        public string[] Characters { get; private set; }
+        public string[] Characters { get; set; }
         public const string CharactersPropertyName = "Characters";
         public const int CharactersItemLen = 128;
 
-        public string[] Tags { get; private set; }
+        public string[] Tags { get; set; }
         public const string TagsPropertyName = "Tags";
         public const int TagsItemLen = 64;
 
