@@ -48,9 +48,8 @@
     <Compile Include="HBook.cs" />
     <Compile Include="HBookHeader.cs" />
     <Compile Include="HBookHeaderArgs.cs" />
-    <Compile Include="HBookPartStream.cs" />
+    <Compile Include="PartReadStream.cs" />
     <Compile Include="HBookPartStreamIsDisposedChangedArgs.cs" />
-    <Compile Include="HBookStream.cs" />
     <Compile Include="HPageHeaderArgs.cs" />
     <Compile Include="Metadata\HMetadataPage.cs" />
     <Compile Include="HMetadataPageCollection.cs" />

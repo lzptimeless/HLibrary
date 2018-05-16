@@ -9,6 +9,7 @@ namespace H.Book
     public class HBookHeaderArgs
     {
         public HBookHeaderFieldSelections Selected { get; set; }
+        public string IetfLanguageTagC { get; set; }
         public string IetfLanguageTag { get; set; }
         public string[] Names { get; set; }
         public string[] Artists { get; set; }

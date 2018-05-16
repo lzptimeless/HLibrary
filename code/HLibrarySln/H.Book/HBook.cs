@@ -3,23 +3,29 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace H.Book
 {
     public class HBook : IHBook
     {
-        private HBookStream _stream;
+        #region fields
+        private OneManyLock _lock = new OneManyLock();
+        private Stream _stream;
         private HBookHeader _header = new HBookHeader();
         private HMetadataBookCover _coverMetadata = new HMetadataBookCover();
         private HMetadataPageCollection _pages = new HMetadataPageCollection();
+        #endregion
 
+        #region properties
         public IHBookHeader Header { get { return _header; } }
         public IReadOnlyList<IHPageHeader> PageHeaders { get { return _pages.Headers; } }
+        #endregion
 
         public async Task LoadAsync(string path)
         {
-            _stream = new HBookStream(path, FileMode.Open);
+            _stream = new FileStream(path, FileMode.Open, FileAccess.ReadWrite, FileShare.None, 2048, true);
             int readedLen = 0;
             // 验证文件头
             byte[] startCode = new byte[HMetadataConstant.StartCode.Length];
@@ -83,7 +89,7 @@ namespace H.Book
 
         public async Task CreateAsync(string path)
         {
-            _stream = new HBookStream(path, FileMode.CreateNew);
+            _stream = new FileStream(path, FileMode.CreateNew, FileAccess.ReadWrite, FileShare.None, 2048, true);
 
             int reserveLen = 0;
 
@@ -99,7 +105,7 @@ namespace H.Book
             await _coverMetadata.SaveAsync(_stream, null, reserveLen);
         }
 
-        public async Task SetHeader(HBookHeaderArgs header)
+        public async Task<bool> SetHeader(HBookHeaderArgs header)
         {
             var metadata = _header.Metadata;
             var fs = metadata.FileStatus;
@@ -133,7 +139,7 @@ namespace H.Book
                 return;
             }
 
-            using (Stream partStream = _stream.ReadPart(_coverMetadata.FileStatus.GetAppendixPosition() + _coverMetadata.ThumbnailLength, _coverMetadata.ImageLength))
+            using (Stream partStream = GetPartReadStream(_stream, _coverMetadata.FileStatus.GetAppendixPosition() + _coverMetadata.ThumbnailLength, _coverMetadata.ImageLength))
                 await readAction.Invoke(partStream);
         }
 
@@ -143,7 +149,7 @@ namespace H.Book
                 return null;
 
             MemoryStream memStream = new MemoryStream(_coverMetadata.ImageLength);
-            using (Stream partStream = _stream.ReadPart(_coverMetadata.FileStatus.GetAppendixPosition() + _coverMetadata.ThumbnailLength, _coverMetadata.ImageLength))
+            using (Stream partStream = GetPartReadStream(_stream, _coverMetadata.FileStatus.GetAppendixPosition() + _coverMetadata.ThumbnailLength, _coverMetadata.ImageLength))
                 await partStream.CopyToAsync(memStream);
 
             return memStream;
@@ -157,7 +163,7 @@ namespace H.Book
                 return;
             }
 
-            using (Stream partStream = _stream.ReadPart(_coverMetadata.FileStatus.GetAppendixPosition(), _coverMetadata.ThumbnailLength))
+            using (Stream partStream = GetPartReadStream(_stream, _coverMetadata.FileStatus.GetAppendixPosition(), _coverMetadata.ThumbnailLength))
                 await readerAction.Invoke(partStream);
         }
 
@@ -167,7 +173,7 @@ namespace H.Book
                 return null;
 
             MemoryStream memStream = new MemoryStream(_coverMetadata.ThumbnailLength);
-            using (Stream partStream = _stream.ReadPart(_coverMetadata.FileStatus.GetAppendixPosition(), _coverMetadata.ThumbnailLength))
+            using (Stream partStream = GetPartReadStream(_stream, _coverMetadata.FileStatus.GetAppendixPosition(), _coverMetadata.ThumbnailLength))
                 await partStream.CopyToAsync(memStream);
 
             return memStream;
@@ -185,7 +191,7 @@ namespace H.Book
                 return;
             }
 
-            using (Stream partStream = _stream.ReadPart(fileStatus.GetAppendixPosition() + metadata.ThumbnailLength, metadata.ImageLength))
+            using (Stream partStream = GetPartReadStream(_stream, fileStatus.GetAppendixPosition() + metadata.ThumbnailLength, metadata.ImageLength))
                 await readerAction.Invoke(partStream);
         }
 
@@ -199,7 +205,7 @@ namespace H.Book
                 return null;
 
             MemoryStream memStream = new MemoryStream(metadata.ImageLength);
-            using (Stream partStream = _stream.ReadPart(fileStatus.GetAppendixPosition() + metadata.ThumbnailLength, metadata.ImageLength))
+            using (Stream partStream = GetPartReadStream(_stream, fileStatus.GetAppendixPosition() + metadata.ThumbnailLength, metadata.ImageLength))
                 await partStream.CopyToAsync(memStream);
 
             return memStream;
@@ -217,7 +223,7 @@ namespace H.Book
                 return;
             }
 
-            using (Stream partStream = _stream.ReadPart(fileStatus.GetAppendixPosition(), metadata.ThumbnailLength))
+            using (Stream partStream = GetPartReadStream(_stream, fileStatus.GetAppendixPosition(), metadata.ThumbnailLength))
                 await readerAction.Invoke(partStream);
         }
 
@@ -231,7 +237,7 @@ namespace H.Book
                 return null;
 
             MemoryStream memStream = new MemoryStream(metadata.ThumbnailLength);
-            using (Stream partStream = _stream.ReadPart(fileStatus.GetAppendixPosition(), metadata.ThumbnailLength))
+            using (Stream partStream = GetPartReadStream(_stream, fileStatus.GetAppendixPosition(), metadata.ThumbnailLength))
                 await partStream.CopyToAsync(memStream);
 
             return memStream;
@@ -357,6 +363,18 @@ namespace H.Book
 
             return 0;
         }
+
+        private static PartReadStream GetPartReadStream(Stream stream, long partPosition, long partLength)
+        {
+            if (partPosition < 0 || partPosition >= stream.Length)
+                throw new ArgumentOutOfRangeException("partPosition", $"origin stream length:{stream.Length}, partPosition:{partPosition}");
+
+            if (partLength <= 0 || partLength > stream.Length - partPosition)
+                throw new ArgumentOutOfRangeException("partLength", $"origin stream length:{stream.Length}, partPosition:{partPosition}, partLength:{partLength}");
+
+            PartReadStream partStream = new PartReadStream(stream, partPosition, partLength);
+            return partStream;
+        }
         #endregion
     }
 
@@ -367,7 +385,12 @@ namespace H.Book
 
         Task LoadAsync(string path);
         Task CreateAsync(string path);
-        Task SetHeader(HBookHeaderArgs header);
+        /// <summary>
+        /// 修改头信息
+        /// </summary>
+        /// <param name="header">头信息</param>
+        /// <returns>true：成功，false：属性在修改前已经发生了改变</returns>
+        Task<bool> SetHeader(HBookHeaderArgs header);
         void ReadCover(Func<Stream, Task> readAction);
         Task<Stream> GetCoverCopy();
         void ReadCoverThumbnail(Func<Stream, Task> readerAction);
