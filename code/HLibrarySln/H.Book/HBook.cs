@@ -37,30 +37,22 @@ namespace H.Book
                 throw new InvalidDataException("StartCode error, this is not a HBook");
             }
             // 读取头
-            byte cc = await ReadNextControlCode(_stream);
-            if (cc != HMetadataControlCodes.BookHeader)
-                throw new InvalidDataException($"0 ControlCode is not Header: expected={HMetadataControlCodes.BookHeader}, value={cc}");
-
-            await _header.Metadata.LoadAsync(_stream, false);
+            await _header.Metadata.LoadAsync(_stream);
             // 读取封面
-            cc = await ReadNextControlCode(_stream);
-            if (cc == HMetadataControlCodes.BookCover)
-                throw new InvalidDataException($"2 ControlCode is not Cover: expected={HMetadataControlCodes.BookCover}, value={cc}");
-
-            await _coverMetadata.LoadAsync(_stream, false);
+            await _coverMetadata.LoadAsync(_stream);
             // 读取页面
+            byte cc = 0;
             while (0 != (cc = await ReadNextControlCode(_stream)))
             {
+                // 移动读取位置到数据对起始位置
+                _stream.Seek(-2, SeekOrigin.Current);
+                // 读取数据段
                 if (cc == HMetadataControlCodes.PageHeader)
                 {
                     HMetadataPage page = new HMetadataPage();
-                    await page.HeaderMetadata.LoadAsync(_stream, false);
+                    await page.HeaderMetadata.LoadAsync(_stream);
                     // 读取页面内容
-                    cc = await ReadNextControlCode(_stream);
-                    if (cc != HMetadataControlCodes.PageContent)
-                        throw new InvalidDataException($"Not found page content: pageIndex={_pages.Count}, controlCode={cc}");
-
-                    await page.ContentMetadata.LoadAsync(_stream, false);
+                    await page.ContentMetadata.LoadAsync(_stream);
                     // 添加到集合
                     _pages.Add(page);
                 }
@@ -68,19 +60,19 @@ namespace H.Book
                 {
                     // 忽略虚拟页面
                     HMetadataVirtualPage virtualPage = new HMetadataVirtualPage();
-                    await virtualPage.LoadAsync(_stream, false);
+                    await virtualPage.LoadAsync(_stream);
                 }
                 else if (cc == HMetadataControlCodes.DeletedPageHeader)
                 {
                     // 忽略被删除的页面头
                     HMetadataDeletedPageHeader deletedPage = new HMetadataDeletedPageHeader();
-                    await deletedPage.LoadAsync(_stream, false);
+                    await deletedPage.LoadAsync(_stream);
                 }
                 else if (cc == HMetadataControlCodes.PageContent)
                 {
                     // 忽略被删除的页面内容或没有页头的内容
                     HMetadataPageContent pageContent = new HMetadataPageContent();
-                    await pageContent.LoadAsync(_stream, false);
+                    await pageContent.LoadAsync(_stream);
                 }
                 else
                     throw new InvalidDataException($"Not support control code: {cc}");
@@ -105,19 +97,30 @@ namespace H.Book
             await _coverMetadata.SaveAsync(_stream, null, reserveLen);
         }
 
-        public async Task<bool> SetHeader(HBookHeaderArgs header)
+        public async Task<bool> SetHeader(HBookHeaderSetting header)
         {
             var metadata = _header.Metadata;
             var fs = metadata.FileStatus;
+            var selected = header.Selected;
+            // 检测当前属性是否符合预期
+            if (selected.HasFlag(HBookHeaderFieldSelections.IetfLanguageTag) && !FieldEqual(header.PreIetfLanguageTag, metadata.IetfLanguageTag)) return false;
+            if (selected.HasFlag(HBookHeaderFieldSelections.Names) && !FieldEqual(header.PreNames, metadata.Names)) return false;
+            if (selected.HasFlag(HBookHeaderFieldSelections.Artists) && !FieldEqual(header.PreArtists, metadata.Artists)) return false;
+            if (selected.HasFlag(HBookHeaderFieldSelections.Groups) && !FieldEqual(header.PreGroups, metadata.Groups)) return false;
+            if (selected.HasFlag(HBookHeaderFieldSelections.Series) && !FieldEqual(header.PreSeries, metadata.Series)) return false;
+            if (selected.HasFlag(HBookHeaderFieldSelections.Categories) && !FieldEqual(header.PreCategories, metadata.Categories)) return false;
+            if (selected.HasFlag(HBookHeaderFieldSelections.Characters) && !FieldEqual(header.PreCharacters, metadata.Characters)) return false;
+            if (selected.HasFlag(HBookHeaderFieldSelections.Tags) && !FieldEqual(header.PreTags, metadata.Tags)) return false;
+
             // 更新
-            if (header.Selected.HasFlag(HBookHeaderFieldSelections.IetfLanguageTag)) metadata.IetfLanguageTag = header.IetfLanguageTag;
-            if (header.Selected.HasFlag(HBookHeaderFieldSelections.Names)) metadata.Names = header.Names;
-            if (header.Selected.HasFlag(HBookHeaderFieldSelections.Artists)) metadata.Artists = header.Artists;
-            if (header.Selected.HasFlag(HBookHeaderFieldSelections.Groups)) metadata.Groups = header.Groups;
-            if (header.Selected.HasFlag(HBookHeaderFieldSelections.Series)) metadata.Series = header.Series;
-            if (header.Selected.HasFlag(HBookHeaderFieldSelections.Categories)) metadata.Categories = header.Categories;
-            if (header.Selected.HasFlag(HBookHeaderFieldSelections.Characters)) metadata.Characters = header.Characters;
-            if (header.Selected.HasFlag(HBookHeaderFieldSelections.Tags)) metadata.Tags = header.Tags;
+            if (selected.HasFlag(HBookHeaderFieldSelections.IetfLanguageTag)) metadata.IetfLanguageTag = header.IetfLanguageTag;
+            if (selected.HasFlag(HBookHeaderFieldSelections.Names)) metadata.Names = header.Names;
+            if (selected.HasFlag(HBookHeaderFieldSelections.Artists)) metadata.Artists = header.Artists;
+            if (selected.HasFlag(HBookHeaderFieldSelections.Groups)) metadata.Groups = header.Groups;
+            if (selected.HasFlag(HBookHeaderFieldSelections.Series)) metadata.Series = header.Series;
+            if (selected.HasFlag(HBookHeaderFieldSelections.Categories)) metadata.Categories = header.Categories;
+            if (selected.HasFlag(HBookHeaderFieldSelections.Characters)) metadata.Characters = header.Characters;
+            if (selected.HasFlag(HBookHeaderFieldSelections.Tags)) metadata.Tags = header.Tags;
 
             // 保存
             int space = fs.GetSpace();
@@ -129,6 +132,8 @@ namespace H.Book
 
             _stream.Seek(fs.Position, SeekOrigin.Current);
             await metadata.SaveAsync(_stream, null, reserveLen);
+
+            return true;
         }
 
         public async void ReadCover(Func<Stream, Task> readAction)
@@ -139,7 +144,7 @@ namespace H.Book
                 return;
             }
 
-            using (Stream partStream = GetPartReadStream(_stream, _coverMetadata.FileStatus.GetAppendixPosition() + _coverMetadata.ThumbnailLength, _coverMetadata.ImageLength))
+            using (Stream partStream = CreatePartReadStream(_stream, _coverMetadata.FileStatus.GetAppendixPosition() + _coverMetadata.ThumbnailLength, _coverMetadata.ImageLength))
                 await readAction.Invoke(partStream);
         }
 
@@ -149,7 +154,7 @@ namespace H.Book
                 return null;
 
             MemoryStream memStream = new MemoryStream(_coverMetadata.ImageLength);
-            using (Stream partStream = GetPartReadStream(_stream, _coverMetadata.FileStatus.GetAppendixPosition() + _coverMetadata.ThumbnailLength, _coverMetadata.ImageLength))
+            using (Stream partStream = CreatePartReadStream(_stream, _coverMetadata.FileStatus.GetAppendixPosition() + _coverMetadata.ThumbnailLength, _coverMetadata.ImageLength))
                 await partStream.CopyToAsync(memStream);
 
             return memStream;
@@ -163,7 +168,7 @@ namespace H.Book
                 return;
             }
 
-            using (Stream partStream = GetPartReadStream(_stream, _coverMetadata.FileStatus.GetAppendixPosition(), _coverMetadata.ThumbnailLength))
+            using (Stream partStream = CreatePartReadStream(_stream, _coverMetadata.FileStatus.GetAppendixPosition(), _coverMetadata.ThumbnailLength))
                 await readerAction.Invoke(partStream);
         }
 
@@ -173,15 +178,15 @@ namespace H.Book
                 return null;
 
             MemoryStream memStream = new MemoryStream(_coverMetadata.ThumbnailLength);
-            using (Stream partStream = GetPartReadStream(_stream, _coverMetadata.FileStatus.GetAppendixPosition(), _coverMetadata.ThumbnailLength))
+            using (Stream partStream = CreatePartReadStream(_stream, _coverMetadata.FileStatus.GetAppendixPosition(), _coverMetadata.ThumbnailLength))
                 await partStream.CopyToAsync(memStream);
 
             return memStream;
         }
 
-        public async void ReadPage(int index, Func<Stream, Task> readerAction)
+        public async void ReadPage(Guid id, Func<Stream, Task> readerAction)
         {
-            var page = _pages[index];
+            var page = _pages[id];
             var metadata = page.ContentMetadata;
             var fileStatus = metadata.FileStatus;
 
@@ -191,13 +196,13 @@ namespace H.Book
                 return;
             }
 
-            using (Stream partStream = GetPartReadStream(_stream, fileStatus.GetAppendixPosition() + metadata.ThumbnailLength, metadata.ImageLength))
+            using (Stream partStream = CreatePartReadStream(_stream, fileStatus.GetAppendixPosition() + metadata.ThumbnailLength, metadata.ImageLength))
                 await readerAction.Invoke(partStream);
         }
 
-        public async Task<Stream> GetPageCopy(int index)
+        public async Task<Stream> GetPageCopy(Guid id)
         {
-            var page = _pages[index];
+            var page = _pages[id];
             var metadata = page.ContentMetadata;
             var fileStatus = metadata.FileStatus;
 
@@ -205,15 +210,15 @@ namespace H.Book
                 return null;
 
             MemoryStream memStream = new MemoryStream(metadata.ImageLength);
-            using (Stream partStream = GetPartReadStream(_stream, fileStatus.GetAppendixPosition() + metadata.ThumbnailLength, metadata.ImageLength))
+            using (Stream partStream = CreatePartReadStream(_stream, fileStatus.GetAppendixPosition() + metadata.ThumbnailLength, metadata.ImageLength))
                 await partStream.CopyToAsync(memStream);
 
             return memStream;
         }
 
-        public async void ReadThumbnail(int index, Func<Stream, Task> readerAction)
+        public async void ReadThumbnail(Guid id, Func<Stream, Task> readerAction)
         {
-            var page = _pages[index];
+            var page = _pages[id];
             var metadata = page.ContentMetadata;
             var fileStatus = metadata.FileStatus;
 
@@ -223,13 +228,13 @@ namespace H.Book
                 return;
             }
 
-            using (Stream partStream = GetPartReadStream(_stream, fileStatus.GetAppendixPosition(), metadata.ThumbnailLength))
+            using (Stream partStream = CreatePartReadStream(_stream, fileStatus.GetAppendixPosition(), metadata.ThumbnailLength))
                 await readerAction.Invoke(partStream);
         }
 
-        public async Task<Stream> GetThumbnailCopy(int index)
+        public async Task<Stream> GetThumbnailCopy(Guid id)
         {
-            var page = _pages[index];
+            var page = _pages[id];
             var metadata = page.ContentMetadata;
             var fileStatus = metadata.FileStatus;
 
@@ -237,13 +242,13 @@ namespace H.Book
                 return null;
 
             MemoryStream memStream = new MemoryStream(metadata.ThumbnailLength);
-            using (Stream partStream = GetPartReadStream(_stream, fileStatus.GetAppendixPosition(), metadata.ThumbnailLength))
+            using (Stream partStream = CreatePartReadStream(_stream, fileStatus.GetAppendixPosition(), metadata.ThumbnailLength))
                 await partStream.CopyToAsync(memStream);
 
             return memStream;
         }
 
-        public async Task AddPage(int index, HPageHeaderArgs header, Stream content, Stream thumbnial)
+        public async Task AddPage(Guid id, HPageHeaderSetting header, Stream content, Stream thumbnial)
         {
             ExceptionFactory.CheckArgNull("content", content);
 
@@ -256,6 +261,8 @@ namespace H.Book
             _stream.Seek(0, SeekOrigin.End);
 
             HMetadataPageHeader headerMetadata = new HMetadataPageHeader();
+            headerMetadata.ID = Guid.NewGuid();
+
             if (header.Selected.HasFlag(HPageHeaderFieldSelections.Artist)) headerMetadata.Artist = header.Artist;
             if (header.Selected.HasFlag(HPageHeaderFieldSelections.Characters)) headerMetadata.Characters = header.Characters;
             if (header.Selected.HasFlag(HPageHeaderFieldSelections.Tags)) headerMetadata.Tags = header.Tags;
@@ -278,40 +285,44 @@ namespace H.Book
             _pages.Add(pageMetadata);
         }
 
-        public async Task DeletePage(int index)
+        public async Task DeletePage(Guid id)
         {
-            if (_pages.Count <= index)
-                return;
-
-            var page = _pages[index];
+            var page = _pages[id];
             var headerFS = page.HeaderMetadata.FileStatus;
 
-            _pages.RemoveAt(index);
+            _pages.Remove(page);
             _stream.Seek(headerFS.Position + 1, SeekOrigin.Begin);
             await _stream.WriteByteAsync(HMetadataControlCodes.DeletedPageHeader);
         }
 
-        public async Task SetPageHeader(int index, HPageHeaderArgs header)
+        public async Task<bool> SetPageHeader(Guid index, HPageHeaderSetting header)
         {
             var page = _pages[index];
-            var headerMetadata = page.HeaderMetadata;
-            var headerFS = headerMetadata.FileStatus;
+            var metadata = page.HeaderMetadata;
+            var fs = metadata.FileStatus;
+            var selected = header.Selected;
+            // 检测属性是否符合预期
+            if (selected.HasFlag(HPageHeaderFieldSelections.Artist) && !FieldEqual(header.PreArtist, metadata.Artist)) return false;
+            if (selected.HasFlag(HPageHeaderFieldSelections.Characters) && !FieldEqual(header.PreCharacters, metadata.Characters)) return false;
+            if (selected.HasFlag(HPageHeaderFieldSelections.Tags) && !FieldEqual(header.PreTags, metadata.Tags)) return false;
 
             // 更新属性
-            if (header.Selected.HasFlag(HPageHeaderFieldSelections.Artist)) headerMetadata.Artist = header.Artist;
-            if (header.Selected.HasFlag(HPageHeaderFieldSelections.Characters)) headerMetadata.Characters = header.Characters;
-            if (header.Selected.HasFlag(HPageHeaderFieldSelections.Tags)) headerMetadata.Tags = header.Tags;
+            if (selected.HasFlag(HPageHeaderFieldSelections.Artist)) metadata.Artist = header.Artist;
+            if (selected.HasFlag(HPageHeaderFieldSelections.Characters)) metadata.Characters = header.Characters;
+            if (selected.HasFlag(HPageHeaderFieldSelections.Tags)) metadata.Tags = header.Tags;
 
             // 保存
-            int space = headerFS.GetSpace();
-            int segHeaderLen = headerFS.GetHeaderLength();
-            int fieldsLen = headerMetadata.GetFieldsLength();
+            int space = fs.GetSpace();
+            int segHeaderLen = fs.GetHeaderLength();
+            int fieldsLen = metadata.GetFieldsLength();
             int reserveLen = checked(space - segHeaderLen - fieldsLen);
             if (reserveLen < 0)
                 throw new ArgumentException($"header is too big: space={space}, fieldsLen={fieldsLen}, segHeaderLen={segHeaderLen}", "header");
 
-            _stream.Seek(headerFS.Position, SeekOrigin.Begin);
-            await headerMetadata.SaveAsync(_stream, null, reserveLen);
+            _stream.Seek(fs.Position, SeekOrigin.Begin);
+            await metadata.SaveAsync(_stream, null, reserveLen);
+
+            return true;
         }
 
         #region private methods
@@ -364,7 +375,14 @@ namespace H.Book
             return 0;
         }
 
-        private static PartReadStream GetPartReadStream(Stream stream, long partPosition, long partLength)
+        /// <summary>
+        /// 把<see cref="Stream"/>的一部分抽象成一个只读的新的<see cref="Stream"/>
+        /// </summary>
+        /// <param name="stream">原始的<see cref="Stream"/></param>
+        /// <param name="partPosition">新<see cref="Stream"/>在原始<see cref="Stream"/>中的起始位置</param>
+        /// <param name="partLength">新<see cref="Stream"/>的长度</param>
+        /// <returns></returns>
+        private static PartReadStream CreatePartReadStream(Stream stream, long partPosition, long partLength)
         {
             if (partPosition < 0 || partPosition >= stream.Length)
                 throw new ArgumentOutOfRangeException("partPosition", $"origin stream length:{stream.Length}, partPosition:{partPosition}");
@@ -374,6 +392,40 @@ namespace H.Book
 
             PartReadStream partStream = new PartReadStream(stream, partPosition, partLength);
             return partStream;
+        }
+
+        /// <summary>
+        /// 比较两个字符串字段是否相等，这里null被认为与empty相等
+        /// </summary>
+        /// <param name="l">用于比较的字段1</param>
+        /// <param name="r">用于比较的字段2</param>
+        /// <returns>true：两个字段相等，false：两个字段不等</returns>
+        private static bool FieldEqual(string l, string r)
+        {
+            if (string.IsNullOrEmpty(l) && string.IsNullOrEmpty(r)) return true;
+            if (string.IsNullOrEmpty(l) || string.IsNullOrEmpty(r)) return false;
+
+            return l.Equals(r);
+        }
+
+        /// <summary>
+        /// 比较两个字符串数组是否相等，这里null和空数组被认为相等，字符串null与empty被认为相等
+        /// </summary>
+        /// <param name="l">用于比较的字段1</param>
+        /// <param name="r">用于比较的字段2</param>
+        /// <returns>true：两个字段相等，false：两个字段不等</returns>
+        private static bool FieldEqual(string[] l, string[] r)
+        {
+            if ((l == null || l.Length == 0) && (r == null || r.Length == 0)) return true;
+            if ((l == null || l.Length == 0) || (r == null || r.Length == 0)) return false;
+            if (l.Length != r.Length) return false;
+
+            for (int i = 0; i < l.Length; i++)
+            {
+                if (!FieldEqual(l[i], r[i])) return false;
+            }
+
+            return true;
         }
         #endregion
     }
@@ -390,17 +442,23 @@ namespace H.Book
         /// </summary>
         /// <param name="header">头信息</param>
         /// <returns>true：成功，false：属性在修改前已经发生了改变</returns>
-        Task<bool> SetHeader(HBookHeaderArgs header);
+        Task<bool> SetHeader(HBookHeaderSetting header);
         void ReadCover(Func<Stream, Task> readAction);
         Task<Stream> GetCoverCopy();
         void ReadCoverThumbnail(Func<Stream, Task> readerAction);
         Task<Stream> GetCoverThumbnailCopy();
-        void ReadPage(int index, Func<Stream, Task> readerAction);
-        Task<Stream> GetPageCopy(int index);
-        void ReadThumbnail(int index, Func<Stream, Task> readerAction);
-        Task<Stream> GetThumbnailCopy(int index);
-        Task AddPage(int index, HPageHeaderArgs header, Stream content, Stream thumbnial);
-        Task DeletePage(int index);
-        Task SetPageHeader(int index, HPageHeaderArgs header);
+        void ReadPage(Guid id, Func<Stream, Task> readerAction);
+        Task<Stream> GetPageCopy(Guid id);
+        void ReadThumbnail(Guid id, Func<Stream, Task> readerAction);
+        Task<Stream> GetThumbnailCopy(Guid id);
+        Task AddPage(Guid id, HPageHeaderSetting header, Stream content, Stream thumbnial);
+        Task DeletePage(Guid id);
+        /// <summary>
+        /// 修改页面头信息
+        /// </summary>
+        /// <param name="id">页面ID</param>
+        /// <param name="header">头信息</param>
+        /// <returns>true：成功，false：属性在修改前已经发生了改变</returns>
+        Task<bool> SetPageHeader(Guid id, HPageHeaderSetting header);
     }
 }

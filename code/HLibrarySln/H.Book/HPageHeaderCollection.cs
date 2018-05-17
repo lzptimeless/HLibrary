@@ -9,31 +9,47 @@ namespace H.Book
 {
     public class HPageHeaderCollection : IReadOnlyList<IHPageHeader>
     {
-        private List<IHPageHeader> _items;
+        private HMetadataPageCollection _pages;
 
-        public HPageHeaderCollection(IEnumerable<IHPageHeader> items)
+        public HPageHeaderCollection(HMetadataPageCollection pages)
         {
-            _items = new List<IHPageHeader>(items);
+            _pages = pages;
         }
 
         public IHPageHeader this[int index]
         {
-            get { return _items[index]; }
+            get { return CreateReadOnlyHeader(_pages[index]); }
+        }
+
+        public IHPageHeader this[Guid id]
+        {
+            get { return CreateReadOnlyHeader(_pages[id]); }
         }
 
         public int Count
         {
-            get { return _items.Count; }
+            get { return _pages.Count; }
         }
 
         public IEnumerator<IHPageHeader> GetEnumerator()
         {
-            return _items.GetEnumerator();
+            foreach (var p in _pages)
+            {
+                yield return CreateReadOnlyHeader(p);
+            }
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return _items.GetEnumerator();
+            foreach (var p in _pages)
+            {
+                yield return CreateReadOnlyHeader(p);
+            }
+        }
+
+        private IHPageHeader CreateReadOnlyHeader(HMetadataPage page)
+        {
+            return new HPageHeader(page.HeaderMetadata);
         }
     }
 }

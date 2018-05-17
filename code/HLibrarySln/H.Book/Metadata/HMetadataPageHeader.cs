@@ -9,7 +9,13 @@ namespace H.Book
     public class HMetadataPageHeader : HMetadataSegment
     {
         public override byte ControlCode { get { return HMetadataControlCodes.PageHeader; } }
-        
+
+        /// <summary>
+        /// Length is 16B
+        /// </summary>
+        public Guid ID { get; set; }
+        public const string IDPropertyName = "ID";
+
         public string Artist { get; set; }
         public const string ArtistPropertyName = "Artist";
         public const int ArtistLen = 128;
@@ -24,21 +30,23 @@ namespace H.Book
 
         public override int GetFieldsLength()
         {
-            // 页内容位置+作者名+角色数+角色+标签数+标签
-            return 4 + ArtistLen +
+            // 页面ID+页内容位置+作者名+角色数+角色+标签数+标签
+            return 16 + ArtistLen +
                 1 + (Characters != null ? Characters.Length : 0) * CharactersItemLen +
                 1 + (Tags != null ? Tags.Length : 0) * TagsItemLen;
         }
 
         protected override byte[] GetFields()
         {
+            ExceptionFactory.CheckPropertyEmpty(IDPropertyName, ID);
             ExceptionFactory.CheckPropertyCountRange(CharactersPropertyName, Characters, 0, byte.MaxValue);
             ExceptionFactory.CheckPropertyCountRange(TagsPropertyName, Tags, 0, byte.MaxValue);
 
             int dataLen = GetFieldsLength();
             byte[] data = new byte[dataLen];
             int writePos = 0;
-            
+            // 写入ID
+            writePos += HMetadataHelper.WritePropertyGuid(IDPropertyName, ID, data, writePos);
             // 写入作者名
             writePos += HMetadataHelper.WritePropertyString(ArtistPropertyName, Artist, data, writePos, ArtistLen);
             // 写入角色

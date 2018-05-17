@@ -19,6 +19,7 @@ namespace H.Book
         }
 
         public HMetadataPageHeader Metadata { get; private set; }
+        public Guid ID { get { return Metadata.ID; } }
         public string Artist { get { return Metadata.Artist; } }
         public IReadOnlyList<string> Charachters { get { return Metadata.Characters; } }
         public IReadOnlyList<string> Tags { get { return Metadata.Tags; } }
@@ -26,6 +27,7 @@ namespace H.Book
 
     public interface IHPageHeader
     {
+        Guid ID { get; }
         string Artist { get; }
         IReadOnlyList<string> Charachters { get; }
         IReadOnlyList<string> Tags { get; }

@@ -6,11 +6,14 @@ using System.Threading.Tasks;
 
 namespace H.Book
 {
-    public class HPageHeaderArgs
+    public class HPageHeaderSetting
     {
         public HPageHeaderFieldSelections Selected { get; set; }
+        public string PreArtist { get; set; }
         public string Artist { get; set; }
+        public string[] PreCharacters { get; set; }
         public string[] Characters { get; set; }
+        public string[] PreTags { get; set; }
         public string[] Tags { get; set; }
     }
 

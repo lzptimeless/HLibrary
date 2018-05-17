@@ -13,7 +13,7 @@ namespace H.Book
 
         public HMetadataPageCollection()
         {
-            RefreshHeaders();
+            Headers = new HPageHeaderCollection(this);
         }
 
         public HPageHeaderCollection Headers { get; private set; }
@@ -28,7 +28,28 @@ namespace H.Book
                 if (_items[index] != value)
                 {
                     _items[index] = value;
-                    RefreshHeaders();
+                }
+            }
+        }
+
+        public HMetadataPage this[Guid id]
+        {
+            get { return _items.First(i => i.HeaderMetadata.ID.Equals(id)); }
+
+            set
+            {
+                int index = -1;
+                for (int i = 0; i < _items.Count; i++)
+                {
+                    if (_items[i].HeaderMetadata.ID.Equals(id))
+                    {
+                        index = i;
+                        break;
+                    }
+                }
+                if (index >= 0 && _items[index] != value)
+                {
+                    _items[index] = value;
                 }
             }
         }
@@ -46,13 +67,11 @@ namespace H.Book
         public void Add(HMetadataPage item)
         {
             _items.Add(item);
-            RefreshHeaders();
         }
 
         public void AddRange(IEnumerable<HMetadataPage> items)
         {
             _items.AddRange(items);
-            RefreshHeaders();
         }
 
         public void Clear()
@@ -60,7 +79,6 @@ namespace H.Book
             if (_items.Count > 0)
             {
                 _items.Clear();
-                RefreshHeaders();
             }
         }
 
@@ -87,22 +105,17 @@ namespace H.Book
         public void Insert(int index, HMetadataPage item)
         {
             _items.Insert(index, item);
-            RefreshHeaders();
         }
 
         public bool Remove(HMetadataPage item)
         {
             bool result = _items.Remove(item);
-            if (result)
-                RefreshHeaders();
-
             return result;
         }
 
         public void RemoveAt(int index)
         {
             _items.RemoveAt(index);
-            RefreshHeaders();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
@@ -110,11 +123,5 @@ namespace H.Book
             return _items.GetEnumerator();
         }
         #endregion
-
-        private void RefreshHeaders()
-        {
-            var headers = _items.Select(i => new HPageHeader(i.HeaderMetadata));
-            Headers = new HPageHeaderCollection(headers);
-        }
     }
 }

@@ -137,6 +137,10 @@ namespace H.Book
 
         public override IAsyncResult BeginRead(byte[] buffer, int offset, int count, AsyncCallback callback, object state)
         {
+            // 防止读取数据超过尾部
+            if (count > PartLength - Position)
+                count = (int)(PartLength - Position);
+
             return _parentStream.BeginRead(buffer, offset, count, callback, state);
         }
 

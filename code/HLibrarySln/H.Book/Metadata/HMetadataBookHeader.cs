@@ -77,8 +77,8 @@ namespace H.Book
 
         public override int GetFieldsLength()
         {
-            // 版本+ID+封面位置+索引位置+语言+书名数+书名+作者数+作者+分组数+分组+系列数+系列+分类数+分类+角色数+角色+标签数+标签
-            int dataLen = 1 + 16 + 4 + 4 + IetfLanguageTagLen +
+            // 版本+ID+语言+书名数+书名+作者数+作者+分组数+分组+系列数+系列+分类数+分类+角色数+角色+标签数+标签
+            int dataLen = 1 + 16 + IetfLanguageTagLen +
                 1 + (Names != null ? Names.Length * NamesItemLen : 0) +
                 1 + (Artists != null ? Artists.Length * ArtistsItemLen : 0) +
                 1 + (Groups != null ? Groups.Length * GroupsItemLen : 0) +

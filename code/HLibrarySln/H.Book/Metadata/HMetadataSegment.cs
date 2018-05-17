@@ -99,7 +99,7 @@ namespace H.Book
         /// </summary>
         /// <param name="stream">数据源</param>
         /// <param name="hasControlCode">数据源包涵控制码，需要检测控制码</param>
-        public async Task LoadAsync(Stream stream, bool hasControlCode)
+        public async Task LoadAsync(Stream stream)
         {
             ExceptionFactory.CheckArgNull("stream", stream);
 
@@ -116,22 +116,20 @@ namespace H.Book
             // 字段缓存
             byte[] fields = null;
             // 验证控制码
-            if (hasControlCode)
-            {
-                byteResult = await stream.ReadByteAsync();
-                if (byteResult == byteResultEnd)
-                    throw new EndOfStreamException("Stream ended when read control code flag");
+            byteResult = await stream.ReadByteAsync();
+            if (byteResult == byteResultEnd)
+                throw new EndOfStreamException("Stream ended when read control code flag");
 
-                if (HMetadataConstant.ControlCodeFlag != byteResult)
-                    throw new InvalidDataException($"Invalid control code flag: expected={HMetadataConstant.ControlCodeFlag}, value={byteResult}");
+            if (HMetadataConstant.ControlCodeFlag != byteResult)
+                throw new InvalidDataException($"Invalid control code flag: expected={HMetadataConstant.ControlCodeFlag}, value={byteResult}");
 
-                byteResult = await stream.ReadByteAsync();
-                if (byteResult == byteResultEnd)
-                    throw new EndOfStreamException("Stream ended when read control code");
+            byteResult = await stream.ReadByteAsync();
+            if (byteResult == byteResultEnd)
+                throw new EndOfStreamException("Stream ended when read control code");
 
-                if (ControlCode != byteResult)
-                    throw new InvalidDataException($"Invalid control code: expected={ControlCode}, value={byteResult}");
-            }
+            if (ControlCode != byteResult)
+                throw new InvalidDataException($"Invalid control code: expected={ControlCode}, value={byteResult}");
+
             byte[] intBuffer = new byte[4];
             // 读取字段数据长度
             if (intBuffer.Length != await stream.ReadAsync(intBuffer, 0, intBuffer.Length))

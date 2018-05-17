@@ -10,6 +10,12 @@ namespace H.Book
     {
         public override byte ControlCode { get { return HMetadataControlCodes.VirtualPageHeader; } }
 
+        /// <summary>
+        /// Length is 16B
+        /// </summary>
+        public Guid ID { get; set; }
+        public const string IDPropertyName = "ID";
+
         public Guid BookID { get; set; }
         public string BookIDPropertyName = "BookID";
 
@@ -18,19 +24,21 @@ namespace H.Book
 
         public override int GetFieldsLength()
         {
-            // 书ID，页面索引
-            return 16 + 4;
+            // 页面ID，书ID，页面索引
+            return 16 + 16 + 4;
         }
 
         protected override byte[] GetFields()
         {
+            ExceptionFactory.CheckPropertyEmpty(IDPropertyName, ID);
             ExceptionFactory.CheckPropertyEmpty(BookIDPropertyName, BookID);
             ExceptionFactory.CheckPropertyRange(PageIndexPropertyName, PageIndex, 0, int.MaxValue);
 
             int dataLen = GetFieldsLength();
             byte[] data = new byte[dataLen];
             int writePos = 0;
-
+            // 写入ID
+            writePos += HMetadataHelper.WritePropertyGuid(IDPropertyName, ID, data, writePos);
             // 写入书ID
             writePos += HMetadataHelper.WritePropertyGuid(BookIDPropertyName, BookID, data, writePos);
             // 写入页面索引
