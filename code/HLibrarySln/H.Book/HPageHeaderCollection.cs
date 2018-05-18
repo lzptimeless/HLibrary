@@ -18,12 +18,26 @@ namespace H.Book
 
         public IHPageHeader this[int index]
         {
-            get { return CreateReadOnlyHeader(_pages[index]); }
+            get
+            {
+                var page = _pages[index];
+                if (page != null)
+                    return CreateReadOnlyHeader(_pages[index]);
+                else
+                    return null;
+            }
         }
 
         public IHPageHeader this[Guid id]
         {
-            get { return CreateReadOnlyHeader(_pages[id]); }
+            get
+            {
+                var page = _pages[id];
+                if (page != null)
+                    return CreateReadOnlyHeader(_pages[id]);
+                else
+                    return null;
+            }
         }
 
         public int Count

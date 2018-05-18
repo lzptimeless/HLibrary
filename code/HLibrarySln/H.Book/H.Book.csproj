@@ -40,9 +40,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Call.cs" />
+    <Compile Include="CallerMonitor.cs" />
+    <Compile Include="CallOutOfLimitException.cs" />
+    <Compile Include="CallOverTimeException.cs" />
     <Compile Include="ExceptionFactory.cs" />
     <Compile Include="Exception\InvalidBufferException.cs" />
     <Compile Include="Exception\InvalidPropertyException.cs" />
+    <Compile Include="Exception\PageNotFoundException.cs" />
     <Compile Include="Exception\ReadPropertyException.cs" />
     <Compile Include="Exception\WritePropertyException.cs" />
     <Compile Include="HBook.cs" />

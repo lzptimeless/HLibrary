@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -11,7 +12,7 @@ namespace H.Book
     public class HBook : IHBook
     {
         #region fields
-        private OneManyLock _lock = new OneManyLock();
+        private AsyncOneManyLock _lock = new AsyncOneManyLock();
         private Stream _stream;
         private HBookHeader _header = new HBookHeader();
         private HMetadataBookCover _coverMetadata = new HMetadataBookCover();
@@ -23,8 +24,10 @@ namespace H.Book
         public IReadOnlyList<IHPageHeader> PageHeaders { get { return _pages.Headers; } }
         #endregion
 
-        public async Task LoadAsync(string path)
+        public async Task LoadAsync(string path, [CallerFilePath] string callerFilePath = "", [CallerMemberName] string callerName = "")
         {
+            if (_stream != null) throw new ApplicationException("Can not load when contains data");
+
             _stream = new FileStream(path, FileMode.Open, FileAccess.ReadWrite, FileShare.None, 2048, true);
             int readedLen = 0;
             // 验证文件头
@@ -54,7 +57,8 @@ namespace H.Book
                     // 读取页面内容
                     await page.ContentMetadata.LoadAsync(_stream);
                     // 添加到集合
-                    _pages.Add(page);
+                    if (!_pages.Add(page))
+                        throw new InvalidDataException("Found duplicate id page");
                 }
                 else if (cc == HMetadataControlCodes.VirtualPageHeader)
                 {
@@ -81,6 +85,8 @@ namespace H.Book
 
         public async Task CreateAsync(string path)
         {
+            if (_stream != null) throw new ApplicationException("Can not load when contains data");
+
             _stream = new FileStream(path, FileMode.CreateNew, FileAccess.ReadWrite, FileShare.None, 2048, true);
 
             int reserveLen = 0;
@@ -184,25 +190,30 @@ namespace H.Book
             return memStream;
         }
 
-        public async void ReadPage(Guid id, Func<Stream, Task> readerAction)
+        public async Task<bool> ReadPage(Guid id, Func<Stream, Task> readerAction)
         {
             var page = _pages[id];
+            if (page == null) return false;
+
             var metadata = page.ContentMetadata;
             var fileStatus = metadata.FileStatus;
-
             if (metadata.ImageLength == 0)
             {
                 await readerAction.Invoke(null);
-                return;
+                return true;
             }
 
             using (Stream partStream = CreatePartReadStream(_stream, fileStatus.GetAppendixPosition() + metadata.ThumbnailLength, metadata.ImageLength))
                 await readerAction.Invoke(partStream);
+
+            return true;
         }
 
         public async Task<Stream> GetPageCopy(Guid id)
         {
             var page = _pages[id];
+            if (page == null) throw ExceptionFactory.CreatePageNotFoundEx(id);
+
             var metadata = page.ContentMetadata;
             var fileStatus = metadata.FileStatus;
 
@@ -216,25 +227,31 @@ namespace H.Book
             return memStream;
         }
 
-        public async void ReadThumbnail(Guid id, Func<Stream, Task> readerAction)
+        public async Task<bool> ReadThumbnail(Guid id, Func<Stream, Task> readerAction)
         {
             var page = _pages[id];
+            if (page == null) return false;
+
             var metadata = page.ContentMetadata;
             var fileStatus = metadata.FileStatus;
 
             if (metadata.ThumbnailLength == 0)
             {
                 await readerAction.Invoke(null);
-                return;
+                return true;
             }
 
             using (Stream partStream = CreatePartReadStream(_stream, fileStatus.GetAppendixPosition(), metadata.ThumbnailLength))
                 await readerAction.Invoke(partStream);
+
+            return true;
         }
 
         public async Task<Stream> GetThumbnailCopy(Guid id)
         {
             var page = _pages[id];
+            if (page == null) throw ExceptionFactory.CreatePageNotFoundEx(id);
+
             var metadata = page.ContentMetadata;
             var fileStatus = metadata.FileStatus;
 
@@ -248,7 +265,7 @@ namespace H.Book
             return memStream;
         }
 
-        public async Task AddPage(Guid id, HPageHeaderSetting header, Stream content, Stream thumbnial)
+        public async Task<Guid> AddPage(HPageHeaderSetting header, Stream content, Stream thumbnial)
         {
             ExceptionFactory.CheckArgNull("content", content);
 
@@ -282,22 +299,31 @@ namespace H.Book
             await contentMetadata.SaveAsync(_stream, appendixes.ToArray(), reserveLen);
 
             HMetadataPage pageMetadata = new HMetadataPage(headerMetadata, contentMetadata);
-            _pages.Add(pageMetadata);
+            if (!_pages.Add(pageMetadata))
+                throw new ApplicationException($"Unkown error, add page failed: id={headerMetadata.ID}");
+
+            return headerMetadata.ID;
         }
 
-        public async Task DeletePage(Guid id)
+        public async Task<bool> DeletePage(Guid id)
         {
             var page = _pages[id];
+            if (page == null) return false;
+
             var headerFS = page.HeaderMetadata.FileStatus;
 
             _pages.Remove(page);
             _stream.Seek(headerFS.Position + 1, SeekOrigin.Begin);
             await _stream.WriteByteAsync(HMetadataControlCodes.DeletedPageHeader);
+
+            return true;
         }
 
-        public async Task<bool> SetPageHeader(Guid index, HPageHeaderSetting header)
+        public async Task<bool> SetPageHeader(Guid id, HPageHeaderSetting header)
         {
-            var page = _pages[index];
+            var page = _pages[id];
+            if (page == null) throw ExceptionFactory.CreatePageNotFoundEx(id);
+
             var metadata = page.HeaderMetadata;
             var fs = metadata.FileStatus;
             var selected = header.Selected;
@@ -432,33 +458,110 @@ namespace H.Book
 
     public interface IHBook
     {
+        /// <summary>
+        /// 文件头
+        /// </summary>
         IHBookHeader Header { get; }
+        /// <summary>
+        /// 页面头信息
+        /// </summary>
         IReadOnlyList<IHPageHeader> PageHeaders { get; }
-
+        /// <summary>
+        /// 从文件中加载
+        /// </summary>
+        /// <param name="path">文件路径</param>
+        /// <returns></returns>
+        /// <exception cref="ApplicationException">已经加载了数据</exception>
+        /// <exception cref="InvalidDataException">文件起始标识错误，或发现重复ID的页面，或发现不支持控制码</exception>
         Task LoadAsync(string path);
+        /// <summary>
+        /// 创建新的<see cref="HBook"/>文件
+        /// </summary>
+        /// <param name="path">文件路径</param>
+        /// <returns></returns>
+        /// <exception cref="ApplicationException"><see cref="HBook"/>已经加载了数据</exception>
         Task CreateAsync(string path);
         /// <summary>
         /// 修改头信息
         /// </summary>
         /// <param name="header">头信息</param>
         /// <returns>true：成功，false：属性在修改前已经发生了改变</returns>
+        /// <exception cref="ArgumentException">头信息太大了，超出预留空间</exception>
         Task<bool> SetHeader(HBookHeaderSetting header);
+        /// <summary>
+        /// 读取封面
+        /// </summary>
+        /// <param name="readAction">读取<see cref="Action"/></param>
         void ReadCover(Func<Stream, Task> readAction);
+        /// <summary>
+        /// 获取封面副本
+        /// </summary>
+        /// <returns>封面副本</returns>
         Task<Stream> GetCoverCopy();
+        /// <summary>
+        /// 读取封面缩略图
+        /// </summary>
+        /// <param name="readerAction">读取<see cref="Action"/></param>
         void ReadCoverThumbnail(Func<Stream, Task> readerAction);
+        /// <summary>
+        /// 获取封面缩略图副本
+        /// </summary>
+        /// <returns>封面缩略图副本</returns>
         Task<Stream> GetCoverThumbnailCopy();
-        void ReadPage(Guid id, Func<Stream, Task> readerAction);
+        /// <summary>
+        /// 读取页面图像，返回true时图像也有可能为null
+        /// </summary>
+        /// <param name="id">页面ID</param>
+        /// <param name="readerAction">读取<see cref="Action"/></param>
+        /// <returns>返回true：读取成功，false：这个页面不存在</returns>
+        Task<bool> ReadPage(Guid id, Func<Stream, Task> readerAction);
+        /// <summary>
+        /// 获取页面图像副本
+        /// </summary>
+        /// <param name="id">页面ID</param>
+        /// <returns>页面图像副本</returns>
+        /// <exception cref="PageNotFoundException">没有找到这个页面</exception>
         Task<Stream> GetPageCopy(Guid id);
-        void ReadThumbnail(Guid id, Func<Stream, Task> readerAction);
+        /// <summary>
+        /// 读取页面缩略图
+        /// </summary>
+        /// <param name="id">页面ID</param>
+        /// <param name="readerAction">读取<see cref="Action"/></param>
+        /// <returns>ture：找到页面，false：没有找到页面</returns>
+        Task<bool> ReadThumbnail(Guid id, Func<Stream, Task> readerAction);
+        /// <summary>
+        /// 获取页面缩略图副本
+        /// </summary>
+        /// <param name="id">页面ID</param>
+        /// <returns>页面缩略图副本</returns>
+        /// <exception cref="PageNotFoundException">没有找到页面</exception>
         Task<Stream> GetThumbnailCopy(Guid id);
-        Task AddPage(Guid id, HPageHeaderSetting header, Stream content, Stream thumbnial);
-        Task DeletePage(Guid id);
+        /// <summary>
+        /// 添加页面
+        /// </summary>
+        /// <param name="header">页面头</param>
+        /// <param name="content">页面图像</param>
+        /// <param name="thumbnial">页面缩略图</param>
+        /// <returns>新的页面的ID</returns>
+        /// <exception cref="ArgumentNullException">content为null</exception>
+        /// <exception cref="ArgumentException">content太大了，超出定义</exception>
+        /// <exception cref="ArgumentException">thumbnial太大了，超出定义</exception>
+        /// <exception cref="ApplicationException">未知异常导致添加失败</exception>
+        Task<Guid> AddPage(HPageHeaderSetting header, Stream content, Stream thumbnial);
+        /// <summary>
+        /// 删除页面
+        /// </summary>
+        /// <param name="id">页面ID</param>
+        /// <returns>返回true：删除成功，false：找不到这个页面</returns>
+        Task<bool> DeletePage(Guid id);
         /// <summary>
         /// 修改页面头信息
         /// </summary>
         /// <param name="id">页面ID</param>
         /// <param name="header">头信息</param>
         /// <returns>true：成功，false：属性在修改前已经发生了改变</returns>
+        /// <exception cref="PageNotFoundException">找不到这个页面</exception>
+        /// <exception cref="ArgumentException">头信息太大了，超出可用空间</exception>
         Task<bool> SetPageHeader(Guid id, HPageHeaderSetting header);
     }
 }

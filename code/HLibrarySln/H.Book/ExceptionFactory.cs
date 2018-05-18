@@ -155,5 +155,10 @@ namespace H.Book
         {
             return new ReadPropertyException(propertyName, msg, innerException);
         }
+
+        public static Exception CreatePageNotFoundEx(Guid id)
+        {
+            return new PageNotFoundException($"Page not exist: id={id}");
+        }
     }
 }
