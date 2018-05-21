@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace H.Book
 {
-    public abstract class HMetadataSegment
+    public abstract class HMetadataSegment : ICloneable
     {
         public HMetadataSegment()
         {
@@ -179,6 +179,24 @@ namespace H.Book
         /// </summary>
         /// <returns></returns>
         public abstract int GetFieldsLength();
+
+        /// <summary>
+        /// 深度复制
+        /// </summary>
+        /// <returns></returns>
+        public object Clone()
+        {
+            HMetadataSegment clone = MemberwiseClone() as HMetadataSegment;
+            clone.FileStatus = FileStatus.Clone() as HMetadataSegmentFileStatus;
+            OnClone(clone);
+            return clone;
+        }
+
+        /// <summary>
+        /// 深度复制，基础类字段已经通过MemberwiseClone函数复制，子类需要处理非基础类字段
+        /// </summary>
+        /// <param name="clone">副本</param>
+        protected abstract void OnClone(HMetadataSegment clone);
 
         /// <summary>
         /// 获取字段数据

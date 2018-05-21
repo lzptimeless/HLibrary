@@ -15,10 +15,7 @@ namespace H.Book
 
         public HMetadataPageCollection()
         {
-            Headers = new HPageHeaderCollection(this);
         }
-
-        public HPageHeaderCollection Headers { get; private set; }
 
         #region IList<HPage>
         /// <summary>
@@ -197,6 +194,15 @@ namespace H.Book
             clone = _items.ToArray();
             _lock.Leave();
             return clone.GetEnumerator();
+        }
+
+        public IHPageHeader[] GetPageHeaders()
+        {
+            IHPageHeader[] headers = null;
+            _lock.Enter(false);
+            headers = _items.Select(i => new HPageHeader(i.HeaderMetadata)).ToArray();
+            _lock.Leave();
+            return headers;
         }
         #endregion
     }

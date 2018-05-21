@@ -70,5 +70,9 @@ namespace H.Book
             }
             PagePositions = pp;
         }
+
+        protected override void OnClone(HMetadataSegment clone)
+        {
+        }
     }
 }

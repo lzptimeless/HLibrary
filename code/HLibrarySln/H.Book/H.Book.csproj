@@ -59,7 +59,6 @@
     <Compile Include="Metadata\HMetadataPage.cs" />
     <Compile Include="HMetadataPageCollection.cs" />
     <Compile Include="HPageHeader.cs" />
-    <Compile Include="HPageHeaderCollection.cs" />
     <Compile Include="Metadata\HMetadataDeletedPageHeader.cs" />
     <Compile Include="Metadata\HMetadataHelper.cs" />
     <Compile Include="Metadata\HMetadataSegment.cs" />

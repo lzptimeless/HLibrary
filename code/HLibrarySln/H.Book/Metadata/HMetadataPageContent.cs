@@ -58,5 +58,9 @@ namespace H.Book
             ImageLength = imgLen;
             ExceptionFactory.CheckPropertyRange(ImageLengthPropertyName, imgLen, 0, int.MaxValue);
         }
+
+        protected override void OnClone(HMetadataSegment clone)
+        {
+        }
     }
 }

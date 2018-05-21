@@ -63,5 +63,9 @@ namespace H.Book
             PageIndex = pageIndex;
             ExceptionFactory.CheckPropertyRange(PageIndexPropertyName, pageIndex, 0, int.MaxValue);
         }
+
+        protected override void OnClone(HMetadataSegment clone)
+        {
+        }
     }
 }

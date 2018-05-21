@@ -9,7 +9,7 @@ namespace H.Book
     /// <summary>
     /// <see cref="HMetadataSegment"/>在文件中的状态
     /// </summary>
-    public class HMetadataSegmentFileStatus
+    public class HMetadataSegmentFileStatus : ICloneable
     {
         #region properties
         /// <summary>
@@ -63,6 +63,11 @@ namespace H.Book
         {
             long p = checked(Position + FieldsLength);
             return p;
+        }
+
+        public object Clone()
+        {
+            return MemberwiseClone();
         }
         #endregion
     }

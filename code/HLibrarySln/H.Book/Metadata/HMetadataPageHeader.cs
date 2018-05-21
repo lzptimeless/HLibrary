@@ -79,5 +79,9 @@ namespace H.Book
             readPos += HMetadataHelper.ReadPropertyList(TagsPropertyName, out tags, buffer, readPos, TagsItemLen);
             Tags = tags;
         }
+
+        protected override void OnClone(HMetadataSegment clone)
+        {
+        }
     }
 }
