@@ -35,8 +35,10 @@
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Exceptions\LockWaitLimitException.cs" />
     <Compile Include="IO\StreamExtension.cs" />
     <Compile Include="IO\ThreadIO.cs" />
+    <Compile Include="Locks\AsyncOneManyLockEx.cs" />
     <Compile Include="Locks\AsyncOneManyLock.cs" />
     <Compile Include="Locks\OneManyLock.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
