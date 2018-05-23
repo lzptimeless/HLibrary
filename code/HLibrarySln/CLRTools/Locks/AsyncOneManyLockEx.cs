@@ -17,9 +17,10 @@ namespace System.Threading
         #region TaskItem
         private class WaitItem
         {
-            public WaitItem(TaskCompletionSource<Boolean> tcs, string receiver)
+            public WaitItem(TaskCompletionSource<Boolean> tcs, Boolean exclusive, String receiver)
             {
                 TCS = tcs;
+                Exclusive = exclusive;
                 Receiver = receiver;
             }
 
@@ -28,9 +29,18 @@ namespace System.Threading
             /// </summary>
             public TaskCompletionSource<Boolean> TCS { get; private set; }
             /// <summary>
+            /// true:is writer, false: is reader
+            /// </summary>
+            public Boolean Exclusive { get; private set; }
+            /// <summary>
             /// The receiver of task
             /// </summary>
-            public string Receiver { get; private set; }
+            public String Receiver { get; private set; }
+
+            public override String ToString()
+            {
+                return $"{(Exclusive ? 'w' : 'r')}:{Receiver ?? "?"}";
+            }
         }
         #endregion
 
@@ -103,7 +113,7 @@ namespace System.Threading
                 throw new ArgumentOutOfRangeException("timeout", timeout, "timeout can be Timeout.InfiniteTimeSpan or bigger than 0");
 
             TaskCompletionSource<Boolean> accressGranter = new TaskCompletionSource<Boolean>(); // Assume no contention
-            WaitItem wi = new WaitItem(accressGranter, receiver);
+            WaitItem wi = new WaitItem(accressGranter, exclusive, receiver);
 
             Lock();
             if (IsReachLimit())
@@ -127,7 +137,7 @@ namespace System.Threading
                     m_WaitingWriters.Add(wi);
 
                     if (ct != CancellationToken.None)
-                        ct.Register(() => CancelWriterWaiting(wi));
+                        ct.Register(() => Task.Run(() => CancelWriterWaiting(wi))); // Use Task.Run to ensure call CancelWriterWaiting on another thread to avoid deadlock
 
                     if (timeout != Timeout.InfiniteTimeSpan)
                         Task.Delay(timeout, ct).ContinueWith(t => OnWriterWaitingTimeout(t, wi));
@@ -146,7 +156,7 @@ namespace System.Threading
                     m_WaitingReaders.Add(wi);
 
                     if (ct != CancellationToken.None)
-                        ct.Register(() => CancelReaderWaiting(wi));
+                        ct.Register(() => Task.Run(() => CancelReaderWaiting(wi))); // Use Task.Run to ensure call CancelWriterWaiting on another thread to avoid deadlock
 
                     if (timeout != Timeout.InfiniteTimeSpan)
                         Task.Delay(timeout, ct).ContinueWith(t => OnReaderWaitingTimeout(t, wi));
@@ -160,11 +170,24 @@ namespace System.Threading
         /// <summary>
         /// Releases the AsyncOneManyLock allowing other code to acquire it
         /// </summary>
-        public void Release()
+        /// <param name="waitTask">The task returned by <see cref="WaitAsync(bool, TimeSpan, CancellationToken, string)"/></param>
+        public void Release(Task waitTask)
         {
+            if (waitTask == null)
+                throw new ArgumentNullException("waitTask");
+
             List<WaitItem> accessGranters = new List<WaitItem>();   // Assume no code is released
 
             Lock();
+            // Remove from processing items
+            WaitItem wi = m_ProcessingItems.FirstOrDefault(w => w.TCS.Task == waitTask);
+            if (wi == null)
+            {
+                Unlock();
+                throw new ApplicationException("Not found waitTask in processing tasks");
+            }
+            m_ProcessingItems.Remove(wi);
+
             if (IsOwnedByWriter) MakeFree(); // The writer left
             else SubtractReader();           // A reader left
 
@@ -185,6 +208,8 @@ namespace System.Threading
                     // Clear all reader task for future readers that need to wait
                     m_WaitingReaders.Clear();
                 }
+
+                m_ProcessingItems.AddRange(accessGranters);
             }
             Unlock();
 
@@ -198,7 +223,7 @@ namespace System.Threading
         {
             StringBuilder sb = new StringBuilder();
             for (int i = 0; i < m_ProcessingItems.Count && i < 10; i++)
-                sb.Append(m_ProcessingItems[i].Receiver ?? "?").Append(',');
+                sb.Append(m_ProcessingItems[i]).Append(',');
 
             if (m_ProcessingItems.Count > 10) sb.Append("..."); // Add "..." to indicate too more
             else if (m_ProcessingItems.Count > 0) sb.Remove(sb.Length - 1, 1); // Remove last ','

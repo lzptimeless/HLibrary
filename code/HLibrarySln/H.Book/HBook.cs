@@ -12,70 +12,79 @@ namespace H.Book
     public class HBook : IHBook
     {
         #region fields
-        private AsyncOneManyLock _lock = new AsyncOneManyLock();
+        private AsyncOneManyLockEx _lock = new AsyncOneManyLockEx(10);
         private Stream _stream;
-        private HMetadataBookHeader _header = new HMetadataBookHeader();
+        private HMetadataBookHeader _headerMetadata = new HMetadataBookHeader();
         private HMetadataBookCover _coverMetadata = new HMetadataBookCover();
         private HMetadataPageCollection _pages = new HMetadataPageCollection();
         #endregion
 
-        public async Task LoadAsync(string path/*, [CallerFilePath] string callerFilePath = "", [CallerMemberName] string callerName = ""*/)
+        public async Task LoadAsync(string path, TimeSpan timeout, CancellationToken ct, [CallerFilePath] string callerFilePath = "", [CallerMemberName] string callerName = "")
         {
-            if (_stream != null) throw new ApplicationException("Can not load when contains data");
+            var wt = _lock.WaitAsync(true, timeout, ct, $"{Path.GetFileName(callerFilePath)}:{callerName}");
+            await wt;
+            try
+            {
+                if (_stream != null) throw new ApplicationException("Can not load when contains data");
 
-            _stream = new FileStream(path, FileMode.Open, FileAccess.ReadWrite, FileShare.None, 2048, true);
-            int readedLen = 0;
-            // 验证文件头
-            byte[] startCode = new byte[HMetadataConstant.StartCode.Length];
-            readedLen = await _stream.ReadAsync(startCode, 0, startCode.Length);
-            if (!startCode.SequenceEqual(HMetadataConstant.StartCode))
-            {
-                _stream.Dispose();
-                _stream = null;
-                throw new InvalidDataException("StartCode error, this is not a HBook");
+                _stream = new FileStream(path, FileMode.Open, FileAccess.ReadWrite, FileShare.None, 2048, true);
+                int readedLen = 0;
+                // 验证文件头
+                byte[] startCode = new byte[HMetadataConstant.StartCode.Length];
+                readedLen = await _stream.ReadAsync(startCode, 0, startCode.Length);
+                if (!startCode.SequenceEqual(HMetadataConstant.StartCode))
+                {
+                    _stream.Dispose();
+                    _stream = null;
+                    throw new InvalidDataException("StartCode error, this is not a HBook");
+                }
+                // 读取头
+                await _headerMetadata.LoadAsync(_stream);
+                // 读取封面
+                await _coverMetadata.LoadAsync(_stream);
+                // 读取页面
+                byte cc = 0;
+                while (0 != (cc = await ReadNextControlCodeAsync(_stream)))
+                {
+                    // 移动读取位置到数据对起始位置
+                    _stream.Seek(-2, SeekOrigin.Current);
+                    // 读取数据段
+                    if (cc == HMetadataControlCodes.PageHeader)
+                    {
+                        HMetadataPage page = new HMetadataPage();
+                        await page.HeaderMetadata.LoadAsync(_stream);
+                        // 读取页面内容
+                        await page.ContentMetadata.LoadAsync(_stream);
+                        // 添加到集合
+                        if (!_pages.Add(page))
+                            throw new InvalidDataException("Found duplicate id page");
+                    }
+                    else if (cc == HMetadataControlCodes.VirtualPageHeader)
+                    {
+                        // 忽略虚拟页面
+                        HMetadataVirtualPage virtualPage = new HMetadataVirtualPage();
+                        await virtualPage.LoadAsync(_stream);
+                    }
+                    else if (cc == HMetadataControlCodes.DeletedPageHeader)
+                    {
+                        // 忽略被删除的页面头
+                        HMetadataDeletedPageHeader deletedPage = new HMetadataDeletedPageHeader();
+                        await deletedPage.LoadAsync(_stream);
+                    }
+                    else if (cc == HMetadataControlCodes.PageContent)
+                    {
+                        // 忽略被删除的页面内容或没有页头的内容
+                        HMetadataPageContent pageContent = new HMetadataPageContent();
+                        await pageContent.LoadAsync(_stream);
+                    }
+                    else
+                        throw new InvalidDataException($"Not support control code: {cc}");
+                }// while (0 != (cc = ReadNextControlCode(_stream)))
             }
-            // 读取头
-            await _header.LoadAsync(_stream);
-            // 读取封面
-            await _coverMetadata.LoadAsync(_stream);
-            // 读取页面
-            byte cc = 0;
-            while (0 != (cc = await ReadNextControlCodeAsync(_stream)))
+            finally
             {
-                // 移动读取位置到数据对起始位置
-                _stream.Seek(-2, SeekOrigin.Current);
-                // 读取数据段
-                if (cc == HMetadataControlCodes.PageHeader)
-                {
-                    HMetadataPage page = new HMetadataPage();
-                    await page.HeaderMetadata.LoadAsync(_stream);
-                    // 读取页面内容
-                    await page.ContentMetadata.LoadAsync(_stream);
-                    // 添加到集合
-                    if (!_pages.Add(page))
-                        throw new InvalidDataException("Found duplicate id page");
-                }
-                else if (cc == HMetadataControlCodes.VirtualPageHeader)
-                {
-                    // 忽略虚拟页面
-                    HMetadataVirtualPage virtualPage = new HMetadataVirtualPage();
-                    await virtualPage.LoadAsync(_stream);
-                }
-                else if (cc == HMetadataControlCodes.DeletedPageHeader)
-                {
-                    // 忽略被删除的页面头
-                    HMetadataDeletedPageHeader deletedPage = new HMetadataDeletedPageHeader();
-                    await deletedPage.LoadAsync(_stream);
-                }
-                else if (cc == HMetadataControlCodes.PageContent)
-                {
-                    // 忽略被删除的页面内容或没有页头的内容
-                    HMetadataPageContent pageContent = new HMetadataPageContent();
-                    await pageContent.LoadAsync(_stream);
-                }
-                else
-                    throw new InvalidDataException($"Not support control code: {cc}");
-            }// while (0 != (cc = ReadNextControlCode(_stream)))
+                _lock.Release(wt);
+            }
         }
 
         public async Task CreateAsync(string path)
@@ -87,11 +96,11 @@ namespace H.Book
             int reserveLen = 0;
 
             // 初始化
-            _header.ID = Guid.NewGuid();
-            _header.Version = 1;
+            _headerMetadata.ID = Guid.NewGuid();
+            _headerMetadata.Version = 1;
             // 存储头
             reserveLen = HMetadataConstant.GetDefaultReserveLength(HMetadataControlCodes.BookHeader);
-            await _header.SaveAsync(_stream, null, reserveLen);
+            await _headerMetadata.SaveAsync(_stream, null, reserveLen);
             // 存储封面
             reserveLen = HMetadataConstant.GetDefaultReserveLength(HMetadataControlCodes.BookCover);
             await _coverMetadata.SaveAsync(_stream, null, reserveLen);
@@ -99,12 +108,12 @@ namespace H.Book
 
         public async Task<IHBookHeader> GetHeaderAsync()
         {
-            return new HBookHeader(_header);
+            return new HBookHeader(_headerMetadata);
         }
 
         public async Task<bool> SetHeaderAsync(HBookHeaderSetting header)
         {
-            var metadata = _header;
+            var metadata = _headerMetadata;
             var fs = metadata.FileStatus;
             var selected = header.Selected;
             // 检测当前属性是否符合预期
@@ -466,10 +475,14 @@ namespace H.Book
         /// 从文件中加载
         /// </summary>
         /// <param name="path">文件路径</param>
+        /// <param name="timeout">超时时间，用<see cref="Timeout.InfiniteTimeSpan"/>代表不限</param>
+        /// <param name="ct">取消控制码</param>
+        /// <param name="callerFilePath">不需要设置</param>
+        /// <param name="callerName">不需要设置</param>
         /// <returns></returns>
         /// <exception cref="ApplicationException">已经加载了数据</exception>
         /// <exception cref="InvalidDataException">文件起始标识错误，或发现重复ID的页面，或发现不支持控制码</exception>
-        Task LoadAsync(string path);
+        Task LoadAsync(string path, TimeSpan timeout, CancellationToken ct, [CallerFilePath] string callerFilePath = "", [CallerMemberName] string callerName = "");
         /// <summary>
         /// 创建新的<see cref="HBook"/>文件
         /// </summary>
