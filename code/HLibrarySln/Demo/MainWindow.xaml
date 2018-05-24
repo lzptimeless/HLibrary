@@ -24,6 +24,7 @@
         </Grid>
     </Window.Tag>
     <Grid>
-        <local:LocalMangaView/>
+        <!--<local:LocalMangaView/>-->
+        <local:TestHBook/>
     </Grid>
 </Window>

@@ -1,0 +1,212 @@
+﻿<UserControl
+    x:Class="Demo.TestHBook"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:Demo"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    d:DesignHeight="1300"
+    d:DesignWidth="800"
+    Background="{StaticResource brush-win-bg}"
+    mc:Ignorable="d">
+    <UserControl.Resources>
+        <DataTemplate x:Key="page">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <Image Width="130" Height="100" />
+                <StackPanel Grid.Column="1" Margin="10">
+                    <TextBlock>
+                        <Run>作者：</Run>
+                        <Run />
+                    </TextBlock>
+                    <TextBlock Margin="0,5,0,0">
+                        <Run>角色：</Run>
+                        <Run />
+                    </TextBlock>
+                    <TextBlock Margin="0,5,0,0">
+                        <Run>标签：</Run>
+                        <Run />
+                    </TextBlock>
+                </StackPanel>
+            </Grid>
+        </DataTemplate>
+    </UserControl.Resources>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition />
+            <ColumnDefinition Width="300" />
+        </Grid.ColumnDefinitions>
+        <ScrollViewer Style="{StaticResource scrollviewer}" VerticalScrollBarVisibility="Auto">
+            <StackPanel Margin="10">
+                <TextBlock
+                    Margin="0,0,0,20"
+                    Style="{StaticResource text-h1}"
+                    Text="头" />
+                <TextBlock Style="{StaticResource text}">
+                    <Run>语言：</Run>
+                    <Run />
+                </TextBlock>
+                <TextBlock Margin="0,5,0,0" Style="{StaticResource text}">
+                    <Run>书名：</Run>
+                    <Run />
+                </TextBlock>
+                <TextBlock Margin="0,5,0,0" Style="{StaticResource text}">
+                    <Run>作者：</Run>
+                    <Run />
+                </TextBlock>
+                <TextBlock Margin="0,5,0,0" Style="{StaticResource text}">
+                    <Run>分组：</Run>
+                    <Run />
+                </TextBlock>
+                <TextBlock Margin="0,5,0,0" Style="{StaticResource text}">
+                    <Run>系列：</Run>
+                    <Run />
+                </TextBlock>
+                <TextBlock Margin="0,5,0,0" Style="{StaticResource text}">
+                    <Run>分类：</Run>
+                    <Run />
+                </TextBlock>
+                <TextBlock Margin="0,5,0,0" Style="{StaticResource text}">
+                    <Run>角色：</Run>
+                    <Run />
+                </TextBlock>
+                <TextBlock Margin="0,5,0,0" Style="{StaticResource text}">
+                    <Run>标签：</Run>
+                    <Run />
+                </TextBlock>
+                <TextBlock
+                    Margin="0,20,0,20"
+                    Style="{StaticResource text-h1}"
+                    Text="封面" />
+                <StackPanel Orientation="Horizontal">
+                    <Border Background="{StaticResource brush-control-bg}">
+                        <Image Width="100" Height="130" />
+                    </Border>
+                    <Border Margin="10,0,0,0" Background="{StaticResource brush-control-bg}">
+                        <Image Width="100" Height="130" />
+                    </Border>
+                </StackPanel>
+                <TextBlock
+                    Margin="0,20,0,20"
+                    Style="{StaticResource text-h1}"
+                    Text="页面" />
+                <ListBox ItemTemplate="{StaticResource page}" Style="{StaticResource list}" />
+            </StackPanel>
+        </ScrollViewer>
+        <ScrollViewer
+            Grid.Column="1"
+            HorizontalContentAlignment="Stretch"
+            Style="{StaticResource scrollviewer}"
+            VerticalScrollBarVisibility="Auto">
+            <StackPanel Margin="10,10,13,10">
+                <TextBlock
+                    Margin="0,0,0,20"
+                    Style="{StaticResource text-h1}"
+                    Text="头" />
+                <TextBlock
+                    Margin="0,0,0,10"
+                    Style="{StaticResource text}"
+                    Text="语言" />
+                <TextBox Style="{StaticResource textbox}" />
+                <TextBlock
+                    Margin="0,10,0,10"
+                    Style="{StaticResource text}"
+                    Text="书名" />
+                <TextBox Style="{StaticResource textbox}" />
+                <TextBlock
+                    Margin="0,10,0,10"
+                    Style="{StaticResource text}"
+                    Text="作者" />
+                <TextBox Style="{StaticResource textbox}" />
+                <TextBlock
+                    Margin="0,10,0,10"
+                    Style="{StaticResource text}"
+                    Text="分组" />
+                <TextBox Style="{StaticResource textbox}" />
+                <TextBlock
+                    Margin="0,10,0,10"
+                    Style="{StaticResource text}"
+                    Text="系列" />
+                <TextBox Style="{StaticResource textbox}" />
+                <TextBlock
+                    Margin="0,10,0,10"
+                    Style="{StaticResource text}"
+                    Text="分类" />
+                <TextBox Style="{StaticResource textbox}" />
+                <TextBlock
+                    Margin="0,10,0,10"
+                    Style="{StaticResource text}"
+                    Text="角色" />
+                <TextBox Style="{StaticResource textbox}" />
+                <TextBlock
+                    Margin="0,10,0,10"
+                    Style="{StaticResource text}"
+                    Text="标签" />
+                <TextBox Style="{StaticResource textbox}" />
+                <StackPanel Margin="0,10,0,0" Orientation="Horizontal">
+                    <Button Content="保存" Style="{StaticResource btn}" />
+                </StackPanel>
+                <TextBlock
+                    Margin="0,20,0,20"
+                    Style="{StaticResource text-h1}"
+                    Text="封面" />
+                <StackPanel Orientation="Horizontal">
+                    <Border Background="{StaticResource brush-control-bg}">
+                        <Image Width="100" Height="130" />
+                    </Border>
+                    <Border Margin="10,0,0,0" Background="{StaticResource brush-control-bg}">
+                        <Image Width="100" Height="130" />
+                    </Border>
+                </StackPanel>
+                <StackPanel Margin="0,10,0,0" Orientation="Horizontal">
+                    <Button Content="缩略图" Style="{StaticResource btn}" />
+                    <Button
+                        Margin="10,0,0,0"
+                        Content="内容"
+                        Style="{StaticResource btn}" />
+                </StackPanel>
+                <TextBlock
+                    Margin="0,20,0,20"
+                    Style="{StaticResource text-h1}"
+                    Text="页面" />
+                <TextBlock
+                    Margin="0,0,0,10"
+                    Style="{StaticResource text}"
+                    Text="作者" />
+                <TextBox Style="{StaticResource textbox}" />
+                <TextBlock
+                    Margin="0,10,0,10"
+                    Style="{StaticResource text}"
+                    Text="角色" />
+                <TextBox Style="{StaticResource textbox}" />
+                <TextBlock
+                    Margin="0,10,0,10"
+                    Style="{StaticResource text}"
+                    Text="标签" />
+                <TextBox Style="{StaticResource textbox}" />
+                <StackPanel Margin="0,10,0,0" Orientation="Horizontal">
+                    <Border Background="{StaticResource brush-control-bg}">
+                        <Image Width="100" Height="130" />
+                    </Border>
+                    <Border Margin="10,0,0,0" Background="{StaticResource brush-control-bg}">
+                        <Image Width="100" Height="130" />
+                    </Border>
+                </StackPanel>
+                <StackPanel Margin="0,10,0,0" Orientation="Horizontal">
+                    <Button Content="缩略图" Style="{StaticResource btn}" />
+                    <Button
+                        Margin="10,0,0,0"
+                        Content="内容"
+                        Style="{StaticResource btn}" />
+                    <Button
+                        Margin="10,0,0,0"
+                        Content="添加"
+                        Style="{StaticResource btn}" />
+                </StackPanel>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</UserControl>
