@@ -72,14 +72,6 @@ namespace H.Book
         }
         #endregion
 
-        #region events
-        public event EventHandler<HBookPartStreamIsDisposedChangedArgs> IsDisposedChanged;
-        private void OnIsDisposedChanged(HBookPartStreamIsDisposedChangedArgs e)
-        {
-            Volatile.Read(ref IsDisposedChanged)?.Invoke(this, e);
-        }
-        #endregion
-
         public override void Flush()
         {
             _parentStream.Flush();
@@ -218,7 +210,6 @@ namespace H.Book
         {
             base.Dispose(disposing);
             IsDisposed = true;
-            OnIsDisposedChanged(new HBookPartStreamIsDisposedChangedArgs(IsDisposed));
         }
     }
 }

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace H.Book
 {
-    public class HBookHeader : IHBookHeader
+    internal class HBookHeader : IHBookHeader
     {
         public HBookHeader()
         {

@@ -11,7 +11,6 @@ namespace H.Book
     public class HMetadataPageCollection : IReadOnlyList<HMetadataPage>
     {
         private List<HMetadataPage> _items = new List<HMetadataPage>();
-        private OneManyLock _lock = new OneManyLock();
 
         public HMetadataPageCollection()
         {
@@ -28,9 +27,7 @@ namespace H.Book
             get
             {
                 HMetadataPage item = null;
-                _lock.Enter(false);
                 if (index < _items.Count) item = _items[index];
-                _lock.Leave();
                 return item;
             }
         }
@@ -45,9 +42,7 @@ namespace H.Book
             get
             {
                 HMetadataPage item = null;
-                _lock.Enter(false);
                 item = _items.FirstOrDefault(i => i.HeaderMetadata.ID == id);
-                _lock.Leave();
                 return item;
             }
         }
@@ -57,9 +52,7 @@ namespace H.Book
             get
             {
                 int count;
-                _lock.Enter(false);
                 count = _items.Count;
-                _lock.Leave();
                 return count;
             }
         }
@@ -76,21 +69,17 @@ namespace H.Book
             if (item.ContentMetadata == null) throw new ArgumentException("The property ContentMetadata can not be null", "item");
 
             bool res = false;
-            _lock.Enter(true);
             if (!_items.Any(i => i.HeaderMetadata.ID == item.HeaderMetadata.ID))
             {
                 _items.Add(item);
                 res = true;
             }
-            _lock.Leave();
             return res;
         }
 
         public void Clear()
         {
-            _lock.Enter(true);
             _items.Clear();
-            _lock.Leave();
         }
 
         public bool Contains(HMetadataPage item)
@@ -98,26 +87,20 @@ namespace H.Book
             if (item == null) throw new ArgumentNullException("item");
 
             bool res = false;
-            _lock.Enter(false);
             res = _items.Contains(item);
-            _lock.Leave();
             return res;
         }
 
         public bool Contains(Guid id)
         {
             bool res = false;
-            _lock.Enter(false);
             res = _items.Any(i => i.HeaderMetadata.ID == id);
-            _lock.Leave();
             return res;
         }
 
         public void CopyTo(HMetadataPage[] array, int arrayIndex)
         {
-            _lock.Enter(false);
             _items.CopyTo(array, arrayIndex);
-            _lock.Leave();
         }
 
         public int IndexOf(HMetadataPage item)
@@ -125,9 +108,7 @@ namespace H.Book
             if (item == null) throw new ArgumentNullException("item");
 
             int index = 0;
-            _lock.Enter(false);
             index = _items.IndexOf(item);
-            _lock.Leave();
             return index;
         }
 
@@ -136,16 +117,13 @@ namespace H.Book
             if (item == null) throw new ArgumentNullException("item");
 
             bool res = false;
-            _lock.Enter(true);
             res = _items.Remove(item);
-            _lock.Leave();
             return res;
         }
 
         public bool Remove(Guid id)
         {
             bool res = false;
-            _lock.Enter(true);
             int index = -1;
             for (int i = 0; i < _items.Count; i++)
             {
@@ -156,7 +134,6 @@ namespace H.Book
                 }
             }
             if (index >= 0) _items.RemoveAt(index);
-            _lock.Leave();
             return res;
         }
 
@@ -168,40 +145,32 @@ namespace H.Book
         public bool RemoveAt(int index)
         {
             bool res = false;
-            _lock.Enter(true);
             if (index < _items.Count)
             {
                 _items.RemoveAt(index);
                 res = true;
             }
-            _lock.Leave();
             return res;
         }
 
         public IEnumerator<HMetadataPage> GetEnumerator()
         {
             IEnumerable<HMetadataPage> clone;
-            _lock.Enter(false);
             clone = _items.ToArray();
-            _lock.Leave();
             return clone.GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
             IEnumerable<HMetadataPage> clone;
-            _lock.Enter(false);
             clone = _items.ToArray();
-            _lock.Leave();
             return clone.GetEnumerator();
         }
 
         public IHPageHeader[] GetPageHeaders()
         {
             IHPageHeader[] headers = null;
-            _lock.Enter(false);
             headers = _items.Select(i => new HPageHeader(i.HeaderMetadata)).ToArray();
-            _lock.Leave();
             return headers;
         }
         #endregion

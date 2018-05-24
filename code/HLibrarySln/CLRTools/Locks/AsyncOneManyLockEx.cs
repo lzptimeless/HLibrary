@@ -1,5 +1,4 @@
-﻿using CLRTools;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -90,6 +89,7 @@ namespace System.Threading
 
         /// <summary>Constructs an AsyncOneManyLock object.</summary>
         /// <param name="waitLimit">The wait tasks limit, -1</param>
+        /// <exception cref="ArgumentOutOfRangeException">waitLimit not -1 or bigger than 0</exception>
         public AsyncOneManyLockEx(int waitLimit)
         {
             if (waitLimit != WaitLimitInfinite && waitLimit <= 0)
@@ -107,6 +107,10 @@ namespace System.Threading
         /// <param name="ct">Use to cancel wait</param>
         /// <param name="receiver">The receiver of wait task, use to add in Exception.Message when timeout or reach the limit, this will help for debug</param>
         /// <returns>A Task to await, return true: wait success, false: reach the wait limit</returns>
+        /// <exception cref="ArgumentOutOfRangeException">timeout not <see cref="Timeout.InfiniteTimeSpan"/> or bigger than 0</exception>
+        /// <exception cref="LockWaitLimitException">Wait queue is reaching the limit</exception>
+        /// <exception cref="TimeoutException">Wait is timeout</exception>
+        /// <exception cref="TaskCanceledException">Wait has been cancelled</exception>
         public Task WaitAsync(Boolean exclusive, TimeSpan timeout, CancellationToken ct, string receiver)
         {
             if (timeout != Timeout.InfiniteTimeSpan && timeout.Ticks < 0)
@@ -171,6 +175,8 @@ namespace System.Threading
         /// Releases the AsyncOneManyLock allowing other code to acquire it
         /// </summary>
         /// <param name="waitTask">The task returned by <see cref="WaitAsync(bool, TimeSpan, CancellationToken, string)"/></param>
+        /// <exception cref="ArgumentNullException">waitTask is null</exception>
+        /// <exception cref="KeyNotFoundException">waitTask is not returned by this lock</exception>
         public void Release(Task waitTask)
         {
             if (waitTask == null)
@@ -184,7 +190,7 @@ namespace System.Threading
             if (wi == null)
             {
                 Unlock();
-                throw new ApplicationException("Not found waitTask in processing tasks");
+                throw new KeyNotFoundException("Not found waitTask in processing tasks");
             }
             m_ProcessingItems.Remove(wi);
 
@@ -249,6 +255,8 @@ namespace System.Threading
 
         private void OnWriterWaitingTimeout(Task delayTask, WaitItem wi)
         {
+            // If delayTask been cancelled, this function may call in synchronized, to avoid deadlock,
+            // this line of code must before Lock()
             if (delayTask.IsCanceled || delayTask.IsFaulted) return;
 
             bool isTimeout = false;
@@ -279,6 +287,8 @@ namespace System.Threading
 
         private void OnReaderWaitingTimeout(Task delayTask, WaitItem wi)
         {
+            // If delayTask been cancelled, this function may call in synchronized, to avoid deadlock,
+            // this line of code must before Lock()
             if (delayTask.IsCanceled || delayTask.IsFaulted) return;
 
             bool isTimeout = false;

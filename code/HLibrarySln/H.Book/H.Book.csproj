@@ -41,8 +41,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ExceptionFactory.cs" />
+    <Compile Include="Exception\InitException.cs" />
     <Compile Include="Exception\InvalidBufferException.cs" />
     <Compile Include="Exception\InvalidPropertyException.cs" />
+    <Compile Include="Exception\IOWriteFailedException.cs" />
     <Compile Include="Exception\PageNotFoundException.cs" />
     <Compile Include="Exception\ReadPropertyException.cs" />
     <Compile Include="Exception\WritePropertyException.cs" />
@@ -50,7 +52,6 @@
     <Compile Include="HBookHeader.cs" />
     <Compile Include="HBookHeaderSetting.cs" />
     <Compile Include="PartReadStream.cs" />
-    <Compile Include="HBookPartStreamIsDisposedChangedArgs.cs" />
     <Compile Include="HPageHeaderSetting.cs" />
     <Compile Include="Metadata\HMetadataPage.cs" />
     <Compile Include="HMetadataPageCollection.cs" />
