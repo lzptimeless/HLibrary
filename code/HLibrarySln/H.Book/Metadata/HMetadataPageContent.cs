@@ -36,6 +36,9 @@ namespace H.Book
             // 写入图像长度
             writePos += HMetadataHelper.WritePropertyInt(ImageLengthPropertyName, ImageLength, data, writePos);
 
+            if (writePos != dataLen)
+                throw new WritePropertyException("Unkown", $"Some error occurred in write property: writePos={writePos}, dataLen={dataLen}", null);
+
             return data;
         }
 

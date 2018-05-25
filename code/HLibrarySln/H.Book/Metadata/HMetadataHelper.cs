@@ -72,7 +72,7 @@ namespace H.Book
                 ExceptionFactory.CheckArgLengthRange("buffer", buffer, bufferStartIndex + len, int.MaxValue, $"bufferStartIndex={bufferStartIndex}, len={len}");
 
                 byte[] valueBuffer = value.ToByteArray();
-                ExceptionFactory.CheckBufferLength("valueBuffer", buffer, len);
+                ExceptionFactory.CheckBufferLength("valueBuffer", valueBuffer, len);
                 Array.Copy(valueBuffer, 0, buffer, bufferStartIndex, valueBuffer.Length);
             }
             catch (Exception ex)
@@ -189,7 +189,7 @@ namespace H.Book
                 ExceptionFactory.CheckArgRange("bufferStartIndex", bufferStartIndex, 0, buffer.Length - 1);
                 ExceptionFactory.CheckBufferLengthRange("buffer", buffer, bufferStartIndex + len, int.MaxValue, $"bufferStartIndex={bufferStartIndex}, len={len}");
 
-                value = new Guid(buffer);
+                value = new Guid(buffer.Take(len).ToArray());
             }
             catch (Exception ex)
             {
@@ -287,7 +287,7 @@ namespace H.Book
 
         private static string BytesToString(byte[] buffer, int bufferStartIndex, int len)
         {
-            string s = Encoding.UTF8.GetString(buffer, bufferStartIndex, len);
+            string s = Encoding.UTF8.GetString(buffer, bufferStartIndex, len).Trim('\0');
             return s;
         }
     }

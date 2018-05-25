@@ -44,6 +44,9 @@ namespace H.Book
             // 写入页面索引
             writePos += HMetadataHelper.WritePropertyInt(PageIndexPropertyName, PageIndex, data, writePos);
 
+            if (writePos != dataLen)
+                throw new WritePropertyException("Unkown", $"Some error occurred in write property: writePos={writePos}, dataLen={dataLen}", null);
+
             return data;
         }
 

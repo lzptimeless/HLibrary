@@ -133,6 +133,7 @@ namespace System.Threading
                 if (IsFree)
                 {
                     MakeWriter();  // No contention
+                    accressGranter.SetResult(true);
                     m_ProcessingItems.Add(wi);
                 }
                 else
@@ -152,6 +153,7 @@ namespace System.Threading
                 if (IsFree || (IsOwnedByReaders && m_WaitingWriters.Count == 0))
                 {
                     AddReaders(1); // No contention
+                    accressGranter.SetResult(true);
                     m_ProcessingItems.Add(wi);
                 }
                 else

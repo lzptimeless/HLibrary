@@ -12,12 +12,12 @@
         <Color x:Key="color-accent-light">#ED575D</Color>
         <Color x:Key="color-accent-deep">#C82129</Color>
         <Color x:Key="color-transparent">#00000000</Color>
-        <Color x:Key="color-win-bg">#1E1E1E</Color>
+        <Color x:Key="color-window-bg">#1E1E1E</Color>
         <SolidColorBrush x:Key="brush-accent" Color="{StaticResource color-accent}" />
         <SolidColorBrush x:Key="brush-accent-light" Color="{StaticResource color-accent-light}" />
         <SolidColorBrush x:Key="brush-accent-deep" Color="{StaticResource color-accent-deep}" />
         <SolidColorBrush x:Key="brush-transparent" Color="{StaticResource color-transparent}" />
-        <SolidColorBrush x:Key="brush-win-bg" Color="{StaticResource color-win-bg}" />
+        <SolidColorBrush x:Key="brush-window-bg" Color="{StaticResource color-window-bg}" />
 
         <!--  Text  -->
         <Color x:Key="color-text">#E6E6E6</Color>

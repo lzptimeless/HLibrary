@@ -45,6 +45,9 @@ namespace H.Book
                 }
             }
 
+            if (writePos != dataLen)
+                throw new WritePropertyException("Unkown", $"Some error occurred in write property: writePos={writePos}, dataLen={dataLen}", null);
+
             return data;
         }
 

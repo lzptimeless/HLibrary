@@ -40,20 +40,17 @@ namespace H.Book
             ExceptionFactory.CheckArgNull("stream", stream);
             ExceptionFactory.CheckArgRange("reserveLen", reserveLen, 0, int.MaxValue);
 
+            long position = stream.Position;
+            int appendixLen = 0;
             if (appendixes != null)
             {
                 for (int i = 0; i < appendixes.Length; i++)
                 {
                     if (appendixes[i].Length > int.MaxValue)
                         throw new ArgumentException($"appendixes[{i}] is too big: max={int.MaxValue}, value={appendixes[i].Length}", "appendixes");
-                }
-            }
 
-            long position = stream.Position;
-            int appendixLen = 0;
-            foreach (var appendix in appendixes)
-            {
-                appendixLen = checked(appendixLen + (int)appendix.Length);
+                    appendixLen = checked(appendixLen + (int)appendixes[i].Length);
+                }
             }
 
             byte[] buffer;

@@ -9,7 +9,7 @@
         mc:Ignorable="d"
         Title="HLibrary" Height="700" Width="1000"
         Style="{StaticResource win-shell}"
-        Background="{StaticResource brush-win-bg}">
+        Background="{StaticResource brush-window-bg}">
     <Window.Tag>
         <Grid>
             <Grid.ColumnDefinitions>
@@ -25,6 +25,6 @@
     </Window.Tag>
     <Grid>
         <!--<local:LocalMangaView/>-->
-        <local:TestHBook/>
+        <local:TestHBook x:Name="TestHBookView"/>
     </Grid>
 </Window>

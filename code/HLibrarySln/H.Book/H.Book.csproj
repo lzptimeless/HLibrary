@@ -51,6 +51,7 @@
     <Compile Include="HBook.cs" />
     <Compile Include="HBookHeader.cs" />
     <Compile Include="HBookHeaderSetting.cs" />
+    <Compile Include="HBookMode.cs" />
     <Compile Include="PartReadStream.cs" />
     <Compile Include="HPageHeaderSetting.cs" />
     <Compile Include="Metadata\HMetadataPage.cs" />

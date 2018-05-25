@@ -126,6 +126,9 @@ namespace H.Book
             // 写入标签数,标签
             writePos += HMetadataHelper.WritePropertyList(TagsPropertyName, Tags, data, writePos, TagsItemLen);
 
+            if (writePos != dataLen)
+                throw new WritePropertyException("Unkown", $"Some error occurred in write property: writePos={writePos}, dataLen={dataLen}", null);
+
             return data;
         }
 

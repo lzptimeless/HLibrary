@@ -24,5 +24,25 @@ namespace Demo
         {
             InitializeComponent();
         }
+
+        private void CoverThumbButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void CoverButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void PageThumbButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void PageContentButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }

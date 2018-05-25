@@ -25,7 +25,14 @@ namespace Demo
         {
             InitializeComponent();
 
-            
+            Loaded += MainWindow_Loaded;
+        }
+
+        private async void MainWindow_Loaded(object sender, RoutedEventArgs e)
+        {
+            var vm = new TestHBookViewModel();
+            TestHBookView.DataContext = vm;
+            await vm.Init();
         }
     }
 }

@@ -13,34 +13,72 @@ namespace H.Book
     {
         #region fields
         private AsyncOneManyLockEx _lock = new AsyncOneManyLockEx(10);
+        private HBookMode _mode;
         private Stream _stream;
         private HMetadataBookHeader _headerMetadata = new HMetadataBookHeader();
         private HMetadataBookCover _coverMetadata = new HMetadataBookCover();
         private HMetadataPageCollection _pages = new HMetadataPageCollection();
 
+        private int _isDisposed;
+        private bool IsDisposed() { return Volatile.Read(ref _isDisposed) == 1; }
+        private bool MakeDisposed() { return Interlocked.CompareExchange(ref _isDisposed, 1, 0) == 0; }
+        private Exception CreateDisposedEx() { return new ObjectDisposedException("HBook", "HBook has been disposed"); }
+
+        private int _isInitialized;
         private Exception _loadEx;
         private Exception _createEx;
-        private bool IsInitError() { return _stream == null || _loadEx != null || _createEx != null; }
-        private Exception CreateInitErrorEx()
-        {
-            if (_stream == null) return new InitException("Not load or create", null);
-            else return new InitException("HBook load or create failed", _loadEx ?? _createEx);
-        }
+        private bool IsInitialized() { return Volatile.Read(ref _isInitialized) == 1; }
+        private bool MakeInitialized() { return Interlocked.CompareExchange(ref _isInitialized, 1, 0) == 0; }
+        private bool IsInitFailed() { return _loadEx != null || _createEx != null; }
+        private bool IsInitError() { return Volatile.Read(ref _isInitialized) != 1 || _loadEx != null || _createEx != null; }
+        private Exception CreateInitFailedEx() { return new InitException("HBook load or create failed", _loadEx ?? _createEx); }
+        private Exception CreateInitErrorEx() { return IsInitFailed() ? CreateInitFailedEx() : new InitException("Not load or create", null); }
 
         private Exception _ioWriteEx;
         private bool IsIOWriteFailed() { return _ioWriteEx != null; }
         private Exception CreateIOWriteFailedEx() { return new IOWriteFailedException("A IO write error ocurred, data maybe damaged", _ioWriteEx); }
         #endregion
 
-        public async Task LoadAsync(string path, [CallerFilePath] string callerFilePath = "", [CallerMemberName] string callerName = "")
+        public HBook(string path, HBookMode mode)
+        {
+            if (mode != HBookMode.OpenOrCreate)
+                _mode = mode;
+            else
+                _mode = File.Exists(path) ? HBookMode.Open : HBookMode.Create;
+
+            if (_mode == HBookMode.Create)
+                _stream = new FileStream(path, FileMode.CreateNew, FileAccess.ReadWrite, FileShare.None, 2048, true);
+            else if (_mode == HBookMode.Open)
+                _stream = new FileStream(path, FileMode.Open, FileAccess.ReadWrite, FileShare.None, 2048, true);
+            else
+                throw new ArgumentOutOfRangeException("mode", $"Not supported mode:{_mode}");
+        }
+
+        ~HBook()
+        {
+            Dispose();
+        }
+
+        public Task InitAsync([CallerFilePath] string callerFilePath = "", [CallerMemberName] string callerName = "")
+        {
+            if (_mode == HBookMode.Create)
+                return CreateAsync(callerFilePath, callerName);
+            else if (_mode == HBookMode.Open)
+                return LoadAsync(callerFilePath, callerName);
+            else
+                throw new NotSupportedException($"Not supported mode:{_mode}");
+        }
+
+        public async Task LoadAsync([CallerFilePath] string callerFilePath = "", [CallerMemberName] string callerName = "")
         {
             var wt = _lock.WaitAsync(true, Timeout.InfiniteTimeSpan, CancellationToken.None, CreateReceiver(callerFilePath, callerName));
             await wt;
             try
             {
-                if (_stream != null) throw new ApplicationException("Can not load when contains data");
+                if (IsDisposed()) throw CreateDisposedEx();
+                if (IsInitFailed()) throw CreateInitFailedEx();
+                if (IsInitialized()) throw new ApplicationException("This HBook already initialized");
 
-                _stream = new FileStream(path, FileMode.Open, FileAccess.ReadWrite, FileShare.None, 2048, true);
                 int readedLen = 0;
                 // 验证文件头
                 byte[] startCode = new byte[HMetadataConstant.StartCode.Length];
@@ -93,10 +131,12 @@ namespace H.Book
                     else
                         throw new InvalidDataException($"Not support control code: {cc}");
                 }// while (0 != (cc = ReadNextControlCode(_stream)))
+
+                MakeInitialized();
             }
             catch (Exception ex)
             {
-                Interlocked.CompareExchange(ref _loadEx, ex, null);
+                if (!IsInitialized()) Interlocked.CompareExchange(ref _loadEx, ex, null);
                 throw ex;
             }
             finally
@@ -105,31 +145,35 @@ namespace H.Book
             }
         }
 
-        public async Task CreateAsync(string path, [CallerFilePath] string callerFilePath = "", [CallerMemberName] string callerName = "")
+        public async Task CreateAsync([CallerFilePath] string callerFilePath = "", [CallerMemberName] string callerName = "")
         {
             var wt = _lock.WaitAsync(true, Timeout.InfiniteTimeSpan, CancellationToken.None, CreateReceiver(callerFilePath, callerName));
             await wt;
             try
             {
-                if (_stream != null) throw new ApplicationException("Can not create when contains data");
-
-                _stream = new FileStream(path, FileMode.CreateNew, FileAccess.ReadWrite, FileShare.None, 2048, true);
+                if (IsDisposed()) throw CreateDisposedEx();
+                if (IsInitFailed()) throw CreateInitFailedEx();
+                if (IsInitialized()) throw new ApplicationException("This HBook already initialized");
 
                 int reserveLen = 0;
 
                 // 初始化
                 _headerMetadata.ID = Guid.NewGuid();
                 _headerMetadata.Version = 1;
+                // 写入起始码
+                await _stream.WriteAsync(HMetadataConstant.StartCode, 0, HMetadataConstant.StartCode.Length);
                 // 存储头
                 reserveLen = HMetadataConstant.GetDefaultReserveLength(HMetadataControlCodes.BookHeader);
                 await _headerMetadata.SaveAsync(_stream, null, reserveLen);
                 // 存储封面
                 reserveLen = HMetadataConstant.GetDefaultReserveLength(HMetadataControlCodes.BookCover);
                 await _coverMetadata.SaveAsync(_stream, null, reserveLen);
+
+                MakeInitialized();
             }
             catch (Exception ex)
             {
-                Interlocked.CompareExchange(ref _createEx, ex, null);
+                if (!IsInitialized()) Interlocked.CompareExchange(ref _createEx, ex, null);
                 throw ex;
             }
             finally
@@ -144,6 +188,7 @@ namespace H.Book
             await wt;
             try
             {
+                if (IsDisposed()) throw CreateDisposedEx();
                 if (IsInitError()) throw CreateInitErrorEx();
                 if (IsIOWriteFailed()) throw CreateIOWriteFailedEx();
 
@@ -161,6 +206,7 @@ namespace H.Book
             await wt;
             try
             {
+                if (IsDisposed()) throw CreateDisposedEx();
                 if (IsInitError()) throw CreateInitErrorEx();
                 if (IsIOWriteFailed()) throw CreateIOWriteFailedEx();
 
@@ -195,7 +241,7 @@ namespace H.Book
                 if (reserveLen < 0)
                     throw new ArgumentException($"header is too big: space={space}, fieldsLen={fieldsLen}, segHeaderLen={segHeaderLen}", "header");
 
-                _stream.Seek(fs.Position, SeekOrigin.Current);
+                _stream.Seek(fs.Position, SeekOrigin.Begin);
                 await metadata.SaveAsync(_stream, null, reserveLen);
 
                 return true;
@@ -217,6 +263,7 @@ namespace H.Book
             await wt;
             try
             {
+                if (IsDisposed()) throw CreateDisposedEx();
                 if (IsInitError()) throw CreateInitErrorEx();
                 if (IsIOWriteFailed()) throw CreateIOWriteFailedEx();
 
@@ -241,6 +288,7 @@ namespace H.Book
             await wt;
             try
             {
+                if (IsDisposed()) throw CreateDisposedEx();
                 if (IsInitError()) throw CreateInitErrorEx();
                 if (IsIOWriteFailed()) throw CreateIOWriteFailedEx();
 
@@ -259,12 +307,51 @@ namespace H.Book
             }
         }
 
+        public async Task SetCoverAsync(Stream thumb, Stream cover, [CallerFilePath] string callerFilePath = "", [CallerMemberName] string callerName = "")
+        {
+            if (thumb != null && (thumb.Length == 0 || thumb.Length > int.MaxValue))
+                throw new ArgumentException($"thumb is too big:expected=[1,{int.MaxValue}], value={thumb.Length}", "thumb");
+
+            if (cover != null && (cover.Length == 0 || cover.Length > int.MaxValue))
+                throw new ArgumentException($"cover is too big:expected=[1,{int.MaxValue}], value={cover.Length}", "cover");
+
+            int thumbLen = thumb != null ? (int)thumb.Length : 0;
+            int coverLen = cover != null ? (int)cover.Length : 0;
+            var wt = _lock.WaitAsync(true, Timeout.InfiniteTimeSpan, CancellationToken.None, CreateReceiver(callerFilePath, callerName));
+            await wt;
+            try
+            {
+                if (IsDisposed()) throw CreateDisposedEx();
+                if (IsInitError()) throw CreateInitErrorEx();
+                if (IsIOWriteFailed()) throw CreateIOWriteFailedEx();
+
+                int space = _coverMetadata.FileStatus.GetSpace();
+                int headerLen = _coverMetadata.FileStatus.GetHeaderLength();
+                int fieldsLen = _coverMetadata.GetFieldsLength();
+                int reserveLen = checked(space - headerLen - fieldsLen - thumbLen - coverLen);
+                if (reserveLen < 0)
+                    throw new ArgumentException($"thumb and cover is too big: space={space}, headerLen={headerLen}, fieldsLen={fieldsLen}, thumbLen={thumbLen}, coverLen={coverLen}");
+
+                List<Stream> appendixes = new List<Stream>();
+                if (thumb != null) appendixes.Add(thumb);
+                if (cover != null) appendixes.Add(cover);
+
+                _stream.Seek(_coverMetadata.FileStatus.Position, SeekOrigin.Begin);
+                await _coverMetadata.SaveAsync(_stream, appendixes.ToArray(), reserveLen);
+            }
+            finally
+            {
+                _lock.Release(wt);
+            }
+        }
+
         public async void ReadCoverThumbnailAsync(Func<Stream, Task> readerAction, [CallerFilePath] string callerFilePath = "", [CallerMemberName] string callerName = "")
         {
             var wt = _lock.WaitAsync(true, Timeout.InfiniteTimeSpan, CancellationToken.None, CreateReceiver(callerFilePath, callerName));
             await wt;
             try
             {
+                if (IsDisposed()) throw CreateDisposedEx();
                 if (IsInitError()) throw CreateInitErrorEx();
                 if (IsIOWriteFailed()) throw CreateIOWriteFailedEx();
 
@@ -289,6 +376,7 @@ namespace H.Book
             await wt;
             try
             {
+                if (IsDisposed()) throw CreateDisposedEx();
                 if (IsInitError()) throw CreateInitErrorEx();
                 if (IsIOWriteFailed()) throw CreateIOWriteFailedEx();
 
@@ -313,6 +401,7 @@ namespace H.Book
             await wt;
             try
             {
+                if (IsDisposed()) throw CreateDisposedEx();
                 if (IsInitError()) throw CreateInitErrorEx();
                 if (IsIOWriteFailed()) throw CreateIOWriteFailedEx();
 
@@ -330,6 +419,7 @@ namespace H.Book
             await wt;
             try
             {
+                if (IsDisposed()) throw CreateDisposedEx();
                 if (IsInitError()) throw CreateInitErrorEx();
                 if (IsIOWriteFailed()) throw CreateIOWriteFailedEx();
 
@@ -361,6 +451,7 @@ namespace H.Book
             await wt;
             try
             {
+                if (IsDisposed()) throw CreateDisposedEx();
                 if (IsInitError()) throw CreateInitErrorEx();
                 if (IsIOWriteFailed()) throw CreateIOWriteFailedEx();
 
@@ -391,6 +482,7 @@ namespace H.Book
             await wt;
             try
             {
+                if (IsDisposed()) throw CreateDisposedEx();
                 if (IsInitError()) throw CreateInitErrorEx();
                 if (IsIOWriteFailed()) throw CreateIOWriteFailedEx();
 
@@ -423,6 +515,7 @@ namespace H.Book
             await wt;
             try
             {
+                if (IsDisposed()) throw CreateDisposedEx();
                 if (IsInitError()) throw CreateInitErrorEx();
                 if (IsIOWriteFailed()) throw CreateIOWriteFailedEx();
 
@@ -461,6 +554,7 @@ namespace H.Book
             await wt;
             try
             {
+                if (IsDisposed()) throw CreateDisposedEx();
                 if (IsInitError()) throw CreateInitErrorEx();
                 if (IsIOWriteFailed()) throw CreateIOWriteFailedEx();
 
@@ -510,6 +604,7 @@ namespace H.Book
             await wt;
             try
             {
+                if (IsDisposed()) throw CreateDisposedEx();
                 if (IsInitError()) throw CreateInitErrorEx();
                 if (IsIOWriteFailed()) throw CreateIOWriteFailedEx();
 
@@ -541,6 +636,7 @@ namespace H.Book
             await wt;
             try
             {
+                if (IsDisposed()) throw CreateDisposedEx();
                 if (IsInitError()) throw CreateInitErrorEx();
                 if (IsIOWriteFailed()) throw CreateIOWriteFailedEx();
 
@@ -584,6 +680,13 @@ namespace H.Book
             }
         }
 
+        public void Dispose()
+        {
+            if (!MakeDisposed()) return;
+
+            _stream.Dispose();
+            GC.SuppressFinalize(this);
+        }
         #region private methods
         private static string CreateReceiver(string filePath, string caller)
         {
@@ -694,27 +797,17 @@ namespace H.Book
         #endregion
     }
 
-    public interface IHBook
+    public interface IHBook : IDisposable
     {
         /// <summary>
         /// 从文件中加载
         /// </summary>
-        /// <param name="path">文件路径</param>
         /// <param name="callerFilePath">不需要设置</param>
         /// <param name="callerName">不需要设置</param>
         /// <returns></returns>
-        /// <exception cref="ApplicationException">已经加载了数据</exception>
+        /// <exception cref="ApplicationException">已经初始化了</exception>
         /// <exception cref="InvalidDataException">文件起始标识错误，或发现重复ID的页面，或发现不支持控制码</exception>
-        Task LoadAsync(string path, [CallerFilePath] string callerFilePath = "", [CallerMemberName] string callerName = "");
-        /// <summary>
-        /// 创建新的<see cref="HBook"/>文件
-        /// </summary>
-        /// <param name="path">文件路径</param>
-        /// <param name="callerFilePath">不需要设置</param>
-        /// <param name="callerName">不需要设置</param>
-        /// <returns></returns>
-        /// <exception cref="ApplicationException"><see cref="HBook"/>已经加载了数据</exception>
-        Task CreateAsync(string path, [CallerFilePath] string callerFilePath = "", [CallerMemberName] string callerName = "");
+        Task InitAsync([CallerFilePath] string callerFilePath = "", [CallerMemberName] string callerName = "");
         /// <summary>
         /// 获取头信息
         /// </summary>
@@ -771,6 +864,17 @@ namespace H.Book
         /// <exception cref="InitException">没有加载数据或，创建数据</exception>
         /// <exception cref="IOWriteFailedException">数据在之前的写入操作中可能已经损坏</exception>
         Task<Stream> GetCoverThumbnailCopyAsync([CallerFilePath] string callerFilePath = "", [CallerMemberName] string callerName = "");
+        /// <summary>
+        /// 设置封面
+        /// </summary>
+        /// <param name="thumb">封面缩略图</param>
+        /// <param name="cover">封面</param>
+        /// <param name="callerFilePath">不需要设置</param>
+        /// <param name="callerName">不需要设置</param>
+        /// <returns></returns>
+        /// <exception cref="InitException">没有加载数据或，创建数据</exception>
+        /// <exception cref="IOWriteFailedException">数据在之前的写入操作中可能已经损坏</exception>
+        Task SetCoverAsync(Stream thumb, Stream cover, [CallerFilePath] string callerFilePath = "", [CallerMemberName] string callerName = "");
         /// <summary>
         /// 获取所有页面头
         /// </summary>

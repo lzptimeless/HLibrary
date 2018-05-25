@@ -8,7 +8,7 @@
              xmlns:local="clr-namespace:Demo"
              mc:Ignorable="d" 
              d:DesignHeight="670" d:DesignWidth="1000"
-             Background="{StaticResource brush-win-bg}">
+             Background="{StaticResource brush-window-bg}">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
