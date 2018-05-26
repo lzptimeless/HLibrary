@@ -61,7 +61,7 @@ namespace H.Book
         /// <returns></returns>
         public long GetAppendixPosition()
         {
-            long p = checked(Position + FieldsLength);
+            long p = checked(Position + GetHeaderLength() + FieldsLength);
             return p;
         }
 

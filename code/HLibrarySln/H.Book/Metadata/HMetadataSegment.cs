@@ -60,25 +60,31 @@ namespace H.Book
             // 写入控制码
             await stream.WriteByteAsync(HMetadataConstant.ControlCodeFlag);
             await stream.WriteByteAsync(ControlCode);
+            long p0 = stream.Position;
             // 写入字段长度
             buffer = BitConverter.GetBytes(fields.Length);
             await stream.WriteAsync(buffer, 0, buffer.Length);
+            long p1 = stream.Position;
             // 写入附加数据长度
             buffer = BitConverter.GetBytes(appendixLen);
             await stream.WriteAsync(buffer, 0, buffer.Length);
+            long p2 = stream.Position;
             // 写入保留区长度
             buffer = BitConverter.GetBytes(reserveLen);
             await stream.WriteAsync(buffer, 0, buffer.Length);
+            long p3 = stream.Position;
             // 写入字段
             if (fields.Length > 0)
                 await stream.WriteAsync(fields, 0, fields.Length);
             // 填充附加数据
+            long p4 = stream.Position;
             if (appendixLen > 0)
             {
                 foreach (var appendix in appendixes)
                 {
                     appendix.Seek(0, SeekOrigin.Begin);
-                    await appendix.CopyToAsync(stream);
+                    long p5 = stream.Position;
+                    await appendix.CopyToAsync(stream); 
                 }
             }
             // 填充保留区

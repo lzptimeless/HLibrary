@@ -9,7 +9,10 @@ namespace H.Book
     public class HMetadataPage
     {
         public HMetadataPage()
-        { }
+        {
+            HeaderMetadata = new HMetadataPageHeader();
+            ContentMetadata = new HMetadataPageContent();
+        }
 
         public HMetadataPage(HMetadataPageHeader headerMetadata, HMetadataPageContent contentMetadata)
         {

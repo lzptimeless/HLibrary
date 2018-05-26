@@ -913,6 +913,7 @@ namespace Demo
                bitmap.CacheOption = BitmapCacheOption.None;
                bitmap.CreateOptions = BitmapCreateOptions.None;
                bitmap.EndInit();
+               bitmap.Freeze();
                return bitmap;
            });
         }

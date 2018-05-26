@@ -299,6 +299,7 @@ namespace H.Book
                 using (Stream partStream = CreatePartReadStream(_stream, _coverMetadata.FileStatus.GetAppendixPosition() + _coverMetadata.ThumbnailLength, _coverMetadata.ImageLength))
                     await partStream.CopyToAsync(memStream);
 
+                memStream.Seek(0, SeekOrigin.Begin);
                 return memStream;
             }
             finally
@@ -331,6 +332,9 @@ namespace H.Book
                 int reserveLen = checked(space - headerLen - fieldsLen - thumbLen - coverLen);
                 if (reserveLen < 0)
                     throw new ArgumentException($"thumb and cover is too big: space={space}, headerLen={headerLen}, fieldsLen={fieldsLen}, thumbLen={thumbLen}, coverLen={coverLen}");
+
+                _coverMetadata.ThumbnailLength = thumbLen;
+                _coverMetadata.ImageLength = coverLen;
 
                 List<Stream> appendixes = new List<Stream>();
                 if (thumb != null) appendixes.Add(thumb);
@@ -387,6 +391,7 @@ namespace H.Book
                 using (Stream partStream = CreatePartReadStream(_stream, _coverMetadata.FileStatus.GetAppendixPosition(), _coverMetadata.ThumbnailLength))
                     await partStream.CopyToAsync(memStream);
 
+                memStream.Seek(0, SeekOrigin.Begin);
                 return memStream;
             }
             finally
@@ -468,6 +473,7 @@ namespace H.Book
                 using (Stream partStream = CreatePartReadStream(_stream, fileStatus.GetAppendixPosition() + metadata.ThumbnailLength, metadata.ImageLength))
                     await partStream.CopyToAsync(memStream);
 
+                memStream.Seek(0, SeekOrigin.Begin);
                 return memStream;
             }
             finally
@@ -532,6 +538,7 @@ namespace H.Book
                 using (Stream partStream = CreatePartReadStream(_stream, fileStatus.GetAppendixPosition(), metadata.ThumbnailLength))
                     await partStream.CopyToAsync(memStream);
 
+                memStream.Seek(0, SeekOrigin.Begin);
                 return memStream;
             }
             finally
@@ -757,6 +764,7 @@ namespace H.Book
             if (partLength <= 0 || partLength > stream.Length - partPosition)
                 throw new ArgumentOutOfRangeException("partLength", $"origin stream length:{stream.Length}, partPosition:{partPosition}, partLength:{partLength}");
 
+            stream.Position = partPosition;
             PartReadStream partStream = new PartReadStream(stream, partPosition, partLength);
             return partStream;
         }

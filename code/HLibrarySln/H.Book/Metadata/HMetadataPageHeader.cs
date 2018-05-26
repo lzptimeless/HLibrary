@@ -18,22 +18,19 @@ namespace H.Book
 
         public string Artist { get; set; }
         public const string ArtistPropertyName = "Artist";
-        public const int ArtistLen = 128;
 
         public string[] Characters { get; set; }
         public const string CharactersPropertyName = "Characters";
-        public const int CharactersItemLen = 128;
 
         public string[] Tags { get; set; }
         public const string TagsPropertyName = "Tags";
-        public const int TagsItemLen = 64;
 
         public override int GetFieldsLength()
         {
-            // 页面ID+页内容位置+作者名+角色数+角色+标签数+标签
-            return 16 + ArtistLen +
-                1 + (Characters != null ? Characters.Length : 0) * CharactersItemLen +
-                1 + (Tags != null ? Tags.Length : 0) * TagsItemLen;
+            // 页面ID+页内容位置+作者名+角色+标签
+            return 16 + HMetadataHelper.GetByteLen(Artist) +
+                HMetadataHelper.GetByteLen(Characters) +
+                HMetadataHelper.GetByteLen(Tags);
         }
 
         protected override byte[] GetFields()
@@ -48,11 +45,11 @@ namespace H.Book
             // 写入ID
             writePos += HMetadataHelper.WritePropertyGuid(IDPropertyName, ID, data, writePos);
             // 写入作者名
-            writePos += HMetadataHelper.WritePropertyString(ArtistPropertyName, Artist, data, writePos, ArtistLen);
+            writePos += HMetadataHelper.WritePropertyString(ArtistPropertyName, Artist, data, writePos);
             // 写入角色
-            writePos += HMetadataHelper.WritePropertyList(CharactersPropertyName, Characters, data, writePos, CharactersItemLen);
+            writePos += HMetadataHelper.WritePropertyList(CharactersPropertyName, Characters, data, writePos);
             // 写入标签
-            writePos += HMetadataHelper.WritePropertyList(TagsPropertyName, Tags, data, writePos, TagsItemLen);
+            writePos += HMetadataHelper.WritePropertyList(TagsPropertyName, Tags, data, writePos);
 
             if (writePos != dataLen)
                 throw new WritePropertyException("Unkown", $"Some error occurred in write property: writePos={writePos}, dataLen={dataLen}", null);
@@ -63,23 +60,27 @@ namespace H.Book
         protected override void SetFields(byte[] buffer)
         {
             ExceptionFactory.CheckArgNull("buffer", buffer);
-            
+
             Artist = null;
             Characters = null;
             Tags = null;
 
             int readPos = 0;
+            // 读取ID
+            Guid id;
+            readPos += HMetadataHelper.ReadPropertyGuid(IDPropertyName, out id, buffer, readPos);
+            ID = id;
             // 读取作者
             string artist;
-            readPos += HMetadataHelper.ReadPropertyString(ArtistPropertyName, out artist, buffer, readPos, ArtistLen);
+            readPos += HMetadataHelper.ReadPropertyString(ArtistPropertyName, out artist, buffer, readPos);
             Artist = artist;
             // 读取角色
             string[] characters;
-            readPos += HMetadataHelper.ReadPropertyList(CharactersPropertyName, out characters, buffer, readPos, CharactersItemLen);
+            readPos += HMetadataHelper.ReadPropertyList(CharactersPropertyName, out characters, buffer, readPos);
             Characters = characters;
             // 读取标签
             string[] tags;
-            readPos += HMetadataHelper.ReadPropertyList(TagsPropertyName, out tags, buffer, readPos, TagsItemLen);
+            readPos += HMetadataHelper.ReadPropertyList(TagsPropertyName, out tags, buffer, readPos);
             Tags = tags;
         }
 

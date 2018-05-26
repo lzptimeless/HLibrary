@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -27,22 +28,46 @@ namespace Demo
 
         private void CoverThumbButton_Click(object sender, RoutedEventArgs e)
         {
+            var vm = DataContext as TestHBookViewModel;
 
+            OpenFileDialog dg = new OpenFileDialog();
+            dg.Filter = "图片|*.jpg;*.png;*.gif";
+            if (dg.ShowDialog() == false) return;
+
+            vm.InputCoverThumb = dg.FileName;
         }
 
         private void CoverButton_Click(object sender, RoutedEventArgs e)
         {
+            var vm = DataContext as TestHBookViewModel;
 
+            OpenFileDialog dg = new OpenFileDialog();
+            dg.Filter = "图片|*.jpg;*.png;*.gif";
+            if (dg.ShowDialog() == false) return;
+
+            vm.InputCover = dg.FileName;
         }
 
         private void PageThumbButton_Click(object sender, RoutedEventArgs e)
         {
+            var vm = DataContext as TestHBookViewModel;
 
+            OpenFileDialog dg = new OpenFileDialog();
+            dg.Filter = "图片|*.jpg;*.png;*.gif";
+            if (dg.ShowDialog() == false) return;
+
+            vm.InputPageThumb = dg.FileName;
         }
 
         private void PageContentButton_Click(object sender, RoutedEventArgs e)
         {
+            var vm = DataContext as TestHBookViewModel;
 
+            OpenFileDialog dg = new OpenFileDialog();
+            dg.Filter = "图片|*.jpg;*.png;*.gif";
+            if (dg.ShowDialog() == false) return;
+
+            vm.InputPageContent = dg.FileName;
         }
     }
 }

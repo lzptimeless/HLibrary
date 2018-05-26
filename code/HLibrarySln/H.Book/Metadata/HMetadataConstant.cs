@@ -12,7 +12,7 @@ namespace H.Book
         /// HBOOK的ASCII码
         /// The ASCII of HBOOK
         /// </summary>
-        public static byte[] StartCode = new byte[] { 0x5B, 0x48, 0x42, 0x4F, 0x4F, 0x4B };
+        public static byte[] StartCode = new byte[] { 0x48, 0x42, 0x4F, 0x4F, 0x4B };
         /// <summary>
         /// 控制码起始标志
         /// The flag of control code
