@@ -17,8 +17,12 @@ namespace H.Book
         /// 控制码起始标志
         /// The flag of control code
         /// </summary>
-        public const byte ControlCodeFlag = 0xFF;
-
+        public const byte CCFlag = 0xFF;
+        /// <summary>
+        /// 数据校验码
+        /// The check code of data
+        /// </summary>
+        public const byte CCode = 0xFE;
         /// <summary>
         /// 获取默认的保留区大小
         /// </summary>

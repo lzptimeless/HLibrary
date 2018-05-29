@@ -34,7 +34,7 @@ namespace H.Book
         /// </summary>
         /// <param name="stream">用以保存数据的<see cref="Stream"/></param>
         /// <param name="appendix">附加数据</param>
-        /// <param name="reserveLen">保留空间大小，会以<see cref="HMetadataConstant.ControlCodeFlag"/>填充</param>
+        /// <param name="reserveLen">保留空间大小，会以<see cref="HMetadataConstant.CCFlag"/>填充</param>
         public async Task SaveAsync(Stream stream, Stream[] appendixes, int reserveLen)
         {
             ExceptionFactory.CheckArgNull("stream", stream);
@@ -58,7 +58,7 @@ namespace H.Book
             ExceptionFactory.CheckBufferNull("fields", fields, "GetFields return null");
             ExceptionFactory.CheckBufferLengthRange("fields", fields, 0, int.MaxValue, "GetFields return null");
             // 写入控制码
-            await stream.WriteByteAsync(HMetadataConstant.ControlCodeFlag);
+            await stream.WriteByteAsync(HMetadataConstant.CCFlag);
             await stream.WriteByteAsync(ControlCode);
             long p0 = stream.Position;
             // 写入字段长度
@@ -88,7 +88,7 @@ namespace H.Book
                 }
             }
             // 填充保留区
-            if (reserveLen > 0) await stream.FillAsync(HMetadataConstant.ControlCodeFlag, reserveLen);
+            if (reserveLen > 0) await stream.FillAsync(HMetadataConstant.CCFlag, reserveLen);
 
             // 更新文件状态
             FileStatus.Position = position;
@@ -123,8 +123,8 @@ namespace H.Book
             if (byteResult == byteResultEnd)
                 throw new EndOfStreamException("Stream ended when read control code flag");
 
-            if (HMetadataConstant.ControlCodeFlag != byteResult)
-                throw new InvalidDataException($"Invalid control code flag: expected={HMetadataConstant.ControlCodeFlag}, value={byteResult}");
+            if (HMetadataConstant.CCFlag != byteResult)
+                throw new InvalidDataException($"Invalid control code flag: expected={HMetadataConstant.CCFlag}, value={byteResult}");
 
             byteResult = await stream.ReadByteAsync();
             if (byteResult == byteResultEnd)

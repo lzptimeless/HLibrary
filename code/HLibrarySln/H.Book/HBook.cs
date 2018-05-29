@@ -705,7 +705,7 @@ namespace H.Book
         /// </summary>
         /// <param name="stream">用以读取的Stream</param>
         /// <returns>控制码，0表示已经读到结尾了</returns>
-        /// <exception cref="InvalidDataException">没有找到控制码标志<see cref="HMetadataConstant.ControlCodeFlag"/></exception>
+        /// <exception cref="InvalidDataException">没有找到控制码标志<see cref="HMetadataConstant.CCFlag"/></exception>
         private static async Task<byte> ReadNextControlCodeAsync(Stream stream)
         {
             int readLen = 0;
@@ -716,11 +716,11 @@ namespace H.Book
             byte[] two = new byte[2];
             readLen = await stream.ReadAsync(two, 0, two.Length);
 
-            if (two[0] != HMetadataConstant.ControlCodeFlag)
+            if (two[0] != HMetadataConstant.CCFlag)
                 throw new InvalidDataException("Not found ControlCodeFlag");
 
             // 返回控制码或者0（初始值）
-            if (readLen < 2 || two[1] != HMetadataConstant.ControlCodeFlag)
+            if (readLen < 2 || two[1] != HMetadataConstant.CCFlag)
                 return two[1];
 
             if (stream.Position >= stream.Length)
@@ -737,7 +737,7 @@ namespace H.Book
 
                 for (int i = 0; i < readLen; i++)
                 {
-                    if (buffer[i] != HMetadataConstant.ControlCodeFlag)
+                    if (buffer[i] != HMetadataConstant.CCFlag)
                     {
                         // 调整Position到控制码后的数据起始位
                         stream.Seek(readLen - i - 1, SeekOrigin.Current);
