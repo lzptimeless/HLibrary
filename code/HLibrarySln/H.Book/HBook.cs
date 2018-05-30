@@ -956,8 +956,8 @@ namespace H.Book
         /// 添加页面
         /// </summary>
         /// <param name="header">页面头</param>
-        /// <param name="content">页面图像</param>
         /// <param name="thumbnail">页面缩略图</param>
+        /// <param name="content">页面图像</param>
         /// <param name="callerFilePath">不需要设置</param>
         /// <param name="callerName">不需要设置</param>
         /// <returns>新的页面的ID</returns>
@@ -967,7 +967,7 @@ namespace H.Book
         /// <exception cref="ApplicationException">未知异常导致添加失败</exception>
         /// <exception cref="InitException">没有加载数据或，创建数据</exception>
         /// <exception cref="IOWriteFailedException">数据在之前的写入操作中可能已经损坏</exception>
-        Task<Guid> AddPageAsync(HPageHeaderSetting header, Stream content, Stream thumbnail, [CallerFilePath] string callerFilePath = "", [CallerMemberName] string callerName = "");
+        Task<Guid> AddPageAsync(HPageHeaderSetting header, Stream thumbnail, Stream content, [CallerFilePath] string callerFilePath = "", [CallerMemberName] string callerName = "");
         /// <summary>
         /// 删除页面
         /// </summary>
