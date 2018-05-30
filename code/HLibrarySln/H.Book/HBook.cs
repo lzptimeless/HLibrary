@@ -16,6 +16,7 @@ namespace H.Book
         private HBookMode _mode;
         private Stream _stream;
         private HMetadataBookHeader _headerMetadata = new HMetadataBookHeader();
+        private HMetadataIndex _indexMetadata = new HMetadataIndex();
         private HMetadataBookCover _coverMetadata = new HMetadataBookCover();
         private HMetadataPageCollection _pages = new HMetadataPageCollection();
 
@@ -91,6 +92,8 @@ namespace H.Book
                 }
                 // 读取头
                 await _headerMetadata.LoadAsync(_stream);
+                // 读取索引
+                await _indexMetadata.LoadAsync(_stream);
                 // 读取封面
                 await _coverMetadata.LoadAsync(_stream);
                 // 读取页面
@@ -165,6 +168,9 @@ namespace H.Book
                 // 存储头
                 reserveLen = HMetadataConstant.GetDefaultReserveLength(HMetadataControlCodes.BookHeader);
                 await _headerMetadata.SaveAsync(_stream, null, reserveLen);
+                // 写入索引
+                reserveLen = HMetadataConstant.GetDefaultReserveLength(HMetadataControlCodes.BookIndex);
+                await _indexMetadata.SaveAsync(_stream, null, reserveLen);
                 // 存储封面
                 reserveLen = HMetadataConstant.GetDefaultReserveLength(HMetadataControlCodes.BookCover);
                 await _coverMetadata.SaveAsync(_stream, null, reserveLen);
@@ -235,11 +241,10 @@ namespace H.Book
 
                 // 保存
                 int space = fs.GetSpace();
-                int segHeaderLen = fs.GetHeaderLength();
-                int fieldsLen = metadata.GetFieldsLength();
-                int reserveLen = checked(space - segHeaderLen - fieldsLen);
+                int desiredLen = metadata.GetDesiredLength(null);
+                int reserveLen = checked(space - desiredLen);
                 if (reserveLen < 0)
-                    throw new ArgumentException($"header is too big: space={space}, fieldsLen={fieldsLen}, segHeaderLen={segHeaderLen}", "header");
+                    throw new ArgumentException($"header is too big: space={space}, desiredLen={desiredLen}", "header");
 
                 _stream.Seek(fs.Position, SeekOrigin.Begin);
                 await metadata.SaveAsync(_stream, null, reserveLen);
@@ -267,13 +272,14 @@ namespace H.Book
                 if (IsInitError()) throw CreateInitErrorEx();
                 if (IsIOWriteFailed()) throw CreateIOWriteFailedEx();
 
-                if (_coverMetadata.ImageLength == 0)
+                var appendix = _coverMetadata.GetImage();
+                if (appendix == null)
                 {
                     await readAction.Invoke(null);
                     return;
                 }
 
-                using (Stream partStream = CreatePartReadStream(_stream, _coverMetadata.FileStatus.GetAppendixPosition() + _coverMetadata.ThumbnailLength, _coverMetadata.ImageLength))
+                using (Stream partStream = CreatePartReadStream(_stream, appendix.Position, appendix.Length))
                     await readAction.Invoke(partStream);
             }
             finally
@@ -292,11 +298,12 @@ namespace H.Book
                 if (IsInitError()) throw CreateInitErrorEx();
                 if (IsIOWriteFailed()) throw CreateIOWriteFailedEx();
 
-                if (_coverMetadata.ImageLength == 0)
+                var appendix = _coverMetadata.GetImage();
+                if (appendix == null)
                     return null;
 
-                MemoryStream memStream = new MemoryStream(_coverMetadata.ImageLength);
-                using (Stream partStream = CreatePartReadStream(_stream, _coverMetadata.FileStatus.GetAppendixPosition() + _coverMetadata.ThumbnailLength, _coverMetadata.ImageLength))
+                MemoryStream memStream = new MemoryStream(appendix.Length);
+                using (Stream partStream = CreatePartReadStream(_stream, appendix.Position, appendix.Length))
                     await partStream.CopyToAsync(memStream);
 
                 memStream.Seek(0, SeekOrigin.Begin);
@@ -316,8 +323,6 @@ namespace H.Book
             if (cover != null && (cover.Length == 0 || cover.Length > int.MaxValue))
                 throw new ArgumentException($"cover is too big:expected=[1,{int.MaxValue}], value={cover.Length}", "cover");
 
-            int thumbLen = thumb != null ? (int)thumb.Length : 0;
-            int coverLen = cover != null ? (int)cover.Length : 0;
             var wt = _lock.WaitAsync(true, Timeout.InfiniteTimeSpan, CancellationToken.None, CreateReceiver(callerFilePath, callerName));
             await wt;
             try
@@ -326,19 +331,18 @@ namespace H.Book
                 if (IsInitError()) throw CreateInitErrorEx();
                 if (IsIOWriteFailed()) throw CreateIOWriteFailedEx();
 
-                int space = _coverMetadata.FileStatus.GetSpace();
-                int headerLen = _coverMetadata.FileStatus.GetHeaderLength();
-                int fieldsLen = _coverMetadata.GetFieldsLength();
-                int reserveLen = checked(space - headerLen - fieldsLen - thumbLen - coverLen);
-                if (reserveLen < 0)
-                    throw new ArgumentException($"thumb and cover is too big: space={space}, headerLen={headerLen}, fieldsLen={fieldsLen}, thumbLen={thumbLen}, coverLen={coverLen}");
-
-                _coverMetadata.ThumbnailLength = thumbLen;
-                _coverMetadata.ImageLength = coverLen;
-
                 List<Stream> appendixes = new List<Stream>();
                 if (thumb != null) appendixes.Add(thumb);
                 if (cover != null) appendixes.Add(cover);
+
+                int space = _coverMetadata.FileStatus.GetSpace();
+                int desiredLen = _coverMetadata.GetDesiredLength(appendixes.ToArray());
+                int reserveLen = checked(space - desiredLen);
+                if (reserveLen < 0)
+                    throw new ArgumentException($"thumb and cover is too big: space={space}, desiredLen={desiredLen}");
+
+                _coverMetadata.HasThumbnail = thumb != null;
+                _coverMetadata.HasImage = cover != null;
 
                 _stream.Seek(_coverMetadata.FileStatus.Position, SeekOrigin.Begin);
                 await _coverMetadata.SaveAsync(_stream, appendixes.ToArray(), reserveLen);
@@ -359,13 +363,14 @@ namespace H.Book
                 if (IsInitError()) throw CreateInitErrorEx();
                 if (IsIOWriteFailed()) throw CreateIOWriteFailedEx();
 
-                if (_coverMetadata.ThumbnailLength == 0)
+                var appendix = _coverMetadata.GetThumbnail();
+                if (appendix == null)
                 {
                     await readerAction.Invoke(null);
                     return;
                 }
 
-                using (Stream partStream = CreatePartReadStream(_stream, _coverMetadata.FileStatus.GetAppendixPosition(), _coverMetadata.ThumbnailLength))
+                using (Stream partStream = CreatePartReadStream(_stream, appendix.Position, appendix.Length))
                     await readerAction.Invoke(partStream);
             }
             finally
@@ -384,11 +389,12 @@ namespace H.Book
                 if (IsInitError()) throw CreateInitErrorEx();
                 if (IsIOWriteFailed()) throw CreateIOWriteFailedEx();
 
-                if (_coverMetadata.ThumbnailLength == 0)
+                var appendix = _coverMetadata.GetThumbnail();
+                if (appendix == null)
                     return null;
 
-                MemoryStream memStream = new MemoryStream(_coverMetadata.ThumbnailLength);
-                using (Stream partStream = CreatePartReadStream(_stream, _coverMetadata.FileStatus.GetAppendixPosition(), _coverMetadata.ThumbnailLength))
+                MemoryStream memStream = new MemoryStream(appendix.Length);
+                using (Stream partStream = CreatePartReadStream(_stream, appendix.Position, appendix.Length))
                     await partStream.CopyToAsync(memStream);
 
                 memStream.Seek(0, SeekOrigin.Begin);
@@ -433,13 +439,14 @@ namespace H.Book
 
                 var metadata = page.ContentMetadata;
                 var fileStatus = metadata.FileStatus;
-                if (metadata.ImageLength == 0)
+                var appendix = metadata.GetImage();
+                if (appendix == null)
                 {
                     await readerAction.Invoke(null);
                     return true;
                 }
 
-                using (Stream partStream = CreatePartReadStream(_stream, fileStatus.GetAppendixPosition() + metadata.ThumbnailLength, metadata.ImageLength))
+                using (Stream partStream = CreatePartReadStream(_stream, appendix.Position, appendix.Length))
                     await readerAction.Invoke(partStream);
 
                 return true;
@@ -465,12 +472,12 @@ namespace H.Book
 
                 var metadata = page.ContentMetadata;
                 var fileStatus = metadata.FileStatus;
-
-                if (metadata.ImageLength == 0)
+                var appendix = metadata.GetImage();
+                if (appendix == null)
                     return null;
 
-                MemoryStream memStream = new MemoryStream(metadata.ImageLength);
-                using (Stream partStream = CreatePartReadStream(_stream, fileStatus.GetAppendixPosition() + metadata.ThumbnailLength, metadata.ImageLength))
+                MemoryStream memStream = new MemoryStream(appendix.Length);
+                using (Stream partStream = CreatePartReadStream(_stream, appendix.Position, appendix.Length))
                     await partStream.CopyToAsync(memStream);
 
                 memStream.Seek(0, SeekOrigin.Begin);
@@ -497,14 +504,14 @@ namespace H.Book
 
                 var metadata = page.ContentMetadata;
                 var fileStatus = metadata.FileStatus;
-
-                if (metadata.ThumbnailLength == 0)
+                var appendix = metadata.GetThumbnail();
+                if (appendix != null)
                 {
                     await readerAction.Invoke(null);
                     return true;
                 }
 
-                using (Stream partStream = CreatePartReadStream(_stream, fileStatus.GetAppendixPosition(), metadata.ThumbnailLength))
+                using (Stream partStream = CreatePartReadStream(_stream, appendix.Position, appendix.Length))
                     await readerAction.Invoke(partStream);
 
                 return true;
@@ -530,12 +537,12 @@ namespace H.Book
 
                 var metadata = page.ContentMetadata;
                 var fileStatus = metadata.FileStatus;
-
-                if (metadata.ThumbnailLength == 0)
+                var appendix = metadata.GetThumbnail();
+                if (appendix == null)
                     return null;
 
-                MemoryStream memStream = new MemoryStream(metadata.ThumbnailLength);
-                using (Stream partStream = CreatePartReadStream(_stream, fileStatus.GetAppendixPosition(), metadata.ThumbnailLength))
+                MemoryStream memStream = new MemoryStream(appendix.Length);
+                using (Stream partStream = CreatePartReadStream(_stream, appendix.Position, appendix.Length))
                     await partStream.CopyToAsync(memStream);
 
                 memStream.Seek(0, SeekOrigin.Begin);
@@ -547,15 +554,15 @@ namespace H.Book
             }
         }
 
-        public async Task<Guid> AddPageAsync(HPageHeaderSetting header, Stream content, Stream thumbnial, [CallerFilePath] string callerFilePath = "", [CallerMemberName] string callerName = "")
+        public async Task<Guid> AddPageAsync(HPageHeaderSetting header, Stream thumbnail, Stream content, [CallerFilePath] string callerFilePath = "", [CallerMemberName] string callerName = "")
         {
             ExceptionFactory.CheckArgNull("content", content);
 
             if (content.Length > int.MaxValue)
                 throw new ArgumentException($"content is too big:max={int.MaxValue}, value={content.Length}", "content");
 
-            if (thumbnial != null && thumbnial.Length > int.MaxValue)
-                throw new ArgumentException($"thumbnial is too big:max={int.MaxValue}, value={thumbnial.Length}", "thumbnial");
+            if (thumbnail != null && thumbnail.Length > int.MaxValue)
+                throw new ArgumentException($"thumbnail is too big:max={int.MaxValue}, value={thumbnail.Length}", "thumbnail");
 
             var wt = _lock.WaitAsync(true, Timeout.InfiniteTimeSpan, CancellationToken.None, CreateReceiver(callerFilePath, callerName));
             await wt;
@@ -566,7 +573,7 @@ namespace H.Book
                 if (IsIOWriteFailed()) throw CreateIOWriteFailedEx();
 
                 _stream.Seek(0, SeekOrigin.End);
-
+                // 写入页头
                 HMetadataPageHeader headerMetadata = new HMetadataPageHeader();
                 headerMetadata.ID = Guid.NewGuid();
 
@@ -576,13 +583,13 @@ namespace H.Book
 
                 int reserveLen = HMetadataConstant.GetDefaultReserveLength(HMetadataControlCodes.PageHeader);
                 await headerMetadata.SaveAsync(_stream, null, reserveLen);
-
+                // 写入页图像
                 HMetadataPageContent contentMetadata = new HMetadataPageContent();
-                contentMetadata.ThumbnailLength = thumbnial != null ? (int)thumbnial.Length : 0;
-                contentMetadata.ImageLength = content != null ? (int)content.Length : 0;
+                contentMetadata.HasThumbnail = thumbnail != null;
+                contentMetadata.HasImage = content != null;
 
                 List<Stream> appendixes = new List<Stream>();
-                if (thumbnial != null) appendixes.Add(thumbnial);
+                if (thumbnail != null) appendixes.Add(thumbnail);
                 if (content != null) appendixes.Add(content);
 
                 reserveLen = HMetadataConstant.GetDefaultReserveLength(HMetadataControlCodes.PageContent);
@@ -591,6 +598,16 @@ namespace H.Book
                 HMetadataPage pageMetadata = new HMetadataPage(headerMetadata, contentMetadata);
                 if (!_pages.Add(pageMetadata))
                     throw new ApplicationException($"Unkown error, add page failed: id={headerMetadata.ID}");
+                // 写入索引
+                _indexMetadata.AddPageID(headerMetadata.ID);
+                int space = _indexMetadata.FileStatus.GetSpace();
+                int desiredLen = _indexMetadata.GetDesiredLength(null);
+                reserveLen = space - desiredLen;
+                if (reserveLen < 0)
+                    throw new ApplicationException($"Index space not enough: space={space}, desiredLen={desiredLen}");
+
+                _stream.Seek(_indexMetadata.FileStatus.Position, SeekOrigin.Begin);
+                await _indexMetadata.SaveAsync(_stream, null, reserveLen);
 
                 return headerMetadata.ID;
             }
@@ -665,11 +682,10 @@ namespace H.Book
 
                 // 保存
                 int space = fs.GetSpace();
-                int segHeaderLen = fs.GetHeaderLength();
-                int fieldsLen = metadata.GetFieldsLength();
-                int reserveLen = checked(space - segHeaderLen - fieldsLen);
+                int desiredLen = metadata.GetDesiredLength(null);
+                int reserveLen = checked(space - desiredLen);
                 if (reserveLen < 0)
-                    throw new ArgumentException($"header is too big: space={space}, fieldsLen={fieldsLen}, segHeaderLen={segHeaderLen}", "header");
+                    throw new ArgumentException($"header is too big: space={space}, desiredLen={desiredLen}", "header");
 
                 _stream.Seek(fs.Position, SeekOrigin.Begin);
                 await metadata.SaveAsync(_stream, null, reserveLen);
@@ -941,17 +957,17 @@ namespace H.Book
         /// </summary>
         /// <param name="header">页面头</param>
         /// <param name="content">页面图像</param>
-        /// <param name="thumbnial">页面缩略图</param>
+        /// <param name="thumbnail">页面缩略图</param>
         /// <param name="callerFilePath">不需要设置</param>
         /// <param name="callerName">不需要设置</param>
         /// <returns>新的页面的ID</returns>
         /// <exception cref="ArgumentNullException">content为null</exception>
         /// <exception cref="ArgumentException">content太大了，超出定义</exception>
-        /// <exception cref="ArgumentException">thumbnial太大了，超出定义</exception>
+        /// <exception cref="ArgumentException">thumbnail太大了，超出定义</exception>
         /// <exception cref="ApplicationException">未知异常导致添加失败</exception>
         /// <exception cref="InitException">没有加载数据或，创建数据</exception>
         /// <exception cref="IOWriteFailedException">数据在之前的写入操作中可能已经损坏</exception>
-        Task<Guid> AddPageAsync(HPageHeaderSetting header, Stream content, Stream thumbnial, [CallerFilePath] string callerFilePath = "", [CallerMemberName] string callerName = "");
+        Task<Guid> AddPageAsync(HPageHeaderSetting header, Stream content, Stream thumbnail, [CallerFilePath] string callerFilePath = "", [CallerMemberName] string callerName = "");
         /// <summary>
         /// 删除页面
         /// </summary>

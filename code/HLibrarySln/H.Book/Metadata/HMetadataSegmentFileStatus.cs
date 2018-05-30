@@ -11,6 +11,21 @@ namespace H.Book
     /// </summary>
     public class HMetadataSegmentFileStatus : ICloneable
     {
+        #region fields
+        /// <summary>
+        /// Control code len(Control code flag + control code)
+        /// </summary>
+        private const int CCLen = 2;
+        /// <summary>
+        /// Check code len
+        /// </summary>
+        private const int CheckLen = 1;
+        /// <summary>
+        /// The lenght of data length
+        /// </summary>
+        private const int LenLen = 4;
+        #endregion
+
         #region properties
         /// <summary>
         /// 在文件中的位置
@@ -23,10 +38,10 @@ namespace H.Book
         public int FieldsLength { get; set; }
         public const string FieldsLengthPropertyName = "FieldsLength";
         /// <summary>
-        /// 附加数据长度
+        /// 附加数据长度集合
         /// </summary>
-        public int AppendixLength { get; set; }
-        public const string AppendixLengthPropertyName = "AppendixLength";
+        public int[] AppendixLengths { get; set; }
+        public const string AppendixLengthsPropertyName = "AppendixLengths";
         /// <summary>
         /// 保留区大小 4B 保留区长度，用以快速定位下一个数据段
         /// </summary>
@@ -36,33 +51,51 @@ namespace H.Book
 
         #region methods
         /// <summary>
-        /// 获取<see cref="HMetadataSegment"/>的头在文件中的大小
-        /// </summary>
-        /// <returns></returns>
-        public int GetHeaderLength()
-        {
-            // 控制码 + 字段大小字段 + 附加数据长度字段 + 保留区大小字段
-            return 2 + 4 + 4 + 4;
-        }
-
-        /// <summary>
         /// 获取<see cref="HMetadataSegment"/>在文件中所占空间大小
         /// </summary>
         /// <returns></returns>
         public int GetSpace()
         {
-            // 头 + 字段大小 + 附加数据长度 + 保留区长度
-            return checked(GetHeaderLength() + FieldsLength + AppendixLength + ReserveLength);
+            checked
+            {
+                // control code add fields
+                int space = CCLen + CheckLen + LenLen + FieldsLength;
+                // appendix
+                if (AppendixLengths != null)
+                {
+                    foreach (int appendixLen in AppendixLengths)
+                    {
+                        space += CheckLen + LenLen + appendixLen;
+                    }
+                }
+                space += CheckLen + LenLen; // Add the end of appendix: 0xFE 0x00 0x00 0x00 0x00
+                // reserved
+                space += CheckLen + LenLen + ReserveLength;
+                return space;
+            }
         }
 
         /// <summary>
-        /// 获取附加数据的位置
+        /// 获取附加数据的信息
         /// </summary>
         /// <returns></returns>
-        public long GetAppendixPosition()
+        public HMetadataAppendix GetAppendix(int index)
         {
-            long p = checked(Position + GetHeaderLength() + FieldsLength);
-            return p;
+            if (index < 0 || AppendixLengths == null || AppendixLengths.Length <= index)
+                return null;
+
+            checked
+            {
+                // control code add fields
+                long position = Position + CCLen + CheckLen + LenLen + FieldsLength;
+                // the appendix before index
+                for (int i = 0; i < index; i++)
+                {
+                    position += CheckLen + LenLen + AppendixLengths[i];
+                }
+                position += CheckLen + LenLen;// Add current appendix checkcode length and lenght of length
+                return new HMetadataAppendix(position, AppendixLengths[index]);
+            }
         }
 
         public object Clone()

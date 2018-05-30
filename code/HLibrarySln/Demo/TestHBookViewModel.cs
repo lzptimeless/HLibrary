@@ -810,10 +810,10 @@ namespace Demo
                 setting.Tags = CreateArrayValue(InputPageTag);
                 setting.Selected = HPageHeaderFieldSelections.All;
                 IsBusy = true;
-                using (FileStream pageFs = new FileStream(pagePath, FileMode.Open, FileAccess.Read))
-                using (FileStream thumbFs = new FileStream(thumbPath, FileMode.Open, FileAccess.Read))
+                using (FileStream pageFs = new FileStream(pagePath, FileMode.Open, FileAccess.Read, FileShare.Read, 2048, true))
+                using (FileStream thumbFs = new FileStream(thumbPath, FileMode.Open, FileAccess.Read, FileShare.Read, 2048, true))
                 {
-                    await _book.AddPageAsync(setting, pageFs, thumbFs);
+                    await _book.AddPageAsync(setting, thumbFs, pageFs);
                 }
             }
             catch (Exception ex)

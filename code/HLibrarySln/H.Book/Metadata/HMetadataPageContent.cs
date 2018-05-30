@@ -10,60 +10,57 @@ namespace H.Book
     {
         public override byte ControlCode { get { return HMetadataControlCodes.PageContent; } }
 
-        public int ThumbnailLength { get; set; }
-        public const string ThumbnailLengthPropertyName = "ThumbnailLength";
+        public bool HasThumbnail { get; set; }
+        public const string HasThumbnailPropertyName = "HasThumbnail";
 
-        public int ImageLength { get; set; }
-        public const string ImageLengthPropertyName = "ImageLength";
+        public bool HasImage { get; set; }
+        public const string HasImagePropertyName = "HasImage";
 
         public override int GetFieldsLength()
         {
-            // 缩略图长度+图像长度
-            return 4 + 4;
+            return 1 + 1;
         }
 
         protected override byte[] GetFields()
         {
-            ExceptionFactory.CheckPropertyRange(ThumbnailLengthPropertyName, ThumbnailLength, 0, int.MaxValue);
-            ExceptionFactory.CheckPropertyRange(ImageLengthPropertyName, ImageLength, 0, int.MaxValue);
-
-            int dataLen = GetFieldsLength();
-            byte[] data = new byte[dataLen];
+            byte[] buffer = new byte[GetFieldsLength()];
             int writePos = 0;
+            writePos += HMetadataHelper.WritePropertyBool(HasThumbnailPropertyName, HasThumbnail, buffer, writePos);
+            writePos += HMetadataHelper.WritePropertyBool(HasImagePropertyName, HasImage, buffer, writePos);
 
-            // 写入缩略图长度
-            writePos += HMetadataHelper.WritePropertyInt(ThumbnailLengthPropertyName, ThumbnailLength, data, writePos);
-            // 写入图像长度
-            writePos += HMetadataHelper.WritePropertyInt(ImageLengthPropertyName, ImageLength, data, writePos);
-
-            if (writePos != dataLen)
-                throw new WritePropertyException("Unkown", $"Some error occurred in write property: writePos={writePos}, dataLen={dataLen}", null);
-
-            return data;
+            return buffer;
         }
 
         protected override void SetFields(byte[] buffer)
         {
             ExceptionFactory.CheckArgNull("buffer", buffer);
 
-            ThumbnailLength = 0;
-            ImageLength = 0;
-
             int readPos = 0;
-            // 读取缩略图长度
-            int thumbLen;
-            readPos += HMetadataHelper.ReadPropertyInt(ThumbnailLengthPropertyName, out thumbLen, buffer, readPos);
-            ThumbnailLength = thumbLen;
-            ExceptionFactory.CheckPropertyRange(ThumbnailLengthPropertyName, thumbLen, 0, int.MaxValue);
-            // 读取图像长度
-            int imgLen;
-            readPos += HMetadataHelper.ReadPropertyInt(ThumbnailLengthPropertyName, out imgLen, buffer, readPos);
-            ImageLength = imgLen;
-            ExceptionFactory.CheckPropertyRange(ImageLengthPropertyName, imgLen, 0, int.MaxValue);
+            bool hasThumbnail;
+            readPos += HMetadataHelper.ReadPropertyBool(HasThumbnailPropertyName, out hasThumbnail, buffer, readPos);
+            HasThumbnail = hasThumbnail;
+
+            bool hasImg;
+            readPos += HMetadataHelper.ReadPropertyBool(HasImagePropertyName, out hasImg, buffer, readPos);
+            HasImage = hasImg;
         }
 
         protected override void OnClone(HMetadataSegment clone)
         {
+        }
+
+        public HMetadataAppendix GetThumbnail()
+        {
+            if (HasThumbnail) return FileStatus.GetAppendix(0);
+            else return null;
+        }
+
+        public HMetadataAppendix GetImage()
+        {
+            if (!HasImage) return null;
+
+            if (HasThumbnail) return FileStatus.GetAppendix(1);
+            else return FileStatus.GetAppendix(0);
         }
     }
 }

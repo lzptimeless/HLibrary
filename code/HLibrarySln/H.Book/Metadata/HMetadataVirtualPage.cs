@@ -19,20 +19,16 @@ namespace H.Book
         public Guid BookID { get; set; }
         public string BookIDPropertyName = "BookID";
 
-        public int PageIndex { get; set; }
-        public string PageIndexPropertyName = "PageIndex";
-
         public override int GetFieldsLength()
         {
-            // 页面ID，书ID，页面索引
-            return 16 + 16 + 4;
+            // 页面ID，书ID
+            return 16 + 16;
         }
 
         protected override byte[] GetFields()
         {
             ExceptionFactory.CheckPropertyEmpty(IDPropertyName, ID);
             ExceptionFactory.CheckPropertyEmpty(BookIDPropertyName, BookID);
-            ExceptionFactory.CheckPropertyRange(PageIndexPropertyName, PageIndex, 0, int.MaxValue);
 
             int dataLen = GetFieldsLength();
             byte[] data = new byte[dataLen];
@@ -41,8 +37,6 @@ namespace H.Book
             writePos += HMetadataHelper.WritePropertyGuid(IDPropertyName, ID, data, writePos);
             // 写入书ID
             writePos += HMetadataHelper.WritePropertyGuid(BookIDPropertyName, BookID, data, writePos);
-            // 写入页面索引
-            writePos += HMetadataHelper.WritePropertyInt(PageIndexPropertyName, PageIndex, data, writePos);
 
             if (writePos != dataLen)
                 throw new WritePropertyException("Unkown", $"Some error occurred in write property: writePos={writePos}, dataLen={dataLen}", null);
@@ -56,15 +50,15 @@ namespace H.Book
 
             int readPos = 0;
             // 读取ID
+            Guid id;
+            readPos += HMetadataHelper.ReadPropertyGuid(IDPropertyName, out id, buffer, readPos);
+            ID = id;
+            ExceptionFactory.CheckPropertyEmpty(IDPropertyName, id);
+            // 读取书ID
             Guid bookId;
             readPos += HMetadataHelper.ReadPropertyGuid(BookIDPropertyName, out bookId, buffer, readPos);
             BookID = bookId;
             ExceptionFactory.CheckPropertyEmpty(BookIDPropertyName, bookId);
-            // 读取页面索引
-            int pageIndex;
-            readPos += HMetadataHelper.ReadPropertyInt(PageIndexPropertyName, out pageIndex, buffer, readPos);
-            PageIndex = pageIndex;
-            ExceptionFactory.CheckPropertyRange(PageIndexPropertyName, pageIndex, 0, int.MaxValue);
         }
 
         protected override void OnClone(HMetadataSegment clone)

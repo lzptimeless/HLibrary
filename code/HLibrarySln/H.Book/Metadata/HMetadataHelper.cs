@@ -115,6 +115,33 @@ namespace H.Book
         /// <param name="buffer">buffer</param>
         /// <param name="startIndex">buffer写入起始位置</param>
         /// <returns></returns>
+        public static int WritePropertyBool(string propertyName, bool value, byte[] buffer, int startIndex)
+        {
+            int needLen = 1;
+            try
+            {
+                ExceptionFactory.CheckArgNull("buffer", buffer);
+                ExceptionFactory.CheckArgRange("startIndex", startIndex, 0, buffer.Length - 1);
+                ExceptionFactory.CheckArgLengthRange("buffer", buffer, startIndex + needLen, int.MaxValue, $"startIndex={startIndex}, needLen={needLen}");
+
+                buffer[startIndex] = (byte)(value ? 1 : 0);
+            }
+            catch (Exception ex)
+            {
+                throw ExceptionFactory.CreateWritePropertyException(propertyName, null, ex);
+            }
+
+            return needLen;
+        }
+
+        /// <summary>
+        /// 向buffer中写入属性值
+        /// </summary>
+        /// <param name="propertyName">属性名</param>
+        /// <param name="value">属性值</param>
+        /// <param name="buffer">buffer</param>
+        /// <param name="startIndex">buffer写入起始位置</param>
+        /// <returns></returns>
         public static int WritePropertyInt(string propertyName, int value, byte[] buffer, int startIndex)
         {
             const int len = 4;
@@ -184,7 +211,9 @@ namespace H.Book
                 ExceptionFactory.CheckArgRange("startIndex", startIndex, 0, buffer.Length - 1);
                 ExceptionFactory.CheckBufferLengthRange("buffer", buffer, startIndex + len, int.MaxValue, $"startIndex={startIndex}, len={len}");
 
-                value = new Guid(buffer.Take(len).ToArray());
+                byte[] data = new byte[len];
+                Array.Copy(buffer, startIndex, data, 0, len);
+                value = new Guid(data);
             }
             catch (Exception ex)
             {
@@ -214,6 +243,45 @@ namespace H.Book
                 ExceptionFactory.CheckArgLengthRange("buffer", buffer, startIndex + 4, int.MaxValue, $"startIndex={startIndex}");
 
                 len = BytesToString(buffer, startIndex, out value);
+            }
+            catch (Exception ex)
+            {
+                throw ExceptionFactory.CreateReadPropertyException(propertyName, null, ex);
+            }
+
+            return len;
+        }
+
+        /// <summary>
+        /// 从buffer中读取属性值
+        /// </summary>
+        /// <param name="propertyName">属性名</param>
+        /// <param name="value">读取到的属性值</param>
+        /// <param name="buffer">存有属性值的buffer</param>
+        /// <param name="startIndex">读取起始位置</param>
+        /// <param name="len">读取字节数</param>
+        /// <returns>读取字节数</returns>
+        public static int ReadPropertyBool(string propertyName, out bool value, byte[] buffer, int startIndex)
+        {
+            value = false;
+            int len = 1;
+            try
+            {
+                ExceptionFactory.CheckArgNull("buffer", buffer);
+                ExceptionFactory.CheckArgRange("startIndex", startIndex, 0, buffer.Length - 1);
+                ExceptionFactory.CheckArgLengthRange("buffer", buffer, startIndex + len, int.MaxValue, $"startIndex={startIndex}");
+
+                switch (buffer[startIndex])
+                {
+                    case 1:
+                        value = true;
+                        break;
+                    case 0:
+                        value = false;
+                        break;
+                    default:
+                        throw new InvalidDataException($"Not a bool value:{buffer[startIndex]}");
+                }
             }
             catch (Exception ex)
             {

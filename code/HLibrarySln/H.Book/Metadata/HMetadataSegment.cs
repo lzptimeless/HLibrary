@@ -35,22 +35,26 @@ namespace H.Book
         /// <param name="stream">用以保存数据的<see cref="Stream"/></param>
         /// <param name="appendix">附加数据</param>
         /// <param name="reserveLen">保留空间大小，会以<see cref="HMetadataConstant.CCFlag"/>填充</param>
-        public async Task SaveAsync(Stream stream, Stream[] appendixes, int reserveLen)
+        public async Task SaveAsync(Stream stream, object[] appendixes, int reserveLen)
         {
             ExceptionFactory.CheckArgNull("stream", stream);
             ExceptionFactory.CheckArgRange("reserveLen", reserveLen, 0, int.MaxValue);
-
             long position = stream.Position;
-            int appendixLen = 0;
-            if (appendixes != null)
+            int[] appendixLens = new int[appendixes != null ? appendixes.Length : 0];
+            for (int i = 0; i < appendixLens.Length; i++)
             {
-                for (int i = 0; i < appendixes.Length; i++)
-                {
-                    if (appendixes[i].Length > int.MaxValue)
-                        throw new ArgumentException($"appendixes[{i}] is too big: max={int.MaxValue}, value={appendixes[i].Length}", "appendixes");
+                long appendixLen;
+                if (appendixes[i] is Stream)
+                    appendixLen = (appendixes[i] as Stream).Length;
+                else if (appendixes[i] is Array)
+                    appendixLen = (appendixes[i] as byte[]).LongLength;
+                else
+                    throw new ArgumentException($"appendixes[{i}] only support Stream or byte[] type", "appendixes");
 
-                    appendixLen = checked(appendixLen + (int)appendixes[i].Length);
-                }
+                if (appendixLen <= 0 || appendixLen > int.MaxValue)
+                    throw new ArgumentException($"appendixes[{i}] length error: expected=[1,{int.MaxValue}], value={appendixLen}", "appendixes");
+
+                appendixLens[i] = (int)appendixLen;
             }
 
             byte[] buffer;
@@ -60,40 +64,53 @@ namespace H.Book
             // 写入控制码
             await stream.WriteByteAsync(HMetadataConstant.CCFlag);
             await stream.WriteByteAsync(ControlCode);
-            long p0 = stream.Position;
+            // 写入校验码
+            await stream.WriteByteAsync(HMetadataConstant.CCode);
             // 写入字段长度
             buffer = BitConverter.GetBytes(fields.Length);
             await stream.WriteAsync(buffer, 0, buffer.Length);
-            long p1 = stream.Position;
-            // 写入附加数据长度
-            buffer = BitConverter.GetBytes(appendixLen);
-            await stream.WriteAsync(buffer, 0, buffer.Length);
-            long p2 = stream.Position;
-            // 写入保留区长度
-            buffer = BitConverter.GetBytes(reserveLen);
-            await stream.WriteAsync(buffer, 0, buffer.Length);
-            long p3 = stream.Position;
             // 写入字段
             if (fields.Length > 0)
                 await stream.WriteAsync(fields, 0, fields.Length);
-            // 填充附加数据
-            long p4 = stream.Position;
-            if (appendixLen > 0)
+            // 写入附加数据
+            for (int i = 0; i < appendixLens.Length; i++)
             {
-                foreach (var appendix in appendixes)
+                // 写入校验码
+                await stream.WriteByteAsync(HMetadataConstant.CCode);
+                // 写入附加数据长度
+                buffer = BitConverter.GetBytes(appendixLens[i]);
+                await stream.WriteAsync(buffer, 0, buffer.Length);
+                // 写入附加数据
+                if (appendixes[i] is Stream)
                 {
-                    appendix.Seek(0, SeekOrigin.Begin);
-                    long p5 = stream.Position;
-                    await appendix.CopyToAsync(stream); 
+                    var s = appendixes[i] as Stream;
+                    s.Seek(0, SeekOrigin.Begin);
+                    await s.CopyToAsync(stream);
                 }
+                else if (appendixes[i] is byte[])
+                {
+                    var array = appendixes[i] as byte[];
+                    await stream.WriteAsync(array, 0, array.Length);
+                }
+                else
+                    throw new ArgumentException($"appendixes[{i}] only support Stream or byte[] type", "appendixes");
             }
+            // 写入附加数据结尾
+            await stream.WriteByteAsync(HMetadataConstant.CCode);
+            buffer = BitConverter.GetBytes((int)0);
+            await stream.WriteAsync(buffer, 0, buffer.Length);
+            // 写入校验码
+            await stream.WriteByteAsync(HMetadataConstant.CCode);
+            // 写入保留区长度
+            buffer = BitConverter.GetBytes(reserveLen);
+            await stream.WriteAsync(buffer, 0, buffer.Length);
             // 填充保留区
             if (reserveLen > 0) await stream.FillAsync(HMetadataConstant.CCFlag, reserveLen);
 
             // 更新文件状态
             FileStatus.Position = position;
             FileStatus.FieldsLength = fields.Length;
-            FileStatus.AppendixLength = appendixLen;
+            FileStatus.AppendixLengths = appendixLens;
             FileStatus.ReserveLength = reserveLen;
         }
 
@@ -113,7 +130,7 @@ namespace H.Book
             // 字段数据长度
             int fieldsLen;
             // 附加数据长度
-            int appendixLen;
+            List<int> appendixLens = new List<int>();
             // 保留区长度
             int reserveLen;
             // 字段缓存
@@ -133,6 +150,14 @@ namespace H.Book
             if (ControlCode != byteResult)
                 throw new InvalidDataException($"Invalid control code: expected={ControlCode}, value={byteResult}");
 
+            // 读取校验码
+            byteResult = await stream.ReadByteAsync();
+            if (byteResult == byteResultEnd)
+                throw new EndOfStreamException("Stream ended when read check code of fields length");
+
+            if (HMetadataConstant.CCode != byteResult)
+                throw new InvalidDataException($"Invalid check code of fields length: value={byteResult}");
+
             byte[] intBuffer = new byte[4];
             // 读取字段数据长度
             if (intBuffer.Length != await stream.ReadAsync(intBuffer, 0, intBuffer.Length))
@@ -142,13 +167,46 @@ namespace H.Book
             if (fieldsLen < 0)
                 throw new InvalidDataException($"Invalid fields len: expected=[0,{int.MaxValue}] value={fieldsLen}");
 
-            // 读取附加数据长度
-            if (intBuffer.Length != await stream.ReadAsync(intBuffer, 0, intBuffer.Length))
-                throw new EndOfStreamException("Stream ended when read appendix len");
+            // 读取字段数据
+            if (fieldsLen > 0)
+            {
+                fields = new byte[fieldsLen];
+                if (fieldsLen != await stream.ReadAsync(fields, 0, fields.Length))
+                    throw new EndOfStreamException("Stream ended when read fields");
+            }
 
-            appendixLen = BitConverter.ToInt32(intBuffer, 0);
-            if (appendixLen < 0)
-                throw new InvalidDataException($"Invalid appendix len: expected=[0,{int.MaxValue}] value={appendixLen}");
+            while (true)
+            {
+                // 读取校验码
+                byteResult = await stream.ReadByteAsync();
+                if (byteResult == byteResultEnd)
+                    throw new EndOfStreamException("Stream ended when read check code of appendix length");
+
+                if (HMetadataConstant.CCode != byteResult)
+                    throw new InvalidDataException($"Invalid check code of appendix length: value={byteResult}");
+
+                // 读取附加数据长度
+                if (intBuffer.Length != await stream.ReadAsync(intBuffer, 0, intBuffer.Length))
+                    throw new EndOfStreamException("Stream ended when read appendix len");
+
+                int appendixLen = BitConverter.ToInt32(intBuffer, 0);
+                if (appendixLen < 0)
+                    throw new InvalidDataException($"Invalid appendix len: expected=[0,{int.MaxValue}] value={appendixLen}");
+
+                if (appendixLen == 0) break; // Readed the end of appendix
+
+                appendixLens.Add(appendixLen);
+                // 略过附加数据
+                stream.Seek(appendixLen, SeekOrigin.Current);
+            }
+            // 读取校验码
+            byteResult = await stream.ReadByteAsync();
+            if (byteResult == byteResultEnd)
+                throw new EndOfStreamException("Stream ended when read check code of reserved length");
+
+            if (HMetadataConstant.CCode != byteResult)
+                throw new InvalidDataException($"Invalid check code of reserved length: value={byteResult}");
+
             // 读取保留区长度
             if (intBuffer.Length != await stream.ReadAsync(intBuffer, 0, intBuffer.Length))
                 throw new EndOfStreamException("Stream ended when read reserve len");
@@ -157,24 +215,54 @@ namespace H.Book
             if (reserveLen < 0)
                 throw new InvalidDataException($"Invalid reserve len: expected=[0,{int.MaxValue}] value={reserveLen}");
 
-            // 读取数据
-            if (fieldsLen > 0)
-            {
-                fields = new byte[fieldsLen];
-                if (fieldsLen != await stream.ReadAsync(fields, 0, fields.Length))
-                    throw new EndOfStreamException("Stream ended when read fields");
-            }
-
-            // 略过附加数据和保留区
-            stream.Seek(checked(appendixLen + reserveLen), SeekOrigin.Current);
+            // 略过保留区
+            if (reserveLen > 0) stream.Seek(reserveLen, SeekOrigin.Current);
 
             // 更新文件状态
             FileStatus.Position = position;
             FileStatus.FieldsLength = fieldsLen;
-            FileStatus.AppendixLength = appendixLen;
+            FileStatus.AppendixLengths = appendixLens.ToArray();
             FileStatus.ReserveLength = reserveLen;
 
             SetFields(fields);
+        }
+
+        /// <summary>
+        /// 获取保存所有数据需要的长度
+        /// </summary>
+        /// <param name="appendixes">附加数据</param>
+        /// <returns>需要的长度</returns>
+        public int GetDesiredLength(object[] appendixes)
+        {
+            int CCLen = 2, CheckLen = 1, LenLen = 4;
+            checked
+            {
+                // control code add fields
+                int deired = CCLen + CheckLen + LenLen + GetFieldsLength();
+                // appendix
+                if (appendixes != null)
+                {
+                    for (int i = 0; i < appendixes.Length; i++)
+                    {
+                        long appendixLen = 0;
+                        if (appendixes[i] is Stream)
+                            appendixLen = (appendixes[i] as Stream).Length;
+                        else if (appendixes[i] is byte[])
+                            appendixLen = (appendixes[i] as byte[]).Length;
+                        else
+                            throw new ArgumentException($"appendixes[{i}] only support Stream or byte[] type", "appendixes");
+
+                        if (appendixLen <= 0 || appendixLen > int.MaxValue)
+                            throw new ArgumentException($"appendixes[{i}] length error: expected=[1,{int.MaxValue}], value={appendixLen}", "appendixes");
+
+                        deired += CheckLen + LenLen + (int)appendixLen;
+                    }
+                }
+                deired += CheckLen + LenLen; // Add the end of appendix: 0xFE 0x00 0x00 0x00 0x00
+                // reserve
+                deired += CheckLen + LenLen;
+                return deired;
+            }
         }
 
         /// <summary>

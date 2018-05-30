@@ -19,7 +19,7 @@ namespace H.Book
         /// </summary>
         public const byte CCFlag = 0xFF;
         /// <summary>
-        /// 数据校验码
+        /// 数据校验码0xFE，一些数据字段前会有一个0xFE用来表示数据起始，方便调试
         /// The check code of data
         /// </summary>
         public const byte CCode = 0xFE;

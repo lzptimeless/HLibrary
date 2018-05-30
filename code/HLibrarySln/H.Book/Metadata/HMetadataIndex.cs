@@ -9,41 +9,37 @@ namespace H.Book
     public class HMetadataIndex : HMetadataSegment
     {
         public override byte ControlCode { get { return HMetadataControlCodes.BookIndex; } }
-        
-        public int[] PagePositions { get; set; }
-        public const string PagePositionsPropertyName = "PagePositions";
+
+        public Guid[] PageIDs { get; set; }
+        public const string PageIDsPropertyName = "PageIDs";
 
         public override int GetFieldsLength()
         {
-            // 页面数4B + 页面位置
-            int pageCount = PagePositions != null ? PagePositions.Length : 0;
-            return 4 + pageCount * 4;
+            // 页面ID+结尾
+            checked
+            {
+                return (PageIDs != null ? PageIDs.Length : 0) * 16 + 16;
+            }
         }
 
         protected override byte[] GetFields()
         {
-            ExceptionFactory.CheckPropertyCountRange(PagePositionsPropertyName, PagePositions, 0, int.MaxValue);
+            ExceptionFactory.CheckPropertyCountRange(PageIDsPropertyName, PageIDs, 0, int.MaxValue);
+            if (PageIDs != null && PageIDs.Any(g => g == Guid.Empty))
+                throw new InvalidPropertyException(PageIDsPropertyName, "Page ID can not be empty", null);
 
             int dataLen = GetFieldsLength();
             byte[] data = new byte[dataLen];
             int writePos = 0;
-            int pageCount = PagePositions != null ? PagePositions.Length : 0;
 
-            // 写入页数
-            writePos += HMetadataHelper.WritePropertyInt("PageCount", pageCount, data, writePos);
-            // 写入页位置
-            if (pageCount > 0)
+            // 写入页面ID
+            if (PageIDs != null)
             {
-                var pps = PagePositions;
-                const int posLen = 4;
-                for (int i = 0; i < pageCount; i++)
-                {
-                    byte[] valueBuffer = BitConverter.GetBytes(pps[i]);
-                    ExceptionFactory.CheckBufferLength("valueBuffer", valueBuffer, posLen);
-                    Array.Copy(valueBuffer, 0, data, writePos, valueBuffer.Length);
-                    writePos += valueBuffer.Length;
-                }
+                for (int i = 0; i < PageIDs.Length; i++)
+                    writePos += HMetadataHelper.WritePropertyGuid($"PageIDs[{i}]", PageIDs[i], data, writePos);
             }
+            // 写入结尾
+            writePos += HMetadataHelper.WritePropertyGuid("end", Guid.Empty, data, writePos);
 
             if (writePos != dataLen)
                 throw new WritePropertyException("Unkown", $"Some error occurred in write property: writePos={writePos}, dataLen={dataLen}", null);
@@ -55,27 +51,37 @@ namespace H.Book
         {
             ExceptionFactory.CheckArgNull("buffer", buffer);
 
-            PagePositions = null;
+            PageIDs = null;
+            List<Guid> ids = new List<Guid>();
 
             int readPos = 0;
-            // 读取页数
-            int pageCount;
-            readPos += HMetadataHelper.ReadPropertyInt("PageCount", out pageCount, buffer, readPos);
-            ExceptionFactory.CheckPropertyRange("PageCount", pageCount, 0, int.MaxValue);
-            // 读取页位置
-            const int posLen = 4;
-            int[] pp = new int[pageCount];
-            for (int i = 0; i < pageCount; i++)
+            // 读取页ID
+            while (true)
             {
-                int pos = BitConverter.ToInt32(buffer, readPos);
-                pp[i]=pos;
-                readPos += posLen;
+                Guid id;
+                readPos += HMetadataHelper.ReadPropertyGuid($"PageIDs[{ids.Count}]", out id, buffer, readPos);
+                if (id == Guid.Empty) break;
+
+                ids.Add(id);
             }
-            PagePositions = pp;
+
+            PageIDs = ids.ToArray();
         }
 
         protected override void OnClone(HMetadataSegment clone)
         {
+        }
+
+        public void AddPageID(Guid id)
+        {
+            if (id == Guid.Empty) throw new ArgumentException("id can not be Guid.Empty", "id");
+
+            int newLen = (PageIDs != null ? PageIDs.Length : 0) + 1;
+            Guid[] newIDs = new Guid[newLen];
+            if (newLen > 1) Array.Copy(PageIDs, 0, newIDs, 0, newLen - 1);
+
+            newIDs[newLen - 1] = id;
+            PageIDs = newIDs;
         }
     }
 }
