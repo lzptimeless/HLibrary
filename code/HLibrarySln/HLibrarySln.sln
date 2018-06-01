@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "H.Book", "H.Book\H.Book.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CLRTools", "CLRTools\CLRTools.csproj", "{4F653FE5-95A5-4019-BE70-25C6F2B48C02}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "H.BookLibrary", "H.BookLibrary\H.BookLibrary.csproj", "{E2C1649C-8612-4548-ADF7-711649C37231}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{4F653FE5-95A5-4019-BE70-25C6F2B48C02}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4F653FE5-95A5-4019-BE70-25C6F2B48C02}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4F653FE5-95A5-4019-BE70-25C6F2B48C02}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E2C1649C-8612-4548-ADF7-711649C37231}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E2C1649C-8612-4548-ADF7-711649C37231}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E2C1649C-8612-4548-ADF7-711649C37231}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E2C1649C-8612-4548-ADF7-711649C37231}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

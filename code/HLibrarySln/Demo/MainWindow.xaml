@@ -8,7 +8,7 @@
         xmlns:local="clr-namespace:Demo"
         mc:Ignorable="d"
         Title="HLibrary" Height="700" Width="1000"
-        Style="{StaticResource win-shell}"
+        Style="{StaticResource window-shell}"
         Background="{StaticResource brush-window-bg}">
     <Window.Tag>
         <Grid>
