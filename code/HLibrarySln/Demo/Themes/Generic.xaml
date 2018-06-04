@@ -638,7 +638,22 @@
         <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
         <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
     </Style>
-
+    
+    <!-- ComboBox -->
+    <Style x:Key="combobox-togglebutton" TargetType="ToggleButton">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ToggleButton">
+                    <Border>
+                        <Path/>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="Focusable" Value="False"/>
+        <Setter Property="ClickMode" Value="Press"/>
+    </Style>
+    
     <!--  Window  -->
     <Style x:Key="window-shell" TargetType="Window">
         <Setter Property="Template">

@@ -25,6 +25,9 @@
     </Window.Tag>
     <Grid>
         <!--<local:LocalMangaView/>-->
-        <local:TestHBook x:Name="TestHBookView"/>
+        <!--<local:TestHBook x:Name="TestHBookView"/>-->
+        <ComboBox VerticalAlignment="Top" HorizontalAlignment="Left">
+            
+        </ComboBox>
     </Grid>
 </Window>

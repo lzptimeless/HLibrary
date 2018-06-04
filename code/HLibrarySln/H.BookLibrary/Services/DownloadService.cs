@@ -10,6 +10,10 @@ namespace H.BookLibrary
 {
     public class DownloadService
     {
+        #region fields
+        
+        #endregion
+
         public event EventHandler<BookEventArgs> DownloadBookStart;
         public event EventHandler<BookEventArgs> DownloadBookStop;
         public event EventHandler<BookEventArgs> DownloadBookResume;
