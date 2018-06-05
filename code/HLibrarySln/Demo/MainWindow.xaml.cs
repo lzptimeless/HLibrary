@@ -26,13 +26,14 @@ namespace Demo
             InitializeComponent();
 
             Loaded += MainWindow_Loaded;
+            Selection.ItemsSource = new[] { "Item1", "Item2", "Item3", "Item4", "Item5", "Item6", "Item7", "Item8", "Item9", "Item10", "Item11", "Item12" };
         }
 
-        private async void MainWindow_Loaded(object sender, RoutedEventArgs e)
+        private void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            var vm = new TestHBookViewModel();
-            TestHBookView.DataContext = vm;
-            await vm.Init();
+            //var vm = new TestHBookViewModel();
+            //TestHBookView.DataContext = vm;
+            //await vm.Init();
         }
     }
 }
