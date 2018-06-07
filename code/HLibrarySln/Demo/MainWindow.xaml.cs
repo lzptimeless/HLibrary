@@ -27,6 +27,8 @@ namespace Demo
 
             Loaded += MainWindow_Loaded;
             Selection.ItemsSource = new[] { "Item1", "Item2", "Item3", "Item4", "Item5", "Item6", "Item7", "Item8", "Item9", "Item10", "Item11", "Item12" };
+            Selection.SelectedIndex = 2;
+            //Selection.IsEnabled = false;
         }
 
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)

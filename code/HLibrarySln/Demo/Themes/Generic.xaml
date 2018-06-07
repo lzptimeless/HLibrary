@@ -513,6 +513,33 @@
         <Setter Property="VerticalScrollBarVisibility" Value="Auto" />
         <Setter Property="HorizontalScrollBarVisibility" Value="Disabled" />
     </Style>
+    <!--  No scrollbar version  -->
+    <Style x:Key="scrollviewer-slim" TargetType="ScrollViewer">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ScrollViewer">
+                    <Border
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}">
+                        <ScrollContentPresenter
+                            x:Name="PART_ScrollContentPresenter"
+                            Margin="{TemplateBinding Padding}"
+                            HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                            VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                            CanContentScroll="{TemplateBinding CanContentScroll}" />
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="OverridesDefaultStyle" Value="True" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="BorderBrush" Value="{StaticResource brush-scrollviewer-border}" />
+        <Setter Property="Background" Value="{StaticResource brush-scrollviewer-bg}" />
+        <Setter Property="VerticalScrollBarVisibility" Value="Auto" />
+        <Setter Property="HorizontalScrollBarVisibility" Value="Disabled" />
+    </Style>
 
     <!--  Input  -->
     <Color x:Key="color-textbox-bg">#3F3F46</Color>
@@ -525,9 +552,9 @@
     <SolidColorBrush x:Key="brush-textbox-focus-border" Color="{StaticResource color-accent-light}" />
     <SolidColorBrush x:Key="brush-textbox-selection" Color="{StaticResource color-textbox-selection}" />
     <SolidColorBrush x:Key="brush-textbox-caret" Color="{StaticResource color-text-highlight}" />
-    <SolidColorBrush x:Key="brush-textbox-disable-bg" Color="Transparent" />
+    <SolidColorBrush x:Key="brush-textbox-disable-bg" Color="{StaticResource color-transparent}" />
     <SolidColorBrush x:Key="brush-textbox-disable-fg" Color="{StaticResource color-text}" />
-    <SolidColorBrush x:Key="brush-textbox-disable-border" Color="Transparent" />
+    <SolidColorBrush x:Key="brush-textbox-disable-border" Color="{StaticResource color-transparent}" />
     <Style x:Key="textbox" TargetType="TextBox">
         <Setter Property="Template">
             <Setter.Value>
@@ -535,8 +562,6 @@
                     <ScrollViewer
                         x:Name="PART_ContentHost"
                         Padding="{TemplateBinding Padding}"
-                        HorizontalAlignment="Stretch"
-                        VerticalAlignment="Stretch"
                         HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
                         VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
                         Background="{TemplateBinding Background}"
@@ -640,10 +665,19 @@
     </Style>
 
     <!--  ComboBox  -->
+    <Color x:Key="color-combobox-bg">#3F3F46</Color>
+    <Color x:Key="color-combobox-bd">#434346</Color>
     <Color x:Key="color-comboboxitem-hover-bg">#40FFFFFF</Color>
     <Color x:Key="color-comboboxitem-selected-bg">#40FFFFFF</Color>
     <Color x:Key="color-combobox-popup-bg">#101010</Color>
     <SolidColorBrush x:Key="brush-combobox-fg" Color="{StaticResource color-text}" />
+    <SolidColorBrush x:Key="brush-combobox-bg" Color="{StaticResource color-combobox-bg}" />
+    <SolidColorBrush x:Key="brush-combobox-bd" Color="{StaticResource color-combobox-bd}" />
+    <SolidColorBrush x:Key="brush-combobox-hover-bd" Color="{StaticResource color-text-highlight}" />
+    <SolidColorBrush x:Key="brush-combobox-focus-bd" Color="{StaticResource color-text-highlight}" />
+    <SolidColorBrush x:Key="brush-combobox-disable-fg" Color="{StaticResource color-text}" />
+    <SolidColorBrush x:Key="brush-combobox-disable-bd" Color="{StaticResource color-transparent}" />
+    <SolidColorBrush x:Key="brush-combobox-disable-bg" Color="{StaticResource color-transparent}" />
     <SolidColorBrush x:Key="brush-comboboxitem-fg" Color="{StaticResource color-text}" />
     <SolidColorBrush x:Key="brush-comboboxitem-bd" Color="{StaticResource color-transparent}" />
     <SolidColorBrush x:Key="brush-comboboxitem-bg" Color="{StaticResource color-transparent}" />
@@ -670,16 +704,8 @@
                             Stroke="{TemplateBinding Foreground}" />
                     </Border>
                     <ControlTemplate.Triggers>
-                        <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="Background" Value="{StaticResource brush-btn-hover-bg}" />
-                        </Trigger>
-                        <Trigger Property="IsPressed" Value="True">
-                            <Setter Property="Background" Value="{StaticResource brush-btn-press-bg}" />
-                        </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
-                            <Setter Property="BorderBrush" Value="{StaticResource brush-btn-disable-border}" />
-                            <Setter Property="Foreground" Value="{StaticResource brush-btn-disable-fg}" />
-                            <Setter Property="Background" Value="{StaticResource brush-btn-disable-bg}" />
+                            <Setter TargetName="Arrow" Property="Visibility" Value="Hidden" />
                         </Trigger>
                         <Trigger Property="IsChecked" Value="True">
                             <Setter TargetName="Arrow" Property="Data">
@@ -694,43 +720,26 @@
         </Setter>
         <Setter Property="Focusable" Value="False" />
         <Setter Property="ClickMode" Value="Press" />
-        <Setter Property="BorderBrush" Value="{StaticResource brush-btn-border}" />
-        <Setter Property="BorderThickness" Value="1" />
-        <Setter Property="Background" Value="{StaticResource brush-btn-bg}" />
-        <Setter Property="Foreground" Value="{StaticResource brush-btn-fg}" />
+        <Setter Property="BorderThickness" Value="0" />
     </Style>
     <Style x:Key="combobox-textbox" TargetType="TextBox">
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="TextBox">
-                    <Border
+                    <ScrollViewer
                         x:Name="PART_ContentHost"
                         Padding="{TemplateBinding Padding}"
-                        HorizontalAlignment="Stretch"
-                        VerticalAlignment="Stretch"
+                        HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                        VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
                         Background="{TemplateBinding Background}"
                         BorderBrush="{TemplateBinding BorderBrush}"
-                        BorderThickness="{TemplateBinding BorderThickness}" />
-                    <ControlTemplate.Triggers>
-                        <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="PART_ContentHost" Property="BorderBrush" Value="{StaticResource brush-textbox-hover-border}" />
-                        </Trigger>
-                        <Trigger Property="IsKeyboardFocusWithin" Value="True">
-                            <Setter TargetName="PART_ContentHost" Property="BorderBrush" Value="{StaticResource brush-textbox-focus-border}" />
-                        </Trigger>
-                        <Trigger Property="IsEnabled" Value="False">
-                            <Setter TargetName="PART_ContentHost" Property="Background" Value="{StaticResource brush-textbox-disable-bg}" />
-                            <Setter TargetName="PART_ContentHost" Property="BorderBrush" Value="{StaticResource brush-textbox-disable-border}" />
-                            <Setter Property="Foreground" Value="{StaticResource brush-textbox-disable-fg}" />
-                        </Trigger>
-                    </ControlTemplate.Triggers>
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        Foreground="{TemplateBinding Foreground}"
+                        Style="{StaticResource scrollviewer-slim}" />
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
-        <Setter Property="Background" Value="{StaticResource brush-textbox-bg}" />
-        <Setter Property="Foreground" Value="{StaticResource brush-textbox-fg}" />
-        <Setter Property="BorderBrush" Value="{StaticResource brush-textbox-border}" />
-        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="BorderThickness" Value="0" />
         <Setter Property="SelectionBrush" Value="{StaticResource brush-textbox-selection}" />
         <Setter Property="CaretBrush" Value="{StaticResource brush-textbox-caret}" />
         <Setter Property="HorizontalContentAlignment" Value="Stretch" />
@@ -778,42 +787,89 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="ComboBox">
-                    <Grid>
-                        <ToggleButton IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" Style="{StaticResource combobox-togglebutton}" />
-                        <ContentPresenter
-                            x:Name="ContentSite"
-                            Margin="5,0,20,0"
-                            HorizontalAlignment="Stretch"
-                            VerticalAlignment="Center"
-                            Content="{TemplateBinding SelectionBoxItem}"
-                            ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
-                            ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}"
-                            IsHitTestVisible="False" />
-                        <TextBox
-                            x:Name="PART_EditableTextBox"
-                            Margin="0,0,20,0"
-                            IsReadOnly="{TemplateBinding IsReadOnly}"
-                            Style="{StaticResource combobox-textbox}"
-                            Visibility="Hidden" />
-                        <Popup
-                            MinWidth="{TemplateBinding ActualWidth}"
-                            MaxHeight="{TemplateBinding MaxDropDownHeight}"
-                            AllowsTransparency="True"
-                            Focusable="False"
-                            IsOpen="{TemplateBinding IsDropDownOpen}"
-                            Placement="Bottom"
-                            PopupAnimation="Fade"
-                            SnapsToDevicePixels="True">
-                            <ScrollViewer
-                                HorizontalContentAlignment="Stretch"
-                                Background="{StaticResource brush-combobox-popup-bg}"
-                                BorderBrush="{StaticResource brush-combobox-popup-bd}"
-                                BorderThickness="1"
-                                Style="{StaticResource scrollviewer}">
-                                <ItemsPresenter KeyboardNavigation.DirectionalNavigation="Contained" />
-                            </ScrollViewer>
-                        </Popup>
-                    </Grid>
+                    <Border
+                        x:Name="Border"
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}">
+                        <Grid>
+                            <ToggleButton
+                                Background="{StaticResource brush-transparent}"
+                                Foreground="{TemplateBinding Foreground}"
+                                IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
+                                Style="{StaticResource combobox-togglebutton}" />
+                            <ContentPresenter
+                                x:Name="ContentSite"
+                                Margin="5,0,20,0"
+                                HorizontalAlignment="Stretch"
+                                VerticalAlignment="Center"
+                                Content="{TemplateBinding SelectionBoxItem}"
+                                ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
+                                ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}"
+                                IsHitTestVisible="False" />
+                            <TextBox
+                                x:Name="PART_EditableTextBox"
+                                Margin="0,0,20,0"
+                                Background="{StaticResource brush-transparent}"
+                                Foreground="{TemplateBinding Foreground}"
+                                IsReadOnly="{TemplateBinding IsReadOnly}"
+                                Style="{StaticResource combobox-textbox}"
+                                Visibility="Hidden" />
+                            <Popup
+                                MinWidth="{TemplateBinding ActualWidth}"
+                                MaxHeight="{TemplateBinding MaxDropDownHeight}"
+                                AllowsTransparency="True"
+                                Focusable="False"
+                                IsOpen="{TemplateBinding IsDropDownOpen}"
+                                Placement="Bottom"
+                                PopupAnimation="Fade"
+                                SnapsToDevicePixels="True">
+                                <ScrollViewer
+                                    HorizontalContentAlignment="Stretch"
+                                    Background="{StaticResource brush-combobox-popup-bg}"
+                                    BorderBrush="{StaticResource brush-combobox-popup-bd}"
+                                    BorderThickness="1"
+                                    Style="{StaticResource scrollviewer}">
+                                    <ItemsPresenter KeyboardNavigation.DirectionalNavigation="Contained" />
+                                </ScrollViewer>
+                            </Popup>
+                            <VisualStateManager.VisualStateGroups>
+                                <VisualStateGroup x:Name="CommonStates">
+                                    <VisualState x:Name="Normal" />
+                                    <VisualState x:Name="MouseOver">
+                                        <Storyboard>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="Border" Storyboard.TargetProperty="(Border.BorderBrush)">
+                                                <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource brush-combobox-hover-bd}" />
+                                            </ObjectAnimationUsingKeyFrames>
+                                        </Storyboard>
+                                    </VisualState>
+                                    <VisualState x:Name="Disabled">
+                                        <Storyboard>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="Border" Storyboard.TargetProperty="(Border.BorderBrush)">
+                                                <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource brush-combobox-disable-bd}" />
+                                            </ObjectAnimationUsingKeyFrames>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="Border" Storyboard.TargetProperty="(Border.Background)">
+                                                <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource brush-combobox-disable-bg}" />
+                                            </ObjectAnimationUsingKeyFrames>
+                                        </Storyboard>
+                                    </VisualState>
+                                </VisualStateGroup>
+                                <VisualStateGroup x:Name="EditStates">
+                                    <VisualState x:Name="Editable">
+                                        <Storyboard>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="PART_EditableTextBox" Storyboard.TargetProperty="(UIElement.Visibility)">
+                                                <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Visible}" />
+                                            </ObjectAnimationUsingKeyFrames>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ContentSite" Storyboard.TargetProperty="(UIElement.Visibility)">
+                                                <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Hidden}" />
+                                            </ObjectAnimationUsingKeyFrames>
+                                        </Storyboard>
+                                    </VisualState>
+                                    <VisualState x:Name="Uneditable" />
+                                </VisualStateGroup>
+                            </VisualStateManager.VisualStateGroups>
+                        </Grid>
+                    </Border>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
@@ -825,8 +881,11 @@
             </Setter.Value>
         </Setter>
         <Setter Property="ItemContainerStyle" Value="{StaticResource comboboxitem}" />
-        <Setter Property="Foreground" Value="{StaticResource brush-combobox-fg}"/>
-        <Setter Property="Height" Value="25"/>
+        <Setter Property="Foreground" Value="{StaticResource brush-combobox-fg}" />
+        <Setter Property="Background" Value="{StaticResource brush-combobox-bg}" />
+        <Setter Property="BorderBrush" Value="{StaticResource brush-combobox-bd}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Height" Value="25" />
     </Style>
 
     <!--  Window  -->

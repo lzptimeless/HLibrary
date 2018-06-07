@@ -35,6 +35,7 @@
             HorizontalAlignment="Left"
             VerticalAlignment="Top"
             IsEditable="False"
+            IsEnabled="False"
             Style="{StaticResource combobox}" 
             Margin="50"/>
 
