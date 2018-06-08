@@ -34,8 +34,8 @@
             Width="200"
             HorizontalAlignment="Left"
             VerticalAlignment="Top"
-            IsEditable="False"
-            IsEnabled="False"
+            IsEditable="True"
+            IsEnabled="True"
             Style="{StaticResource combobox}" 
             Margin="50"/>
 
