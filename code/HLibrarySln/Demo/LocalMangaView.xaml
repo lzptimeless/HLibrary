@@ -17,7 +17,7 @@
         <Grid Height="40">
             <!--收缩条件设置按钮-->
             <Button
-                Style="{StaticResource btn}"
+                Style="{StaticResource button}"
                 BorderThickness="0"
                 Margin="5,0"
                 Content="设置搜索条件"
@@ -32,7 +32,7 @@
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
                 <Button
-                    Style="{StaticResource btn-path-fill}"
+                    Style="{StaticResource button-path-fill}"
                     Height="30"
                     Width="30"
                     Padding="9">
@@ -42,35 +42,35 @@
                     Grid.Column="1"
                     Orientation="Horizontal">
                     <Button
-                        Style="{StaticResource btn}"
+                        Style="{StaticResource button}"
                         BorderThickness="0"
                         Height="30"
                         MinWidth="20"
                         Content="1"/>
                     <TextBlock
-                        Style="{StaticResource text}"
+                        Style="{StaticResource textblock}"
                         Text="..."
                         VerticalAlignment="Center"/>
                     <Button
-                        Style="{StaticResource btn}"
+                        Style="{StaticResource button}"
                         BorderThickness="0"
                         Height="30"
                         MinWidth="20"
                         Content="30"/>
                     <Button
-                        Style="{StaticResource btn}"
+                        Style="{StaticResource button}"
                         BorderThickness="0"
                         Height="30"
                         MinWidth="20"
                         Content="31"/>
                     <Button
-                        Style="{StaticResource btn}"
+                        Style="{StaticResource button}"
                         BorderThickness="0"
                         Height="30"
                         MinWidth="20"
                         Content="32"/>
                     <Button
-                        Style="{StaticResource btn}"
+                        Style="{StaticResource button}"
                         BorderThickness="0"
                         Height="30"
                         MinWidth="20"
@@ -78,29 +78,29 @@
                         IsEnabled="False"
                         Foreground="{StaticResource brush-accent}"/>
                     <Button
-                        Style="{StaticResource btn}"
+                        Style="{StaticResource button}"
                         BorderThickness="0"
                         Height="30"
                         MinWidth="20"
                         Content="34"/>
                     <Button
-                        Style="{StaticResource btn}"
+                        Style="{StaticResource button}"
                         BorderThickness="0"
                         Height="30"
                         MinWidth="20"
                         Content="35"/>
                     <Button
-                        Style="{StaticResource btn}"
+                        Style="{StaticResource button}"
                         BorderThickness="0"
                         Height="30"
                         MinWidth="20"
                         Content="36"/>
                     <TextBlock
-                        Style="{StaticResource text}"
+                        Style="{StaticResource textblock}"
                         Text="..."
                         VerticalAlignment="Center"/>
                     <Button
-                        Style="{StaticResource btn}"
+                        Style="{StaticResource button}"
                         BorderThickness="0"
                         Height="30"
                         MinWidth="20"
@@ -108,7 +108,7 @@
                 </StackPanel>
                 <Button
                     Grid.Column="2"
-                    Style="{StaticResource btn-path-fill}"
+                    Style="{StaticResource button-path-fill}"
                     Height="30"
                     Width="30"
                     Padding="9">
@@ -159,7 +159,7 @@
                             Height="30"
                             Background="#A0000000">
                             <TextBlock
-                                Style="{StaticResource text}"
+                                Style="{StaticResource textblock}"
                                 VerticalAlignment="Center"
                                 Margin="5,0">
                                 <Run Text="漫画"/>
