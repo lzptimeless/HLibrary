@@ -6,8 +6,7 @@
         xmlns:local="clr-namespace:H.BookLibrary"
         mc:Ignorable="d"
         Title="Shell" Height="300" Width="300"
-        Style="{StaticResource window-shell}"
-        Background="{StaticResource brush-window-bg}">
+        Style="{StaticResource window-shell}">
     <Grid>
         
     </Grid>

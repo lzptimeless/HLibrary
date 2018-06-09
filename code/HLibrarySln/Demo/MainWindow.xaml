@@ -37,14 +37,52 @@
                 IsEditable="True"
                 IsEnabled="True"
                 Style="{StaticResource combobox}" />
+            <ComboBox
+                x:Name="Selection2"
+                Width="200"
+                Margin="0,10,0,0"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Top"
+                IsEditable="False"
+                IsEnabled="True"
+                Style="{StaticResource combobox}" />
             <TextBox
                 Width="200"
                 Margin="0,10,0,0"
                 HorizontalAlignment="Left"
-                IsEnabled="False"
+                IsEnabled="True"
                 Style="{StaticResource textbox}"
                 Text="测试内容123" />
-            <Button Style="{StaticResource button}" HorizontalAlignment="Left" Content="测试按钮" Margin="0,10,0,0" IsEnabled="False"/>
+            <Button
+                Margin="0,10,0,0"
+                HorizontalAlignment="Left"
+                Content="测试按钮"
+                IsEnabled="False"
+                Style="{StaticResource button}" />
+            <Button
+                Margin="0,10,0,0"
+                HorizontalAlignment="Left"
+                Content="测试按钮"
+                Style="{StaticResource button}" />
+            <ScrollViewer
+                Width="200"
+                Height="100"
+                Margin="0,10,0,0"
+                HorizontalAlignment="Left"
+                HorizontalScrollBarVisibility="Auto"
+                IsEnabled="True"
+                Style="{StaticResource scrollviewer}"
+                VerticalScrollBarVisibility="Auto">
+                <StackPanel Width="400" Height="200" />
+            </ScrollViewer>
+            <ListBox
+                x:Name="List"
+                Width="200"
+                Height="100"
+                Margin="0,10,0,0"
+                HorizontalAlignment="Left"
+                HorizontalContentAlignment="Stretch"
+                Style="{StaticResource listbox}" />
         </StackPanel>
     </Grid>
 </Window>
