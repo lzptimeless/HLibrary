@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -11,28 +10,30 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
 using System.Windows.Shapes;
 
 namespace Demo
 {
     /// <summary>
-    /// Interaction logic for MainWindow.xaml
+    /// Interaction logic for ThemeView.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class ThemeView : Window
     {
-        public MainWindow()
+        public ThemeView()
         {
             InitializeComponent();
-
-            Loaded += MainWindow_Loaded;
         }
 
-        private void MainWindow_Loaded(object sender, RoutedEventArgs e)
+        private void Enable_Checked(object sender, RoutedEventArgs e)
         {
-            //var vm = new TestHBookViewModel();
-            //TestHBookView.DataContext = vm;
-            //await vm.Init();
+            if (IsLoaded)
+                Root.IsEnabled = true;
+        }
+
+        private void Enable_Unchecked(object sender, RoutedEventArgs e)
+        {
+            if (IsLoaded)
+                Root.IsEnabled = false;
         }
     }
 }
