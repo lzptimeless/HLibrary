@@ -54,13 +54,13 @@
     <Color x:Key="color-control-bg">#20FFFFFF</Color>
     <Color x:Key="color-control-hover-fg">#E6E6E6</Color>
     <Color x:Key="color-control-hover-bd">#60FFFFFF</Color>
-    <Color x:Key="color-control-hover-bg">#40FFFFFF</Color>
+    <Color x:Key="color-control-hover-bg">#20FFFFFF</Color>
     <Color x:Key="color-control-press-fg">#E6E6E6</Color>
     <Color x:Key="color-control-press-bd">#60FFFFFF</Color>
     <Color x:Key="color-control-press-bg">#30FFFFFF</Color>
     <Color x:Key="color-control-select-fg">#E6E6E6</Color>
-    <Color x:Key="color-control-select-bd">#40FFFFFF</Color>
-    <Color x:Key="color-control-select-bg">#40FFFFFF</Color>
+    <Color x:Key="color-control-select-bd">#20FFFFFF</Color>
+    <Color x:Key="color-control-select-bg">#20FFFFFF</Color>
     <Color x:Key="color-control-disable-fg">#ABABAB</Color>
     <Color x:Key="color-control-disable-bd">#00000000</Color>
     <Color x:Key="color-control-disable-bg">#00000000</Color>
@@ -96,9 +96,9 @@
     <Color x:Key="color-panel-bd">#3A3A3A</Color>
     <Color x:Key="color-panel-bg">#1E1E1E</Color>
     <Color x:Key="color-panel-hover-bd">#60FFFFFF</Color>
-    <Color x:Key="color-panel-hover-bg">#40FFFFFF</Color>
-    <Color x:Key="color-panel-select-bd">#40FFFFFF</Color>
-    <Color x:Key="color-panel-select-bg">#40FFFFFF</Color>
+    <Color x:Key="color-panel-hover-bg">#20FFFFFF</Color>
+    <Color x:Key="color-panel-select-bd">#20FFFFFF</Color>
+    <Color x:Key="color-panel-select-bg">#20FFFFFF</Color>
     <Color x:Key="color-panel-disable-bd">#00000000</Color>
     <Color x:Key="color-panel-disable-bg">#00000000</Color>
     <SolidColorBrush x:Key="brush-panel-bd" Color="{StaticResource color-panel-bd}" />
@@ -112,12 +112,23 @@
     <SolidColorBrush x:Key="brush-panel-highlight-bd" Color="{StaticResource color-accent-deep}" />
     <SolidColorBrush x:Key="brush-panel-highlight-bg" Color="{StaticResource color-accent}" />
 
+    <!--  弹出层颜色  -->
+    <Color x:Key="color-popup-bd">#3A3A3A</Color>
+    <Color x:Key="color-popup-bg">#101010</Color>
+    <SolidColorBrush x:Key="brush-popup-bd" Color="{StaticResource color-popup-bd}" />
+    <SolidColorBrush x:Key="brush-popup-bg" Color="{StaticResource color-popup-bg}" />
+
     <!--  窗口色  -->
     <Color x:Key="color-window-bd">#3A3A3A</Color>
     <Color x:Key="color-window-bg">#1E1E1E</Color>
     <SolidColorBrush x:Key="brush-window-bd" Color="{StaticResource color-window-bd}" />
     <SolidColorBrush x:Key="brush-window-bg" Color="{StaticResource color-window-bg}" />
     <!--  公共颜色-结束  -->
+
+    <!--  用到的图标  -->
+    <PathGeometry x:Key="icon-cut">M13.876871,20.849818L11.666832,26.864772C11.569847,27.307759 11.592857,27.772721 11.786828,28.044751 12.000819,28.357736 12.502837,28.477731 13.093845,28.357736 14.175884,28.13374 15.609856,27.055749 16.073909,24.76378 16.342893,23.460754 16.255856,22.476817 15.809869,21.840776L15.809869,21.841813C15.33489,21.166833,14.490889,20.935817,13.876871,20.849818z M6.0755872,11.797367C4.3400048,11.816226 3.1917004,12.630284 2.699784,13.42088 2.1037709,14.379855 2.4807879,15.137842 3.7377557,15.283898L10.001841,15.28988C10.147839,14.683868 10.217847,13.812905 9.743844,13.139877 9.3068284,12.500907 8.4128398,12.077877 7.099781,11.8739 6.7385358,11.817653 6.3969917,11.793875 6.0755872,11.797367z M20.679902,0L15.572868,15.597859 15.570854,15.598836 31.999995,16.258864 27.931971,19.085799 19.303914,19.521831 15.895868,18.065852 14.77385,18.031856 14.630844,18.481862C15.680901,18.68584 16.974856,19.185836 17.837899,20.425813 18.687882,21.639789 18.907916,23.263795 18.50392,25.253764 17.790902,28.734746 15.359854,30.325734 13.54386,30.701707 11.962855,31.027692 10.437819,30.438708 9.6458205,29.304748 9.2578172,28.746709 9.2778367,26.259736 9.3058519,26.152741L10.012828,24.244803 12.126858,17.98083 5.7267846,17.807859 3.6637806,17.857846C3.4997777,17.838864 1.0257599,16.92884 0.64575182,16.381848 -0.15027454,15.241845 -0.25824655,13.478864 0.59173577,12.108883 1.5807567,10.531934 3.9707896,8.8849173 7.4747838,9.4249507 9.4858464,9.730917 10.931841,10.510938 11.775842,11.720886 12.661835,12.987902 12.661835,14.413851 12.477874,15.471885L12.935884,15.494895 13.30985,14.367892 13.173862,10.714915 16.613891,2.8279734z</PathGeometry>
+    <PathGeometry x:Key="icon-copy">M12,8L12,30 28,30 28,14 22,14 22,8z M10,6L24,6 24,8 26,8 26,10 24,10 24,12 26,12 26,10 28,10 28,12 30,12 30,32 10,32z M0,0L10,0 10,2 12,2 12,4 8,4 8,2 2,2 2,20 8,20 8,22 0,22z</PathGeometry>
+    <PathGeometry x:Key="icon-paste">M15.780046,21.209021L23.000044,28.471234 23.000044,22.999996 25.000044,22.999996 25.000044,31.999996 16.000044,31.999996 16.000044,29.999996 21.700115,29.999996 14.362039,22.619015z M12.416057,1.9139996C11.419057,1.9139996,10.607057,2.6970005,10.607057,3.6590004L10.607057,4.6159992 6.8670568,4.6159992 6.8670568,8.0860004 17.966058,8.0860004 17.966058,4.6159992 14.224057,4.6159992 14.224057,3.6590004C14.224057,2.6970005,13.413057,1.9139996,12.416057,1.9139996z M12.416057,0C14.172057,0,15.653057,1.1469994,16.093057,2.7019997L19.966057,2.7019997 19.966057,3.9999828 25.000044,3.9999828 25.000044,10.99998 25.000044,19.845975 23.000063,17.845976 23.000063,10.99998 23.000063,5.9999828 19.966057,5.9999828 19.966057,10 4.8670559,10 4.8670559,5.9999828 2.0000067,5.9999828 2.0000067,29.999983 10.929038,29.999983 12.929045,31.999983 0,31.999983 0,3.9999828 4.8670559,3.9999828 4.8670559,2.7019997 8.7390566,2.7019997C9.1790566,1.1469994,10.660057,0,12.416057,0z</PathGeometry>
 
     <!--  Text  -->
     <FontFamily x:Key="font">Microsoft YaHei UI</FontFamily>
@@ -1025,6 +1036,51 @@
         <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="Padding" Value="4,0" />
         <Setter Property="Height" Value="25" />
+        <Setter Property="ContextMenu">
+            <Setter.Value>
+                <ContextMenu>
+                    <MenuItem
+                        Command="ApplicationCommands.Cut"
+                        Header="剪切(T)"
+                        InputGestureText="Ctrl+X">
+                        <MenuItem.Icon>
+                            <Path
+                                Width="16"
+                                Height="16"
+                                Data="{StaticResource icon-cut}"
+                                Fill="{StaticResource brush-control-fg}"
+                                Stretch="Uniform" />
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem
+                        Command="ApplicationCommands.Copy"
+                        Header="复制(C)"
+                        InputGestureText="Ctrl+C">
+                        <MenuItem.Icon>
+                            <Path
+                                Width="16"
+                                Height="16"
+                                Data="{StaticResource icon-copy}"
+                                Fill="{StaticResource brush-control-fg}"
+                                Stretch="Uniform" />
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem
+                        Command="ApplicationCommands.Paste"
+                        Header="粘贴(P)"
+                        InputGestureText="Ctrl+V">
+                        <MenuItem.Icon>
+                            <Path
+                                Width="16"
+                                Height="16"
+                                Data="{StaticResource icon-paste}"
+                                Fill="{StaticResource brush-control-fg}"
+                                Stretch="Uniform" />
+                        </MenuItem.Icon>
+                    </MenuItem>
+                </ContextMenu>
+            </Setter.Value>
+        </Setter>
     </Style>
 
     <!--  ListBox  -->
@@ -1246,8 +1302,8 @@
                             SnapsToDevicePixels="True">
                             <ScrollViewer
                                 HorizontalContentAlignment="Stretch"
-                                Background="{StaticResource brush-panel-bg}"
-                                BorderBrush="{StaticResource brush-panel-bd}"
+                                Background="{StaticResource brush-popup-bg}"
+                                BorderBrush="{StaticResource brush-popup-bd}"
                                 BorderThickness="1"
                                 Style="{StaticResource scrollviewer}">
                                 <ItemsPresenter KeyboardNavigation.DirectionalNavigation="Contained" />
@@ -1292,6 +1348,341 @@
         <Setter Property="FontSize" Value="{StaticResource font-size}" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="Height" Value="25" />
+    </Style>
+
+    <!--  Menu  -->
+    <Style x:Key="{x:Static MenuItem.SeparatorStyleKey}" TargetType="{x:Type Separator}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Separator}">
+                    <Border
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}" />
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="Height" Value="1" />
+        <Setter Property="Margin" Value="30,2,2,2" />
+        <Setter Property="BorderThickness" Value="0,1,0,0" />
+        <Setter Property="BorderBrush" Value="{StaticResource brush-panel-bd}" />
+        <Setter Property="Background" Value="{StaticResource brush-transparent}" />
+    </Style>
+    <ControlTemplate x:Key="{x:Static MenuItem.TopLevelHeaderTemplateKey}" TargetType="{x:Type MenuItem}">
+        <Grid>
+            <Border
+                x:Name="Border"
+                Background="{TemplateBinding Background}"
+                BorderBrush="{TemplateBinding BorderBrush}"
+                BorderThickness="{TemplateBinding BorderThickness}">
+                <ContentPresenter
+                    Margin="{TemplateBinding Padding}"
+                    HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                    VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                    ContentSource="Header"
+                    RecognizesAccessKey="True" />
+            </Border>
+            <Popup
+                x:Name="Popup"
+                AllowsTransparency="True"
+                Focusable="False"
+                IsOpen="{TemplateBinding IsSubmenuOpen}"
+                Placement="Bottom"
+                PopupAnimation="Fade">
+                <ScrollViewer
+                    Padding="2"
+                    Background="{StaticResource brush-popup-bg}"
+                    BorderBrush="{StaticResource brush-popup-bd}"
+                    BorderThickness="1"
+                    CanContentScroll="True"
+                    Style="{StaticResource scrollviewer}">
+                    <ItemsPresenter KeyboardNavigation.DirectionalNavigation="Cycle" />
+                </ScrollViewer>
+            </Popup>
+        </Grid>
+        <ControlTemplate.Triggers>
+            <Trigger Property="IsSuspendingPopupAnimation" Value="true">
+                <Setter TargetName="Popup" Property="PopupAnimation" Value="None" />
+            </Trigger>
+            <Trigger Property="IsHighlighted" Value="true">
+                <Setter Property="Foreground" Value="{StaticResource brush-control-hover-fg}" />
+                <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource brush-panel-hover-bd}" />
+                <Setter TargetName="Border" Property="Background" Value="{StaticResource brush-panel-hover-bg}" />
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Foreground" Value="{StaticResource brush-control-disable-fg}" />
+                <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource brush-panel-disable-bd}" />
+                <Setter TargetName="Border" Property="Background" Value="{StaticResource brush-panel-disable-bg}" />
+            </Trigger>
+        </ControlTemplate.Triggers>
+    </ControlTemplate>
+    <ControlTemplate x:Key="{x:Static MenuItem.TopLevelItemTemplateKey}" TargetType="{x:Type MenuItem}">
+        <Border
+            x:Name="Border"
+            Background="{TemplateBinding Background}"
+            BorderBrush="{TemplateBinding BorderBrush}"
+            BorderThickness="{TemplateBinding BorderThickness}">
+            <ContentPresenter
+                Margin="{TemplateBinding Padding}"
+                HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                ContentSource="Header"
+                RecognizesAccessKey="True" />
+        </Border>
+        <ControlTemplate.Triggers>
+            <Trigger Property="IsHighlighted" Value="true">
+                <Setter Property="Foreground" Value="{StaticResource brush-control-hover-fg}" />
+                <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource brush-panel-hover-bd}" />
+                <Setter TargetName="Border" Property="Background" Value="{StaticResource brush-panel-hover-bg}" />
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Foreground" Value="{StaticResource brush-control-disable-fg}" />
+                <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource brush-panel-disable-bd}" />
+                <Setter TargetName="Border" Property="Background" Value="{StaticResource brush-panel-disable-bg}" />
+            </Trigger>
+        </ControlTemplate.Triggers>
+    </ControlTemplate>
+    <ControlTemplate x:Key="{x:Static MenuItem.SubmenuItemTemplateKey}" TargetType="{x:Type MenuItem}">
+        <Border
+            x:Name="Border"
+            Padding="{TemplateBinding Padding}"
+            Background="{TemplateBinding Background}"
+            BorderBrush="{TemplateBinding BorderBrush}"
+            BorderThickness="{TemplateBinding BorderThickness}">
+            <Grid HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="35" SharedSizeGroup="Icon" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" SharedSizeGroup="Shortcut" />
+                    <ColumnDefinition Width="25" />
+                </Grid.ColumnDefinitions>
+                <ContentPresenter
+                    x:Name="Icon"
+                    Margin="6,0,6,0"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Center"
+                    ContentSource="Icon" />
+                <Border
+                    x:Name="Check"
+                    Width="16"
+                    Height="16"
+                    Margin="6,0,6,0"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Center"
+                    Background="{StaticResource brush-transparent}"
+                    BorderBrush="{TemplateBinding Foreground}"
+                    BorderThickness="1"
+                    Visibility="Collapsed">
+                    <Path
+                        x:Name="CheckMark"
+                        Width="10"
+                        Height="10"
+                        Data="M27.903015,0L32,4.0970465 12.369019,23.728029 11.685974,24.520998 0,14.441042 3.7819824,10.054994 11.330017,16.567019z"
+                        Fill="{StaticResource brush-accent-light}"
+                        SnapsToDevicePixels="False"
+                        Stretch="Uniform"
+                        Visibility="Hidden" />
+                </Border>
+                <ContentPresenter
+                    x:Name="HeaderHost"
+                    Grid.Column="1"
+                    VerticalAlignment="Center"
+                    ContentSource="Header"
+                    RecognizesAccessKey="True" />
+                <TextBlock
+                    x:Name="InputGestureText"
+                    Grid.Column="2"
+                    Margin="30,0,0,0"
+                    VerticalAlignment="Center"
+                    FontFamily="{TemplateBinding FontFamily}"
+                    FontSize="{TemplateBinding FontSize}"
+                    Foreground="{TemplateBinding Foreground}"
+                    Text="{TemplateBinding InputGestureText}" />
+            </Grid>
+        </Border>
+        <ControlTemplate.Triggers>
+            <Trigger Property="Icon" Value="{x:Null}">
+                <Setter TargetName="Icon" Property="Visibility" Value="Hidden" />
+            </Trigger>
+            <Trigger Property="IsChecked" Value="true">
+                <Setter TargetName="CheckMark" Property="Visibility" Value="Visible" />
+            </Trigger>
+            <Trigger Property="IsCheckable" Value="true">
+                <Setter TargetName="Check" Property="Visibility" Value="Visible" />
+                <Setter TargetName="Icon" Property="Visibility" Value="Hidden" />
+            </Trigger>
+            <Trigger Property="IsHighlighted" Value="true">
+                <Setter Property="Foreground" Value="{StaticResource brush-control-hover-fg}" />
+                <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource brush-panel-hover-bd}" />
+                <Setter TargetName="Border" Property="Background" Value="{StaticResource brush-panel-hover-bg}" />
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Foreground" Value="{StaticResource brush-control-disable-fg}" />
+                <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource brush-panel-disable-bd}" />
+                <Setter TargetName="Border" Property="Background" Value="{StaticResource brush-panel-disable-bg}" />
+            </Trigger>
+        </ControlTemplate.Triggers>
+    </ControlTemplate>
+    <ControlTemplate x:Key="{x:Static MenuItem.SubmenuHeaderTemplateKey}" TargetType="{x:Type MenuItem}">
+        <Grid>
+            <Border
+                x:Name="Border"
+                Padding="{TemplateBinding Padding}"
+                Background="{TemplateBinding Background}"
+                BorderBrush="{TemplateBinding BorderBrush}"
+                BorderThickness="{TemplateBinding BorderThickness}">
+                <Grid HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="35" SharedSizeGroup="Icon" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="Shortcut" />
+                        <ColumnDefinition Width="25" />
+                    </Grid.ColumnDefinitions>
+                    <ContentPresenter
+                        x:Name="Icon"
+                        Margin="6,0,6,0"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Center"
+                        ContentSource="Icon" />
+                    <ContentPresenter
+                        x:Name="HeaderHost"
+                        Grid.Column="1"
+                        VerticalAlignment="Center"
+                        ContentSource="Header"
+                        RecognizesAccessKey="True" />
+                    <TextBlock
+                        x:Name="InputGestureText"
+                        Grid.Column="2"
+                        Margin="30,0,0,0"
+                        VerticalAlignment="Center"
+                        FontFamily="{TemplateBinding FontFamily}"
+                        FontSize="{TemplateBinding FontSize}"
+                        Foreground="{TemplateBinding Foreground}"
+                        Text="{TemplateBinding InputGestureText}" />
+                    <Path
+                        Grid.Column="3"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Data="M0,0 L3,3.5 L0,7"
+                        Stroke="{TemplateBinding Foreground}" />
+                </Grid>
+            </Border>
+            <Popup
+                x:Name="Popup"
+                AllowsTransparency="True"
+                Focusable="False"
+                HorizontalOffset="-4"
+                IsOpen="{TemplateBinding IsSubmenuOpen}"
+                Placement="Right"
+                PopupAnimation="Fade">
+                <ScrollViewer
+                    Padding="2"
+                    Background="{StaticResource brush-popup-bg}"
+                    BorderBrush="{StaticResource brush-popup-bd}"
+                    BorderThickness="1"
+                    CanContentScroll="True"
+                    Style="{StaticResource scrollviewer}">
+                    <ItemsPresenter KeyboardNavigation.DirectionalNavigation="Cycle" />
+                </ScrollViewer>
+            </Popup>
+        </Grid>
+        <ControlTemplate.Triggers>
+            <Trigger Property="Icon" Value="{x:Null}">
+                <Setter TargetName="Icon" Property="Visibility" Value="Collapsed" />
+            </Trigger>
+            <Trigger Property="IsHighlighted" Value="true">
+                <Setter Property="Foreground" Value="{StaticResource brush-control-hover-fg}" />
+                <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource brush-panel-hover-bd}" />
+                <Setter TargetName="Border" Property="Background" Value="{StaticResource brush-panel-hover-bg}" />
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Foreground" Value="{StaticResource brush-control-disable-fg}" />
+                <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource brush-panel-disable-bd}" />
+                <Setter TargetName="Border" Property="Background" Value="{StaticResource brush-panel-disable-bg}" />
+            </Trigger>
+        </ControlTemplate.Triggers>
+    </ControlTemplate>
+    <Style x:Key="{x:Type MenuItem}" TargetType="{x:Type MenuItem}">
+        <Setter Property="OverridesDefaultStyle" Value="True" />
+        <Setter Property="Foreground" Value="{StaticResource brush-control-fg}" />
+        <Setter Property="BorderBrush" Value="{StaticResource brush-transparent}" />
+        <Setter Property="Background" Value="{StaticResource brush-transparent}" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="FontFamily" Value="{StaticResource font}" />
+        <Setter Property="FontSize" Value="{StaticResource font-size}" />
+        <Setter Property="Height" Value="23" />
+        <Style.Triggers>
+            <Trigger Property="Role" Value="TopLevelHeader">
+                <Setter Property="Template" Value="{StaticResource {x:Static MenuItem.TopLevelHeaderTemplateKey}}" />
+                <Setter Property="Grid.IsSharedSizeScope" Value="true" />
+                <Setter Property="Height" Value="Auto" />
+                <Setter Property="Padding" Value="10,0" />
+            </Trigger>
+            <Trigger Property="Role" Value="TopLevelItem">
+                <Setter Property="Template" Value="{StaticResource {x:Static MenuItem.TopLevelItemTemplateKey}}" />
+            </Trigger>
+            <Trigger Property="Role" Value="SubmenuHeader">
+                <Setter Property="Template" Value="{StaticResource {x:Static MenuItem.SubmenuHeaderTemplateKey}}" />
+            </Trigger>
+            <Trigger Property="Role" Value="SubmenuItem">
+                <Setter Property="Template" Value="{StaticResource {x:Static MenuItem.SubmenuItemTemplateKey}}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+    <Style x:Key="{x:Type Menu}" TargetType="{x:Type Menu}">
+        <Setter Property="OverridesDefaultStyle" Value="True" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Menu}">
+                    <Border
+                        Padding="{TemplateBinding Padding}"
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}">
+                        <ItemsPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="BorderBrush" Value="{StaticResource brush-panel-bd}" />
+        <Setter Property="Background" Value="{StaticResource brush-panel-bg}" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        <Setter Property="VerticalContentAlignment" Value="Stretch" />
+    </Style>
+    <Style x:Key="{x:Type ContextMenu}" TargetType="{x:Type ContextMenu}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type ContextMenu}">
+                    <Border
+                        x:Name="Border"
+                        Padding="{TemplateBinding Padding}"
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}">
+                        <ItemsPresenter
+                            HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                            VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                            KeyboardNavigation.DirectionalNavigation="Cycle" />
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="OverridesDefaultStyle" Value="True" />
+        <Setter Property="Grid.IsSharedSizeScope" Value="true" />
+        <Setter Property="HasDropShadow" Value="True" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="BorderBrush" Value="{StaticResource brush-popup-bd}" />
+        <Setter Property="Background" Value="{StaticResource brush-popup-bg}" />
+        <Setter Property="Padding" Value="2" />
+        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        <Setter Property="VerticalContentAlignment" Value="Stretch" />
     </Style>
 
     <!--  Window  -->
