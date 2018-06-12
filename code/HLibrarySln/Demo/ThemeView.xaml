@@ -323,6 +323,12 @@
                     <TextBlock Style="{StaticResource textblock}" Text="右键菜单" />
                 </Border>
             </WrapPanel>
+            <DataGrid
+                x:Name="DataGrid"
+                Width="410"
+                Height="150"
+                Margin="5,10,0,0"
+                HorizontalAlignment="Left" />
         </StackPanel>
     </ScrollViewer>
 </Window>
