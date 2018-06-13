@@ -8,6 +8,8 @@
         Title="Shell" Height="300" Width="300"
         Style="{StaticResource window-shell}">
     <Grid>
-        
+        <StackPanel>
+            <Button Style="{StaticResource button}" Content="下载" Click="DownloadButton_Click" x:Name="DownloadButton"/>
+        </StackPanel>
     </Grid>
 </Window>

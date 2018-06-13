@@ -23,5 +23,12 @@ namespace H.BookLibrary
         {
             InitializeComponent();
         }
+
+        private void DownloadButton_Click(object sender, RoutedEventArgs e)
+        {
+            string id = "894871";
+            HitomiBookDownloader bookDownloader = new HitomiBookDownloader();
+            bookDownloader.Download(id, $"books/hitomi-{id}-{DateTime.UtcNow.Ticks}");
+        }
     }
 }

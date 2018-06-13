@@ -2069,7 +2069,7 @@
         </Setter>
         <Setter Property="Background" Value="{StaticResource brush-panel-bg}" />
         <Setter Property="SnapsToDevicePixels" Value="true" />
-        <Setter Property="Height" Value="22" />
+        <!--<Setter Property="Height" Value="22" />-->
         <Setter Property="Validation.ErrorTemplate" Value="{x:Null}" />
         <Setter Property="ValidationErrorTemplate">
             <Setter.Value>
