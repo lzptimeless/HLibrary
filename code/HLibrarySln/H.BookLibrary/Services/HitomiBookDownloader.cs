@@ -22,85 +22,102 @@ namespace H.BookLibrary
             if (_book != null)
                 throw new ApplicationException("One book is processing");
 
-            //_book = new HBook(savePath, HBookMode.Create);
+            _book = new HBook(savePath, HBookMode.Create);
             _httpClient = new HttpClient();
 
+            string pageContent = await Retry(3, () => GetBookPage(id));
+            ProcessBookPage(pageContent);
+        }
+
+        private async Task<string> GetBookPage(string id)
+        {
             using (var previewRequest = CreateRequest($"galleries/{id}.html", HttpMethod.Get, null, null))
             {
                 using (var response = await _httpClient.SendAsync(previewRequest))
                 {
                     string content = await response.Content.ReadAsStringAsync();
-                    StringBuilder xhtmlSB = new StringBuilder();
-                    using (var htmlReader = new HtmlReader(content))
-                    {
-                        using (var htmlWriter = new HtmlWriter(xhtmlSB))
-                        {
-                            htmlReader.Read();
-                            while (!htmlReader.EOF)
-                            {
-                                htmlWriter.WriteNode(htmlReader, true);
-                            }
-                        }
-                    }
-                    string xhtml = xhtmlSB.ToString();
-                    XDocument xDoc = XDocument.Parse(xhtml);
-                    var coverPath = (from item in xDoc.Descendants()
-                                     where item.Name == "img" && item.HasAttributes && item.Attribute("src").Value.Contains("/bigtn/")
-                                     select item.Attribute("src").Value).FirstOrDefault();
-
-                    var bookName = (from item in xDoc.Descendants()
-                                    where item.Name == "a" && !item.HasElements && item.HasAttributes && item.Attribute("href").Value.Contains("/reader/")
-                                    select item.Value).FirstOrDefault();
-
-                    var artist = ((from item in xDoc.Descendants()
-                                   where item.Name == "a" && item.HasAttributes && item.Attribute("href").Value.Contains("/artist/")
-                                   select item.Value).FirstOrDefault() ?? string.Empty).Split(',');
-
-                    var headerInfo = (from item in xDoc.Descendants()
-                                      where item.Name == "div" && item.HasAttributes && item.Attribute("class") != null && item.Attribute("class").Value.Contains("gallery-info")
-                                      select item).FirstOrDefault();
-
-                    var headerFields = from item in headerInfo.Descendants()
-                                       where item.Name == "tr" && item.HasElements
-                                       select item;
-
-                    foreach (var tr in headerFields)
-                    {
-                        var cells = tr.Elements().ToArray();
-                        if (cells.Length != 2) continue;
-
-                        string key = cells[0].Value.Trim();
-                        string value = cells[1].Value.Trim();
-                        if (string.Equals(value, "N/A", StringComparison.OrdinalIgnoreCase)) continue;
-
-                        switch (key)
-                        {
-                            case "Group":
-                                break;
-                            case "Type":
-                                break;
-                            case "Language":
-                                break;
-                            case "Series":
-                                break;
-                            case "Characters":
-                                break;
-                            case "Tags":
-                                break;
-                            default:
-                                break;
-                        }
-                    }
-
-                    Regex regex = new Regex(@"var thumbnails = \[(?<thumbnails>[\s\S]+?)\]");
-                    var mh = regex.Match(xhtml);
-                    var thumbnails = mh.Groups["thumbnails"].Value.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(s => s.Trim(new[] { '\'', ' ', '\n', '\r' }));
-                    thumbnails = thumbnails.Where(s => !string.IsNullOrEmpty(s));
+                    return content;
                 }
             }
         }
 
-        private HttpRequestMessage CreateRequest(string path, HttpMethod method, Dictionary<string, object> urlParams, Dictionary<string, object> bodyParams)
+        private void ProcessBookPage(string content)
+        {
+            StringBuilder xhtmlSB = new StringBuilder();
+            using (var htmlReader = new HtmlReader(content))
+            {
+                using (var htmlWriter = new HtmlWriter(xhtmlSB))
+                {
+                    htmlReader.Read();
+                    while (!htmlReader.EOF)
+                    {
+                        htmlWriter.WriteNode(htmlReader, true);
+                    }
+                }
+            }
+
+            HBookHeaderSetting headerSetting = new HBookHeaderSetting();
+            string emptyValue = "N/A";
+            string xhtml = xhtmlSB.ToString();
+            XDocument xDoc = XDocument.Parse(xhtml);
+            var coverPath = (from item in xDoc.Descendants()
+                             where item.Name == "img" && item.HasAttributes && item.Attribute("src").Value.Contains("/bigtn/")
+                             select item.Attribute("src").Value).FirstOrDefault();
+
+            var bookNames = ((from item in xDoc.Descendants()
+                              where item.Name == "a" && !item.HasElements && item.HasAttributes && item.Attribute("href").Value.Contains("/reader/")
+                              select item.Value).FirstOrDefault() ?? string.Empty).Split(',');
+
+
+
+
+            var artists = ((from item in xDoc.Descendants()
+                            where item.Name == "a" && item.HasAttributes && item.Attribute("href").Value.Contains("/artist/")
+                            select item.Value).FirstOrDefault() ?? string.Empty).Split(',');
+
+            var headerInfo = (from item in xDoc.Descendants()
+                              where item.Name == "div" && item.HasAttributes && item.Attribute("class") != null && item.Attribute("class").Value.Contains("gallery-info")
+                              select item).FirstOrDefault();
+
+            var headerFields = from item in headerInfo.Descendants()
+                               where item.Name == "tr" && item.HasElements
+                               select item;
+
+            foreach (var tr in headerFields)
+            {
+                var cells = tr.Elements().ToArray();
+                if (cells.Length != 2) continue;
+
+                string key = cells[0].Value.Trim();
+                string value = cells[1].Value.Trim();
+                if (string.Equals(value, "N/A", StringComparison.OrdinalIgnoreCase)) continue;
+
+                switch (key)
+                {
+                    case "Group":
+                        break;
+                    case "Type":
+                        break;
+                    case "Language":
+                        break;
+                    case "Series":
+                        break;
+                    case "Characters":
+                        break;
+                    case "Tags":
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            Regex regex = new Regex(@"var thumbnails = \[(?<thumbnails>[\s\S]+?)\]");
+            var mh = regex.Match(xhtml);
+            var thumbnails = mh.Groups["thumbnails"].Value.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(s => s.Trim(new[] { '\'', ' ', '\n', '\r' }));
+            thumbnails = thumbnails.Where(s => !string.IsNullOrEmpty(s));
+        }
+
+        private static HttpRequestMessage CreateRequest(string path, HttpMethod method, Dictionary<string, object> urlParams, Dictionary<string, object> bodyParams)
         {
             UriBuilder uriBd;
             if (path.StartsWith("//"))
@@ -124,6 +141,30 @@ namespace H.BookLibrary
             request.Headers.UserAgent.ParseAdd("HBookLibrary");
 
             return request;
+        }
+
+        private static async Task<T> Retry<T>(int retryCount, Func<Task<T>> action)
+        {
+            bool isRetry = false;
+            T result = default(T);
+            do
+            {
+                isRetry = false;
+                try
+                {
+                    result = await action();
+                }
+                catch
+                {
+                    if (retryCount <= 0) throw;
+
+                    --retryCount;
+                    isRetry = true;
+                }
+            }
+            while (isRetry);
+
+            return result;
         }
 
         private static string CreateHttpParameters(IEnumerable<KeyValuePair<string, object>> parameters, bool isEnableUrlEncode)
