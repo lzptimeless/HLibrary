@@ -28,7 +28,7 @@ namespace H.BookLibrary
         {
             string id = "894871";
             HitomiBookDownloader bookDownloader = new HitomiBookDownloader();
-            bookDownloader.Download(id, $"books/hitomi-{id}-{DateTime.UtcNow.Ticks}");
+            bookDownloader.Download(id, $"books/hitomi-{id}-{DateTime.Now.ToString("yyyy-MM-dd")}");
         }
     }
 }

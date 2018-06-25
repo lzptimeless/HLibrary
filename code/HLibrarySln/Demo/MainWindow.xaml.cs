@@ -28,11 +28,11 @@ namespace Demo
             Loaded += MainWindow_Loaded;
         }
 
-        private void MainWindow_Loaded(object sender, RoutedEventArgs e)
+        private async void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            //var vm = new TestHBookViewModel();
-            //TestHBookView.DataContext = vm;
-            //await vm.Init();
+            var vm = new TestHBookViewModel();
+            TestHBookView.DataContext = vm;
+            await vm.Init();
         }
     }
 }

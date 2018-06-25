@@ -1,6 +1,7 @@
 ﻿using H.Book;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
@@ -15,18 +16,82 @@ namespace H.BookLibrary
         #region fields
         private IHBook _book;
         private HttpClient _httpClient;
+        private HBookHeaderSetting _headerSetting;
+        private string _coverUrl;
+        private string[] _thumbnailUrls;
         #endregion
 
         public async void Download(string id, string savePath)
         {
-            if (_book != null)
+            if (_httpClient != null)
                 throw new ApplicationException("One book is processing");
 
-            _book = new HBook(savePath, HBookMode.Create);
             _httpClient = new HttpClient();
 
             string pageContent = await Retry(3, () => GetBookPage(id));
-            ProcessBookPage(pageContent);
+            await Task.Run(() => ProcessBookPage(pageContent));
+
+            string dir = Path.GetDirectoryName(savePath);
+            if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
+
+            _book = new HBook(savePath, HBookMode.Create);
+            await _book.InitAsync();
+            await _book.SetHeaderAsync(_headerSetting);
+
+            if (!string.IsNullOrEmpty(_coverUrl))
+            {
+                Console.WriteLine("Download cover...");
+                using (var s = await DownloadImage(_coverUrl))
+                {
+                    if (s != null) await _book.SetCoverAsync(s, s);
+                }
+            }
+
+            if (_thumbnailUrls != null)
+            {
+                int pageIndex = 0;
+                foreach (string thumbUrl in _thumbnailUrls)
+                {
+                    Console.WriteLine("Download page thumbnail:" + pageIndex++);
+                    using (var s = await DownloadImage(thumbUrl))
+                    {
+                        HPageHeaderSetting pageHeader = new HPageHeaderSetting();
+                        if (_headerSetting != null && _headerSetting.Artists != null && _headerSetting.Artists.Length == 1)
+                        {
+                            pageHeader.Artist = _headerSetting.Artists[0];
+                            pageHeader.Selected = pageHeader.Selected | HPageHeaderFieldSelections.Artist;
+                        }
+                        if (s != null) await _book.AddPageAsync(pageHeader, s, s);
+                    }
+                }
+            }
+
+            Console.WriteLine("Download complete.");
+        }
+
+        private async Task<Stream> DownloadImage(string url)
+        {
+            using (var req = CreateRequest(url, HttpMethod.Get, null, null))
+            {
+                using (var res = await _httpClient.SendAsync(req))
+                {
+                    MemoryStream ms = new MemoryStream();
+                    try
+                    {
+                        using (var s = await res.Content.ReadAsStreamAsync())
+                        {
+                            await s.CopyToAsync(ms);
+                        }
+                        return ms;
+                    }
+                    catch (Exception ex)
+                    {
+                        ms.Dispose();
+                        Console.WriteLine("DownloadImage failed:" + url + Environment.NewLine + ex.ToString());
+                        throw ex;
+                    }
+                }
+            }
         }
 
         private async Task<string> GetBookPage(string id)
@@ -64,16 +129,29 @@ namespace H.BookLibrary
                              where item.Name == "img" && item.HasAttributes && item.Attribute("src").Value.Contains("/bigtn/")
                              select item.Attribute("src").Value).FirstOrDefault();
 
+            _coverUrl = coverPath;
+
             var bookNames = ((from item in xDoc.Descendants()
                               where item.Name == "a" && !item.HasElements && item.HasAttributes && item.Attribute("href").Value.Contains("/reader/")
                               select item.Value).FirstOrDefault() ?? string.Empty).Split(',');
 
-
-
+            bookNames = bookNames.Where(n => !string.IsNullOrEmpty(n) && string.Equals(n, emptyValue, StringComparison.OrdinalIgnoreCase)).ToArray();
+            if (bookNames.Length > 0)
+            {
+                headerSetting.Names = bookNames;
+                headerSetting.Selected = headerSetting.Selected | HBookHeaderFieldSelections.Names;
+            }
 
             var artists = ((from item in xDoc.Descendants()
                             where item.Name == "a" && item.HasAttributes && item.Attribute("href").Value.Contains("/artist/")
                             select item.Value).FirstOrDefault() ?? string.Empty).Split(',');
+
+            artists = artists.Where(a => !string.IsNullOrEmpty(a) && string.Equals(a, emptyValue, StringComparison.OrdinalIgnoreCase)).ToArray();
+            if (artists.Length > 0)
+            {
+                headerSetting.Artists = artists;
+                headerSetting.Selected = headerSetting.Selected | HBookHeaderFieldSelections.Artists;
+            }
 
             var headerInfo = (from item in xDoc.Descendants()
                               where item.Name == "div" && item.HasAttributes && item.Attribute("class") != null && item.Attribute("class").Value.Contains("gallery-info")
@@ -88,40 +166,72 @@ namespace H.BookLibrary
                 var cells = tr.Elements().ToArray();
                 if (cells.Length != 2) continue;
 
-                string key = cells[0].Value.Trim();
+                string key = cells[0].Value.Trim().ToLowerInvariant();
                 string value = cells[1].Value.Trim();
-                if (string.Equals(value, "N/A", StringComparison.OrdinalIgnoreCase)) continue;
+                if (string.IsNullOrEmpty(value) || string.Equals(value, "N/A", StringComparison.OrdinalIgnoreCase)) continue;
+
+                string[] values = value.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                if (values.Length == 0) continue;
 
                 switch (key)
                 {
-                    case "Group":
+                    case "group":
+                        {
+                            headerSetting.Groups = values;
+                            headerSetting.Selected = headerSetting.Selected | HBookHeaderFieldSelections.Groups;
+                        }
                         break;
-                    case "Type":
+                    case "type":
+                        {
+                            headerSetting.Categories = values;
+                            headerSetting.Selected = headerSetting.Selected | HBookHeaderFieldSelections.Categories;
+                        }
                         break;
-                    case "Language":
+                    case "language":
+                        {
+                            string ietf = LanguageHelper.LangToIETF(values[0]);
+                            headerSetting.IetfLanguageTag = ietf ?? values[0];
+                            headerSetting.Selected = headerSetting.Selected | HBookHeaderFieldSelections.Groups;
+                        }
                         break;
-                    case "Series":
+                    case "series":
+                        {
+                            headerSetting.Series = values;
+                            headerSetting.Selected = headerSetting.Selected | HBookHeaderFieldSelections.Series;
+                        }
                         break;
-                    case "Characters":
+                    case "characters":
+                        {
+                            headerSetting.Characters = values;
+                            headerSetting.Selected = headerSetting.Selected | HBookHeaderFieldSelections.Characters;
+                        }
                         break;
-                    case "Tags":
+                    case "tags":
+                        {
+                            headerSetting.Tags = values;
+                            headerSetting.Selected = headerSetting.Selected | HBookHeaderFieldSelections.Tags;
+                        }
                         break;
                     default:
                         break;
                 }
             }
 
+            _headerSetting = headerSetting;
+
             Regex regex = new Regex(@"var thumbnails = \[(?<thumbnails>[\s\S]+?)\]");
             var mh = regex.Match(xhtml);
             var thumbnails = mh.Groups["thumbnails"].Value.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(s => s.Trim(new[] { '\'', ' ', '\n', '\r' }));
-            thumbnails = thumbnails.Where(s => !string.IsNullOrEmpty(s));
+            _thumbnailUrls = thumbnails.Where(s => !string.IsNullOrEmpty(s)).ToArray();
         }
 
         private static HttpRequestMessage CreateRequest(string path, HttpMethod method, Dictionary<string, object> urlParams, Dictionary<string, object> bodyParams)
         {
             UriBuilder uriBd;
-            if (path.StartsWith("//"))
+            if (path.StartsWith("https://"))
                 uriBd = new UriBuilder(path);
+            else if (path.StartsWith("//"))
+                uriBd = new UriBuilder("https:" + path);
             else
             {
                 uriBd = new UriBuilder("https", "hitomi.la");
