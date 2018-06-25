@@ -135,7 +135,7 @@ namespace H.BookLibrary
                               where item.Name == "a" && !item.HasElements && item.HasAttributes && item.Attribute("href").Value.Contains("/reader/")
                               select item.Value).FirstOrDefault() ?? string.Empty).Split(',');
 
-            bookNames = bookNames.Where(n => !string.IsNullOrEmpty(n) && string.Equals(n, emptyValue, StringComparison.OrdinalIgnoreCase)).ToArray();
+            bookNames = bookNames.Where(n => !string.IsNullOrEmpty(n) && !string.Equals(n, emptyValue, StringComparison.OrdinalIgnoreCase)).ToArray();
             if (bookNames.Length > 0)
             {
                 headerSetting.Names = bookNames;
@@ -146,7 +146,7 @@ namespace H.BookLibrary
                             where item.Name == "a" && item.HasAttributes && item.Attribute("href").Value.Contains("/artist/")
                             select item.Value).FirstOrDefault() ?? string.Empty).Split(',');
 
-            artists = artists.Where(a => !string.IsNullOrEmpty(a) && string.Equals(a, emptyValue, StringComparison.OrdinalIgnoreCase)).ToArray();
+            artists = artists.Where(a => !string.IsNullOrEmpty(a) && !string.Equals(a, emptyValue, StringComparison.OrdinalIgnoreCase)).ToArray();
             if (artists.Length > 0)
             {
                 headerSetting.Artists = artists;
@@ -191,7 +191,7 @@ namespace H.BookLibrary
                         {
                             string ietf = LanguageHelper.LangToIETF(values[0]);
                             headerSetting.IetfLanguageTag = ietf ?? values[0];
-                            headerSetting.Selected = headerSetting.Selected | HBookHeaderFieldSelections.Groups;
+                            headerSetting.Selected = headerSetting.Selected | HBookHeaderFieldSelections.IetfLanguageTag;
                         }
                         break;
                     case "series":
