@@ -70,6 +70,8 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Common\LanguageHelper.cs" />
+    <Compile Include="Common\Output.cs" />
+    <Compile Include="Converters\ArrayToTextConverter.cs" />
     <Compile Include="Html\HtmlReader.cs" />
     <Compile Include="Html\HtmlWriter.cs" />
     <Compile Include="Services\HitomiBookDownloader.cs" />
@@ -81,6 +83,12 @@
     <Compile Include="Services\PagesResult.cs" />
     <Compile Include="Shell.xaml.cs">
       <DependentUpon>Shell.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ViewModels\BookDetailViewModel.cs" />
+    <Compile Include="ViewModels\PageControlModel.cs" />
+    <Compile Include="ViewModels\ViewModelBase.cs" />
+    <Compile Include="Views\BookDetailView.xaml.cs">
+      <DependentUpon>BookDetailView.xaml</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
@@ -118,6 +126,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Shell.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\BookDetailView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -897,7 +897,7 @@ namespace Demo
         private IHBook CreateHBook()
         {
             //string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "testbook.hbook");
-            string path = @"..\..\..\H.BookLibrary\bin\Debug\books\hitomi-894871-2018-06-25";
+            string path = @"..\..\..\H.BookLibrary\bin\Debug\books\hitomi-1201123-2018-06-27";
             return new HBook(path, HBookMode.OpenOrCreate);
         }
 

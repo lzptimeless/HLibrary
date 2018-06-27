@@ -14,11 +14,13 @@ namespace H.BookLibrary
     public class HitomiBookDownloader
     {
         #region fields
+        private string _id;
         private IHBook _book;
         private HttpClient _httpClient;
         private HBookHeaderSetting _headerSetting;
         private string _coverUrl;
         private string[] _thumbnailUrls;
+        private string[] _pageUrls;
         #endregion
 
         public async void Download(string id, string savePath)
@@ -26,10 +28,16 @@ namespace H.BookLibrary
             if (_httpClient != null)
                 throw new ApplicationException("One book is processing");
 
+            _id = id;
             _httpClient = new HttpClient();
 
-            string pageContent = await Retry(3, () => GetBookPage(id));
-            await Task.Run(() => ProcessBookPage(pageContent));
+            Output.Print($"Download book gallery: {id}");
+            string galleryHtml = await Retry(3, () => DownloadHtml($"galleries/{id}.html", null));
+            await Task.Run(() => ParseGallery(galleryHtml));
+
+            Output.Print($"Download book page html: {id}");
+            string pageHtml = await Retry(3, () => DownloadHtml($"reader/{_id}.html", "1"));
+            await Task.Run(() => ParsePage(pageHtml));
 
             string dir = Path.GetDirectoryName(savePath);
             if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
@@ -40,38 +48,68 @@ namespace H.BookLibrary
 
             if (!string.IsNullOrEmpty(_coverUrl))
             {
-                Console.WriteLine("Download cover...");
-                using (var s = await DownloadImage(_coverUrl))
+                Output.Print("Download cover...");
+                using (var s = await Retry(3, () => DownloadImage(_coverUrl)))
                 {
                     if (s != null) await _book.SetCoverAsync(s, s);
                 }
             }
+            else Output.Print("Cover url is empty.");
 
             if (_thumbnailUrls != null)
             {
-                int pageIndex = 0;
-                foreach (string thumbUrl in _thumbnailUrls)
+                for (int i = 0; i < _thumbnailUrls.Length; i++)
                 {
-                    Console.WriteLine("Download page thumbnail:" + pageIndex++);
-                    using (var s = await DownloadImage(thumbUrl))
+                    string thumburl = _thumbnailUrls[i];
+                    string pageurl = _pageUrls[i];
+                    Output.Print("Download page thumbnail:" + i);
+                    using (var thumbS = await Retry(3, () => DownloadImage(thumburl)))
                     {
-                        HPageHeaderSetting pageHeader = new HPageHeaderSetting();
-                        if (_headerSetting != null && _headerSetting.Artists != null && _headerSetting.Artists.Length == 1)
+                        Stream pageS = null;
+                        if (!string.IsNullOrEmpty(pageurl))
                         {
-                            pageHeader.Artist = _headerSetting.Artists[0];
-                            pageHeader.Selected = pageHeader.Selected | HPageHeaderFieldSelections.Artist;
+                            Output.Print("Download page:" + i);
+                            pageS = await Retry(3, () => DownloadImage(pageurl));
                         }
-                        if (s != null) await _book.AddPageAsync(pageHeader, s, s);
+                        else Output.Print($"Page url is null: {i}");
+
+                        try
+                        {
+                            HPageHeaderSetting pageHeader = new HPageHeaderSetting();
+                            if (_headerSetting != null && _headerSetting.Artists != null && _headerSetting.Artists.Length == 1)
+                            {
+                                pageHeader.Artist = _headerSetting.Artists[0];
+                                pageHeader.Selected = pageHeader.Selected | HPageHeaderFieldSelections.Artist;
+                            }
+                            await _book.AddPageAsync(pageHeader, thumbS, pageS);
+                        }
+                        finally
+                        {
+                            if (pageS != null) pageS.Dispose();
+                        }
                     }
                 }
             }
+            else Output.Print("Page url is empty.");
 
-            Console.WriteLine("Download complete.");
+            Output.Print("Download complete.");
+        }
+
+        private async Task<string> DownloadHtml(string url, string fragment)
+        {
+            using (var req = CreateRequest(url, fragment, HttpMethod.Get, null, null))
+            {
+                using (var res = await _httpClient.SendAsync(req))
+                {
+                    string html = await res.Content.ReadAsStringAsync();
+                    return html;
+                }
+            }
         }
 
         private async Task<Stream> DownloadImage(string url)
         {
-            using (var req = CreateRequest(url, HttpMethod.Get, null, null))
+            using (var req = CreateRequest(url, null, HttpMethod.Get, null, null))
             {
                 using (var res = await _httpClient.SendAsync(req))
                 {
@@ -94,19 +132,72 @@ namespace H.BookLibrary
             }
         }
 
-        private async Task<string> GetBookPage(string id)
+        private void ParsePage(string content)
         {
-            using (var previewRequest = CreateRequest($"galleries/{id}.html", HttpMethod.Get, null, null))
+            StringBuilder xhtmlSB = new StringBuilder();
+            using (var htmlReader = new HtmlReader(content))
             {
-                using (var response = await _httpClient.SendAsync(previewRequest))
+                using (var htmlWriter = new HtmlWriter(xhtmlSB))
                 {
-                    string content = await response.Content.ReadAsStringAsync();
-                    return content;
+                    htmlReader.Read();
+                    while (!htmlReader.EOF)
+                    {
+                        htmlWriter.WriteNode(htmlReader, true);
+                    }
                 }
+            }
+
+            string xhtml = xhtmlSB.ToString();
+            XDocument xDoc = XDocument.Parse(xhtml);
+            var xbody = xDoc.Element("html").Element("body");
+            string[] gpageurls = xbody.Elements().Where(x => x.Name == "div" && x.Attribute("class") != null && x.Attribute("class").Value == "img-url").Select(x => x.Value.Trim()).ToArray();
+
+            _pageUrls = new string[_thumbnailUrls.Length];
+            for (int i = 0; i < _thumbnailUrls.Length; i++)
+            {
+                string thumburl = _thumbnailUrls[i];
+                string thumbname = thumburl.Substring(thumburl.LastIndexOf('/') + 1);
+                thumbname = thumbname.Substring(0, thumbname.IndexOf('.'));// 因为有些文件名的后缀重复，这里过滤掉后缀
+                string gpageurl = gpageurls.FirstOrDefault(s => s.Contains($"/{thumbname}."));
+                _pageUrls[i] = !string.IsNullOrEmpty(gpageurl) ? UrlFromUrl(gpageurl, null) : null;
             }
         }
 
-        private void ProcessBookPage(string content)
+        private string UrlFromUrl(string url, string basedomain)
+        {
+            Regex r = new Regex(@"//..?\.hitomi\.la/");
+            return r.Replace(url, $"//{SubdomainFromUrl(url, basedomain)}.hitomi.la/");
+        }
+
+        private string SubdomainFromUrl(string url, string basedomain)
+        {
+            string ret = "a";
+            if (!string.IsNullOrEmpty(basedomain)) ret = basedomain;
+
+            Regex r = new Regex(@"/\d*(?<gid>\d)/");
+            var m = r.Match(url);
+            if (!m.Success) return ret;
+
+            int gid;
+            if (!int.TryParse(m.Groups["gid"].Value, out gid)) return ret;
+
+            if (gid == 1) gid = 0;
+
+            return SubdomainFromGalleryID(gid) + ret;
+        }
+
+        private string SubdomainFromGalleryID(int id)
+        {
+            bool adapose = false;
+            int number_of_frontends = 2;
+
+            if (adapose) return "0";
+
+            int o = id % number_of_frontends;
+            return char.ConvertFromUtf32(97 + o);
+        }
+
+        private void ParseGallery(string content)
         {
             StringBuilder xhtmlSB = new StringBuilder();
             using (var htmlReader = new HtmlReader(content))
@@ -122,55 +213,43 @@ namespace H.BookLibrary
             }
 
             HBookHeaderSetting headerSetting = new HBookHeaderSetting();
-            string emptyValue = "N/A";
             string xhtml = xhtmlSB.ToString();
             XDocument xDoc = XDocument.Parse(xhtml);
-            var coverPath = (from item in xDoc.Descendants()
-                             where item.Name == "img" && item.HasAttributes && item.Attribute("src").Value.Contains("/bigtn/")
-                             select item.Attribute("src").Value).FirstOrDefault();
+            var xbody = xDoc.Descendants().Where(x => x.Name == "body").First();
+            var xcontainer = xbody.Elements().Where(x => x.Name == "div" && x.Attribute("class").Value == "container").First();
+            var xcontent = xcontainer.Elements().Where(x => x.Name == "div" && x.Attribute("class").Value == "content").First();
 
-            _coverUrl = coverPath;
+            var xcovercloumn = xcontent.Elements().Where(x => x.Name == "div" && x.Attribute("class").Value == "cover-column").First();
+            var xcover = xcovercloumn.Elements().Where(x => x.Name == "div" && x.Attribute("class").Value == "cover").First();
+            _coverUrl = xcover.Descendants().Where(x => x.Name == "img").Select(i => i.Attribute("src").Value).First().Trim();
 
-            var bookNames = ((from item in xDoc.Descendants()
-                              where item.Name == "a" && !item.HasElements && item.HasAttributes && item.Attribute("href").Value.Contains("/reader/")
-                              select item.Value).FirstOrDefault() ?? string.Empty).Split(',');
+            var xgallery = xcontent.Elements().Where(x => x.Name == "div" && x.Attribute("class").Value.Contains("manga-gallery")).First();
 
-            bookNames = bookNames.Where(n => !string.IsNullOrEmpty(n) && !string.Equals(n, emptyValue, StringComparison.OrdinalIgnoreCase)).ToArray();
-            if (bookNames.Length > 0)
+            string[] booknames = xgallery.Element("h1").Element("a").Value.Split(new[] { " | " }, StringSplitOptions.RemoveEmptyEntries).Select(s => s.Trim()).ToArray();
+            if (booknames.Length > 0)
             {
-                headerSetting.Names = bookNames;
+                headerSetting.Names = booknames;
                 headerSetting.Selected = headerSetting.Selected | HBookHeaderFieldSelections.Names;
             }
 
-            var artists = ((from item in xDoc.Descendants()
-                            where item.Name == "a" && item.HasAttributes && item.Attribute("href").Value.Contains("/artist/")
-                            select item.Value).FirstOrDefault() ?? string.Empty).Split(',');
-
-            artists = artists.Where(a => !string.IsNullOrEmpty(a) && !string.Equals(a, emptyValue, StringComparison.OrdinalIgnoreCase)).ToArray();
+            var artists = xgallery.Element("h2").Descendants().Where(x => x.Name == "a").Select(a => a.Value.Trim()).ToArray();
             if (artists.Length > 0)
             {
                 headerSetting.Artists = artists;
                 headerSetting.Selected = headerSetting.Selected | HBookHeaderFieldSelections.Artists;
             }
 
-            var headerInfo = (from item in xDoc.Descendants()
-                              where item.Name == "div" && item.HasAttributes && item.Attribute("class") != null && item.Attribute("class").Value.Contains("gallery-info")
-                              select item).FirstOrDefault();
+            var xgalleryinfo = xgallery.Elements().Where(x => x.Name == "div" && x.Attribute("class").Value == "gallery-info").First();
+            var xtrs = xgalleryinfo.Descendants().Where(x => x.Name == "tr");
 
-            var headerFields = from item in headerInfo.Descendants()
-                               where item.Name == "tr" && item.HasElements
-                               select item;
-
-            foreach (var tr in headerFields)
+            foreach (var xtr in xtrs)
             {
-                var cells = tr.Elements().ToArray();
-                if (cells.Length != 2) continue;
+                var xtds = xtr.Elements().ToArray();
+                if (xtds.Length != 2) continue;
 
-                string key = cells[0].Value.Trim().ToLowerInvariant();
-                string value = cells[1].Value.Trim();
-                if (string.IsNullOrEmpty(value) || string.Equals(value, "N/A", StringComparison.OrdinalIgnoreCase)) continue;
+                string key = xtds[0].Value.Trim().ToLowerInvariant();
+                string[] values = xtds[1].Descendants().Where(x => x.Name == "a").Select(a => a.Value.Trim().Trim(new[] { '♀', '♂' }).Trim()).ToArray();
 
-                string[] values = value.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
                 if (values.Length == 0) continue;
 
                 switch (key)
@@ -225,7 +304,7 @@ namespace H.BookLibrary
             _thumbnailUrls = thumbnails.Where(s => !string.IsNullOrEmpty(s)).ToArray();
         }
 
-        private static HttpRequestMessage CreateRequest(string path, HttpMethod method, Dictionary<string, object> urlParams, Dictionary<string, object> bodyParams)
+        private static HttpRequestMessage CreateRequest(string path, string fragment, HttpMethod method, Dictionary<string, object> urlParams, Dictionary<string, object> bodyParams)
         {
             UriBuilder uriBd;
             if (path.StartsWith("https://"))
@@ -237,6 +316,8 @@ namespace H.BookLibrary
                 uriBd = new UriBuilder("https", "hitomi.la");
                 uriBd.Path = path;
             }
+
+            if (!string.IsNullOrEmpty(fragment)) uriBd.Fragment = fragment;
 
             if (urlParams != null)
                 uriBd.Query = CreateHttpParameters(urlParams, true);

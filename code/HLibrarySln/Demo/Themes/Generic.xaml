@@ -5,7 +5,11 @@
     xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
     xmlns:sys="clr-namespace:System;assembly=mscorlib">
     <!--  公共颜色-开始  -->
-    <!--  主题色  -->
+    <!--  主色  -->
+    <Color x:Key="color-main">#000000</Color>
+    <SolidColorBrush x:Key="brush-main" Color="{StaticResource color-main}" />
+
+    <!--  强调色  -->
     <Color x:Key="color-accent">#ED242C</Color>
     <Color x:Key="color-accent-light">#ED575D</Color>
     <Color x:Key="color-accent-deep">#C82129</Color>
@@ -212,7 +216,7 @@
         <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="Padding" Value="8,0" />
         <Setter Property="MinWidth" Value="60" />
-        <Setter Property="Height" Value="30" />
+        <Setter Property="Height" Value="25" />
     </Style>
     <Style x:Key="button-highlight" TargetType="Button">
         <Setter Property="Template">
@@ -259,7 +263,7 @@
         <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="Padding" Value="8,0" />
         <Setter Property="MinWidth" Value="60" />
-        <Setter Property="Height" Value="30" />
+        <Setter Property="Height" Value="25" />
     </Style>
     <Style x:Key="button-path-fill" TargetType="Button">
         <Setter Property="Template">
@@ -355,6 +359,10 @@
         <Setter Property="MinWidth" Value="12" />
         <Setter Property="MinHeight" Value="12" />
     </Style>
+    <Style
+        x:Key="{x:Type Button}"
+        BasedOn="{StaticResource button}"
+        TargetType="{x:Type Button}" />
 
     <!--  Checkbox  -->
     <Style x:Key="checkbox" TargetType="{x:Type CheckBox}">
@@ -481,6 +489,10 @@
         <Setter Property="FontSize" Value="{StaticResource font-size}" />
         <Setter Property="FontFamily" Value="{StaticResource font}" />
     </Style>
+    <Style
+        x:Key="{x:Type CheckBox}"
+        BasedOn="{StaticResource checkbox}"
+        TargetType="{x:Type CheckBox}" />
 
     <!--  RadioButton  -->
     <Style x:Key="radiobutton" TargetType="{x:Type RadioButton}">
@@ -575,6 +587,10 @@
         <Setter Property="FontSize" Value="{StaticResource font-size}" />
         <Setter Property="FontFamily" Value="{StaticResource font}" />
     </Style>
+    <Style
+        x:Key="{x:Type RadioButton}"
+        BasedOn="{StaticResource radiobutton}"
+        TargetType="{x:Type RadioButton}" />
 
     <!--  Thumb  -->
     <Style x:Key="thumb" TargetType="Thumb">
@@ -706,6 +722,10 @@
         <Setter Property="BorderBrush" Value="{StaticResource brush-control-bd}" />
         <Setter Property="Height" Value="10" />
     </Style>
+    <Style
+        x:Key="{x:Type ProgressBar}"
+        BasedOn="{StaticResource progressbar}"
+        TargetType="{x:Type ProgressBar}" />
 
     <!--  ScrollBar  -->
     <sys:Double x:Key="scrollbar-size">12</sys:Double>
@@ -970,6 +990,11 @@
         <Setter Property="VerticalScrollBarVisibility" Value="Auto" />
         <Setter Property="HorizontalScrollBarVisibility" Value="Disabled" />
     </Style>
+    <Style
+        x:Key="{x:Type ScrollViewer}"
+        BasedOn="{StaticResource scrollviewer}"
+        TargetType="{x:Type ScrollViewer}" />
+
     <!--  No scrollbar version  -->
     <Style x:Key="scrollviewer-slim" TargetType="ScrollViewer">
         <Setter Property="Template">
@@ -1089,6 +1114,10 @@
             </Setter.Value>
         </Setter>
     </Style>
+    <Style
+        x:Key="{x:Type TextBox}"
+        BasedOn="{StaticResource textbox}"
+        TargetType="{x:Type TextBox}" />
 
     <!--  ListBox  -->
     <Style x:Key="listboxitem" TargetType="ListBoxItem">
@@ -1160,6 +1189,10 @@
         <Setter Property="VerticalContentAlignment" Value="Stretch" />
         <Setter Property="HorizontalContentAlignment" Value="Stretch" />
     </Style>
+    <Style
+        x:Key="{x:Type ListBox}"
+        BasedOn="{StaticResource listbox}"
+        TargetType="{x:Type ListBox}" />
 
     <!--  ComboBox  -->
     <Style x:Key="combobox-togglebutton" TargetType="ToggleButton">
@@ -1356,6 +1389,10 @@
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="Height" Value="25" />
     </Style>
+    <Style
+        x:Key="{x:Type ComboBox}"
+        BasedOn="{StaticResource combobox}"
+        TargetType="{x:Type ComboBox}" />
 
     <!--  Menu  -->
     <Style x:Key="{x:Static MenuItem.SeparatorStyleKey}" TargetType="{x:Type Separator}">

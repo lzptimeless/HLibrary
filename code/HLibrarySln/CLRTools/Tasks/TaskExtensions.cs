@@ -10,8 +10,12 @@ namespace System.Threading.Tasks
     public static class TaskExtensions
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]  // Causes compiler to optimize the call away
-        public static void NoAwait(this Task task) { }
+        public static void NoCare(this Task task) { }
 
+        public static async void NoAwait(this Task task)
+        {
+            await task;
+        }
         #region WithCancellation
 
         private struct Void { } // Because there isn't a non-generic TaskCompletionSource class.

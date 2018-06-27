@@ -4,12 +4,14 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:H.BookLibrary"
+        xmlns:view="clr-namespace:H.BookLibrary.Views"
         mc:Ignorable="d"
-        Title="Shell" Height="300" Width="300"
+        Title="Shell" Height="700" Width="1082"
         Style="{StaticResource window-shell}">
     <Grid>
-        <StackPanel>
+        <!--<StackPanel>
             <Button Style="{StaticResource button}" Content="下载" Click="DownloadButton_Click" x:Name="DownloadButton"/>
-        </StackPanel>
+        </StackPanel>-->
+        <ContentControl x:Name="PageHost"/>
     </Grid>
 </Window>
