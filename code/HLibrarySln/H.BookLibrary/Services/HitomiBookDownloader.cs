@@ -23,7 +23,7 @@ namespace H.BookLibrary
         private string[] _pageUrls;
         #endregion
 
-        public async void Download(string id, string savePath)
+        public async Task<IHBook> DownloadAsync(string id, string savePath)
         {
             if (_httpClient != null)
                 throw new ApplicationException("One book is processing");
@@ -93,6 +93,7 @@ namespace H.BookLibrary
             else Output.Print("Page url is empty.");
 
             Output.Print("Download complete.");
+            return _book;
         }
 
         private async Task<string> DownloadHtml(string url, string fragment)

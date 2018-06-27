@@ -42,9 +42,12 @@ namespace H.BookLibrary
 
         private void DownloadButton_Click(object sender, RoutedEventArgs e)
         {
-            string id = "1201123";
-            HitomiBookDownloader bookDownloader = new HitomiBookDownloader();
-            bookDownloader.Download(id, $"books/hitomi-{id}-{DateTime.Now.ToString("yyyy-MM-dd")}.hb");
+            //BookDownloadViewModel vm = new BookDownloadViewModel(BookIDTextBox.Text.Trim());
+            //BookDownloadView view = new BookDownloadView();
+            //view.DataContext = vm;
+            //vm.Init(view);
+
+            //PageHost.Content = view;
         }
     }
 }

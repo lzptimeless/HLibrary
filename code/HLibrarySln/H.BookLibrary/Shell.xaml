@@ -1,17 +1,37 @@
-﻿<Window x:Class="H.BookLibrary.Shell"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:H.BookLibrary"
-        xmlns:view="clr-namespace:H.BookLibrary.Views"
-        mc:Ignorable="d"
-        Title="Shell" Height="700" Width="1082"
-        Style="{StaticResource window-shell}">
+﻿<Window
+    x:Class="H.BookLibrary.Shell"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:H.BookLibrary"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:view="clr-namespace:H.BookLibrary.Views"
+    Title="Shell"
+    Width="1082"
+    Height="700"
+    Style="{StaticResource window-shell}"
+    mc:Ignorable="d">
     <Grid>
-        <!--<StackPanel>
-            <Button Style="{StaticResource button}" Content="下载" Click="DownloadButton_Click" x:Name="DownloadButton"/>
+        <!--<Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        <StackPanel Margin="20,20,20,0" Orientation="Horizontal">
+            <TextBlock
+                VerticalAlignment="Center"
+                Style="{StaticResource textblock}"
+                Text="ID:" />
+            <TextBox
+                x:Name="BookIDTextBox"
+                Width="100"
+                Margin="10,0,0,0"
+                Text="1201123" />
+            <Button
+                x:Name="DownloadButton"
+                Margin="10,0,0,0"
+                Click="DownloadButton_Click"
+                Content="下载" />
         </StackPanel>-->
-        <ContentControl x:Name="PageHost"/>
+        <ContentControl x:Name="PageHost" Grid.Row="1" />
     </Grid>
 </Window>
