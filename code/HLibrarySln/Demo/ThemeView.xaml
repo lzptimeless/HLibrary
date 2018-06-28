@@ -10,7 +10,7 @@
     Title="Theme View"
     Width="800"
     Height="1000"
-    Style="{StaticResource window-shell}"
+    Style="{StaticResource Window-Shell}"
     mc:Ignorable="d">
     <Window.Resources>
         <coll:ArrayList x:Key="StringArray">
@@ -42,8 +42,8 @@
             <TextBlock
                 Margin="10,0,0,0"
                 VerticalAlignment="Center"
-                Foreground="{StaticResource brush-text-highlight-fg}"
-                Style="{StaticResource textblock-h3}"
+                Foreground="{StaticResource Brush-Text-Highlight-FG}"
+                Style="{StaticResource TextBlock-H3}"
                 Text="主题展示" />
             <CheckBox
                 x:Name="Enable"
@@ -52,7 +52,7 @@
                 Checked="Enable_Checked"
                 Content="是否可用"
                 IsChecked="True"
-                Style="{StaticResource checkbox}"
+                Style="{StaticResource CheckBox}"
                 Unchecked="Enable_Unchecked"
                 WindowChrome.IsHitTestVisibleInChrome="True" />
         </StackPanel>
@@ -60,74 +60,74 @@
     <ScrollViewer
         Padding="30,20"
         HorizontalContentAlignment="Stretch"
-        Style="{StaticResource scrollviewer}">
+        Style="{StaticResource ScrollViewer}">
         <StackPanel x:Name="Root">
             <WrapPanel>
                 <TextBlock
                     Margin="5"
                     VerticalAlignment="Bottom"
-                    Style="{StaticResource textblock-h1}">
+                    Style="{StaticResource TextBlock-H1}">
                     标题1
                 </TextBlock>
                 <TextBlock
                     Margin="5"
                     VerticalAlignment="Bottom"
-                    Style="{StaticResource textblock-h2}">
+                    Style="{StaticResource TextBlock-H2}">
                     标题2
                 </TextBlock>
                 <TextBlock
                     Margin="5"
                     VerticalAlignment="Bottom"
-                    Style="{StaticResource textblock-h3}">
+                    Style="{StaticResource TextBlock-H3}">
                     标题3
                 </TextBlock>
                 <TextBlock
                     Margin="5"
                     VerticalAlignment="Bottom"
-                    Style="{StaticResource textblock}">
+                    Style="{StaticResource TextBlock}">
                     普通文本
                 </TextBlock>
                 <TextBlock
                     Margin="5"
                     VerticalAlignment="Bottom"
-                    Style="{StaticResource textblock-weak}">
+                    Style="{StaticResource TextBlock-Weak}">
                     次要文本
                 </TextBlock>
             </WrapPanel>
-            <WrapPanel Margin="0,10,0,0" Background="{StaticResource brush-panel-highlight-bg}">
+            <WrapPanel Margin="0,10,0,0" Background="{StaticResource Brush-Panel-Highlight-BG}">
                 <TextBlock
                     Margin="5"
                     VerticalAlignment="Bottom"
-                    Foreground="{StaticResource brush-text-highlight-fg}"
-                    Style="{StaticResource textblock-h1}">
+                    Foreground="{StaticResource Brush-Text-Highlight-FG}"
+                    Style="{StaticResource TextBlock-H1}">
                     标题1
                 </TextBlock>
                 <TextBlock
                     Margin="5"
                     VerticalAlignment="Bottom"
-                    Foreground="{StaticResource brush-text-highlight-fg}"
-                    Style="{StaticResource textblock-h2}">
+                    Foreground="{StaticResource Brush-Text-Highlight-FG}"
+                    Style="{StaticResource TextBlock-H2}">
                     标题2
                 </TextBlock>
                 <TextBlock
                     Margin="5"
                     VerticalAlignment="Bottom"
-                    Foreground="{StaticResource brush-text-highlight-fg}"
-                    Style="{StaticResource textblock-h3}">
+                    Foreground="{StaticResource Brush-Text-Highlight-FG}"
+                    Style="{StaticResource TextBlock-H3}">
                     标题3
                 </TextBlock>
                 <TextBlock
                     Margin="5"
                     VerticalAlignment="Bottom"
-                    Foreground="{StaticResource brush-text-fg}"
-                    Style="{StaticResource textblock}">
+                    Foreground="{StaticResource Brush-Text-FG}"
+                    Style="{StaticResource TextBlock}">
                     普通文本
                 </TextBlock>
                 <TextBlock
                     Margin="5"
                     VerticalAlignment="Bottom"
-                    Foreground="{StaticResource brush-text-weak-fg}"
-                    Style="{StaticResource textblock-weak}">
+                    Foreground="{StaticResource Brush-Text-Weak-FG}"
+                    Style="{StaticResource TextBlock-Weak}">
                     次要文本
                 </TextBlock>
             </WrapPanel>
@@ -135,13 +135,13 @@
                 <Button
                     Margin="5"
                     VerticalAlignment="Bottom"
-                    Style="{StaticResource button}">
+                    Style="{StaticResource Button}">
                     普通按钮
                 </Button>
                 <Button
                     Margin="5"
                     VerticalAlignment="Bottom"
-                    Style="{StaticResource button-highlight}">
+                    Style="{StaticResource Button-Highlight}">
                     重要按钮
                 </Button>
                 <Button
@@ -150,7 +150,7 @@
                     Margin="5"
                     Padding="4"
                     VerticalAlignment="Bottom"
-                    Style="{StaticResource button-path-fill}">
+                    Style="{StaticResource Button-Path-Fill}">
                     <PathGeometry>M7.7479932,17.727996L1.79001,18.589019C2.0199909,22.276,4.144993,24.328002,4.144993,24.328002L9.0480124,21.024993C9.0480124,21.024993 8.3200156,20.192993 8.0250012,19.526 7.6839978,18.765014 7.7479932,17.727996 7.7479932,17.727996z M13.596998,15.455017C14.611006,15.455017 15.432998,16.277008 15.432998,17.292999 15.432998,18.309021 14.611006,19.128997 13.596998,19.128997 12.579022,19.128997 11.760997,18.309021 11.760997,17.292999 11.760997,16.277008 12.579022,15.455017 13.596998,15.455017z M13.569013,12.593994C10.980998,12.593994 8.8870017,14.690002 8.8870017,17.277008 8.8870017,19.861999 10.980998,21.957 13.569013,21.957 16.153,21.957 18.247026,19.861999 18.247026,17.277008 18.247026,14.690002 16.153,12.593994 13.569013,12.593994z M13.553999,3.3870089C16.492996,3.3870087,19.206012,4.3310089,21.427023,5.9190063L21.427023,6.0870056C20.477009,6.1900024 19.491016,6.5700068 18.626024,7.2649989 16.587997,8.8950038 16.001022,11.540008 17.307024,13.17102 18.614,14.803009 21.322012,14.800994 23.358024,13.17102 24.395012,12.339996 25.051996,11.247009 25.278009,10.158004 26.437006,12.153991 27.110042,14.46701 27.110042,16.941009 27.110042,24.427001 21.042013,30.496 13.553999,30.496 6.0690062,30.496 0,24.427001 0,16.941009 0,9.4540095 6.0690062,3.3870087 13.553999,3.3870089z M31.587036,0C31.815002,1.2760393E-07,32.000002,0.21600354,32.000002,0.48300172L32.000002,2.6790011 32.000002,2.9860079 32.000002,9.0590052C32.000002,9.0940089 31.989013,9.1249995 31.983032,9.1580043 32.082033,9.9719996 31.626037,10.897003 30.751037,11.472991 29.607053,12.22702 28.189998,12.096008 27.584041,11.178009 26.980037,10.260009 27.418026,8.9060054 28.563045,8.1520076 29.403013,7.5969996 30.389036,7.5260005 31.093017,7.8870082L31.093017,3.5160067 23.344047,4.2320099 23.344047,9.365005C23.615043,10.24501 23.160026,11.335998 22.176992,11.984008 21.031027,12.736999 19.614002,12.606018 19.010029,11.688018 18.406023,10.772003 18.842029,9.4159999 19.986011,8.6610102 20.796011,8.1269984 21.738027,8.0470118 22.437002,8.365005L22.437002,3.7940066 22.437002,3.7880099 22.437002,1.2910005C22.437002,1.0240022,22.621999,0.80700694,22.850029,0.80700688z</PathGeometry>
                 </Button>
                 <Button
@@ -159,7 +159,7 @@
                     Margin="5"
                     Padding="4"
                     VerticalAlignment="Bottom"
-                    Style="{StaticResource button-path-stroke}">
+                    Style="{StaticResource Button-Path-Stroke}">
                     <PathGeometry>M7.7479932,17.727996L1.79001,18.589019C2.0199909,22.276,4.144993,24.328002,4.144993,24.328002L9.0480124,21.024993C9.0480124,21.024993 8.3200156,20.192993 8.0250012,19.526 7.6839978,18.765014 7.7479932,17.727996 7.7479932,17.727996z M13.596998,15.455017C14.611006,15.455017 15.432998,16.277008 15.432998,17.292999 15.432998,18.309021 14.611006,19.128997 13.596998,19.128997 12.579022,19.128997 11.760997,18.309021 11.760997,17.292999 11.760997,16.277008 12.579022,15.455017 13.596998,15.455017z M13.569013,12.593994C10.980998,12.593994 8.8870017,14.690002 8.8870017,17.277008 8.8870017,19.861999 10.980998,21.957 13.569013,21.957 16.153,21.957 18.247026,19.861999 18.247026,17.277008 18.247026,14.690002 16.153,12.593994 13.569013,12.593994z M13.553999,3.3870089C16.492996,3.3870087,19.206012,4.3310089,21.427023,5.9190063L21.427023,6.0870056C20.477009,6.1900024 19.491016,6.5700068 18.626024,7.2649989 16.587997,8.8950038 16.001022,11.540008 17.307024,13.17102 18.614,14.803009 21.322012,14.800994 23.358024,13.17102 24.395012,12.339996 25.051996,11.247009 25.278009,10.158004 26.437006,12.153991 27.110042,14.46701 27.110042,16.941009 27.110042,24.427001 21.042013,30.496 13.553999,30.496 6.0690062,30.496 0,24.427001 0,16.941009 0,9.4540095 6.0690062,3.3870087 13.553999,3.3870089z M31.587036,0C31.815002,1.2760393E-07,32.000002,0.21600354,32.000002,0.48300172L32.000002,2.6790011 32.000002,2.9860079 32.000002,9.0590052C32.000002,9.0940089 31.989013,9.1249995 31.983032,9.1580043 32.082033,9.9719996 31.626037,10.897003 30.751037,11.472991 29.607053,12.22702 28.189998,12.096008 27.584041,11.178009 26.980037,10.260009 27.418026,8.9060054 28.563045,8.1520076 29.403013,7.5969996 30.389036,7.5260005 31.093017,7.8870082L31.093017,3.5160067 23.344047,4.2320099 23.344047,9.365005C23.615043,10.24501 23.160026,11.335998 22.176992,11.984008 21.031027,12.736999 19.614002,12.606018 19.010029,11.688018 18.406023,10.772003 18.842029,9.4159999 19.986011,8.6610102 20.796011,8.1269984 21.738027,8.0470118 22.437002,8.365005L22.437002,3.7940066 22.437002,3.7880099 22.437002,1.2910005C22.437002,1.0240022,22.621999,0.80700694,22.850029,0.80700688z</PathGeometry>
                 </Button>
             </WrapPanel>
@@ -169,31 +169,31 @@
                     VerticalAlignment="Bottom"
                     Content="选择框-已选"
                     IsChecked="True"
-                    Style="{StaticResource checkbox}" />
+                    Style="{StaticResource CheckBox}" />
                 <CheckBox
                     Margin="5"
                     VerticalAlignment="Bottom"
                     Content="选择框-未选"
                     IsChecked="False"
-                    Style="{StaticResource checkbox}" />
+                    Style="{StaticResource CheckBox}" />
                 <CheckBox
                     Margin="5"
                     VerticalAlignment="Bottom"
                     Content="选择框-不确定"
                     IsChecked="{x:Null}"
                     IsThreeState="True"
-                    Style="{StaticResource checkbox}" />
+                    Style="{StaticResource CheckBox}" />
                 <RadioButton
                     Margin="5"
                     VerticalAlignment="Bottom"
                     Content="单选框-已选"
                     IsChecked="True"
-                    Style="{StaticResource radiobutton}" />
+                    Style="{StaticResource RadioButton}" />
                 <RadioButton
                     Margin="5"
                     VerticalAlignment="Bottom"
                     Content="单选框-未选"
-                    Style="{StaticResource radiobutton}" />
+                    Style="{StaticResource RadioButton}" />
             </WrapPanel>
             <WrapPanel Margin="0,10,0,0">
                 <ScrollViewer
@@ -201,7 +201,7 @@
                     Height="100"
                     Margin="5"
                     HorizontalScrollBarVisibility="Auto"
-                    Style="{StaticResource scrollviewer}">
+                    Style="{StaticResource ScrollViewer}">
                     <Border Width="400" Height="200" />
                 </ScrollViewer>
                 <ListBox
@@ -209,33 +209,33 @@
                     Height="100"
                     Margin="5"
                     ItemsSource="{StaticResource StringArray}"
-                    Style="{StaticResource listbox}" />
+                    Style="{StaticResource ListBox}" />
             </WrapPanel>
             <WrapPanel Margin="0,10,0,0">
                 <TextBox
                     Width="200"
                     Margin="5"
-                    Style="{StaticResource textbox}"
+                    Style="{StaticResource TextBox}"
                     Text="输入框" />
                 <ComboBox
                     Width="200"
                     Margin="5"
                     ItemsSource="{StaticResource StringArray}"
                     SelectedIndex="0"
-                    Style="{StaticResource combobox}" />
+                    Style="{StaticResource ComboBox}" />
                 <ComboBox
                     Width="200"
                     Margin="5"
                     IsEditable="True"
                     ItemsSource="{StaticResource StringArray}"
                     SelectedIndex="0"
-                    Style="{StaticResource combobox}" />
+                    Style="{StaticResource ComboBox}" />
             </WrapPanel>
             <WrapPanel Margin="0,10,0,0">
                 <TextBlock
                     Margin="5"
                     VerticalAlignment="Bottom"
-                    Style="{StaticResource textblock}"
+                    Style="{StaticResource TextBlock}"
                     Text="工具提示">
                     <TextBlock.ToolTip>
                         <ToolTip
@@ -248,14 +248,14 @@
                     Width="200"
                     Margin="5"
                     VerticalAlignment="Bottom"
-                    Style="{StaticResource progressbar}"
+                    Style="{StaticResource ProgressBar}"
                     Value="80" />
                 <ProgressBar
                     Width="200"
                     Margin="5"
                     VerticalAlignment="Bottom"
                     IsIndeterminate="True"
-                    Style="{StaticResource progressbar}" />
+                    Style="{StaticResource ProgressBar}" />
             </WrapPanel>
             <WrapPanel Margin="0,10,0,0">
                 <Menu
@@ -271,7 +271,7 @@
                                         Width="16"
                                         Height="16"
                                         Data="M7.7479932,17.727996L1.79001,18.589019C2.0199909,22.276,4.144993,24.328002,4.144993,24.328002L9.0480124,21.024993C9.0480124,21.024993 8.3200156,20.192993 8.0250012,19.526 7.6839978,18.765014 7.7479932,17.727996 7.7479932,17.727996z M13.596998,15.455017C14.611006,15.455017 15.432998,16.277008 15.432998,17.292999 15.432998,18.309021 14.611006,19.128997 13.596998,19.128997 12.579022,19.128997 11.760997,18.309021 11.760997,17.292999 11.760997,16.277008 12.579022,15.455017 13.596998,15.455017z M13.569013,12.593994C10.980998,12.593994 8.8870017,14.690002 8.8870017,17.277008 8.8870017,19.861999 10.980998,21.957 13.569013,21.957 16.153,21.957 18.247026,19.861999 18.247026,17.277008 18.247026,14.690002 16.153,12.593994 13.569013,12.593994z M13.553999,3.3870089C16.492996,3.3870087,19.206012,4.3310089,21.427023,5.9190063L21.427023,6.0870056C20.477009,6.1900024 19.491016,6.5700068 18.626024,7.2649989 16.587997,8.8950038 16.001022,11.540008 17.307024,13.17102 18.614,14.803009 21.322012,14.800994 23.358024,13.17102 24.395012,12.339996 25.051996,11.247009 25.278009,10.158004 26.437006,12.153991 27.110042,14.46701 27.110042,16.941009 27.110042,24.427001 21.042013,30.496 13.553999,30.496 6.0690062,30.496 0,24.427001 0,16.941009 0,9.4540095 6.0690062,3.3870087 13.553999,3.3870089z M31.587036,0C31.815002,1.2760393E-07,32.000002,0.21600354,32.000002,0.48300172L32.000002,2.6790011 32.000002,2.9860079 32.000002,9.0590052C32.000002,9.0940089 31.989013,9.1249995 31.983032,9.1580043 32.082033,9.9719996 31.626037,10.897003 30.751037,11.472991 29.607053,12.22702 28.189998,12.096008 27.584041,11.178009 26.980037,10.260009 27.418026,8.9060054 28.563045,8.1520076 29.403013,7.5969996 30.389036,7.5260005 31.093017,7.8870082L31.093017,3.5160067 23.344047,4.2320099 23.344047,9.365005C23.615043,10.24501 23.160026,11.335998 22.176992,11.984008 21.031027,12.736999 19.614002,12.606018 19.010029,11.688018 18.406023,10.772003 18.842029,9.4159999 19.986011,8.6610102 20.796011,8.1269984 21.738027,8.0470118 22.437002,8.365005L22.437002,3.7940066 22.437002,3.7880099 22.437002,1.2910005C22.437002,1.0240022,22.621999,0.80700694,22.850029,0.80700688z"
-                                        Fill="{StaticResource brush-text}"
+                                        Fill="{StaticResource Brush-Text}"
                                         Stretch="Uniform" />
                                 </MenuItem.Icon>
                             </MenuItem>
@@ -285,7 +285,7 @@
                                         Width="16"
                                         Height="16"
                                         Data="M7.7479932,17.727996L1.79001,18.589019C2.0199909,22.276,4.144993,24.328002,4.144993,24.328002L9.0480124,21.024993C9.0480124,21.024993 8.3200156,20.192993 8.0250012,19.526 7.6839978,18.765014 7.7479932,17.727996 7.7479932,17.727996z M13.596998,15.455017C14.611006,15.455017 15.432998,16.277008 15.432998,17.292999 15.432998,18.309021 14.611006,19.128997 13.596998,19.128997 12.579022,19.128997 11.760997,18.309021 11.760997,17.292999 11.760997,16.277008 12.579022,15.455017 13.596998,15.455017z M13.569013,12.593994C10.980998,12.593994 8.8870017,14.690002 8.8870017,17.277008 8.8870017,19.861999 10.980998,21.957 13.569013,21.957 16.153,21.957 18.247026,19.861999 18.247026,17.277008 18.247026,14.690002 16.153,12.593994 13.569013,12.593994z M13.553999,3.3870089C16.492996,3.3870087,19.206012,4.3310089,21.427023,5.9190063L21.427023,6.0870056C20.477009,6.1900024 19.491016,6.5700068 18.626024,7.2649989 16.587997,8.8950038 16.001022,11.540008 17.307024,13.17102 18.614,14.803009 21.322012,14.800994 23.358024,13.17102 24.395012,12.339996 25.051996,11.247009 25.278009,10.158004 26.437006,12.153991 27.110042,14.46701 27.110042,16.941009 27.110042,24.427001 21.042013,30.496 13.553999,30.496 6.0690062,30.496 0,24.427001 0,16.941009 0,9.4540095 6.0690062,3.3870087 13.553999,3.3870089z M31.587036,0C31.815002,1.2760393E-07,32.000002,0.21600354,32.000002,0.48300172L32.000002,2.6790011 32.000002,2.9860079 32.000002,9.0590052C32.000002,9.0940089 31.989013,9.1249995 31.983032,9.1580043 32.082033,9.9719996 31.626037,10.897003 30.751037,11.472991 29.607053,12.22702 28.189998,12.096008 27.584041,11.178009 26.980037,10.260009 27.418026,8.9060054 28.563045,8.1520076 29.403013,7.5969996 30.389036,7.5260005 31.093017,7.8870082L31.093017,3.5160067 23.344047,4.2320099 23.344047,9.365005C23.615043,10.24501 23.160026,11.335998 22.176992,11.984008 21.031027,12.736999 19.614002,12.606018 19.010029,11.688018 18.406023,10.772003 18.842029,9.4159999 19.986011,8.6610102 20.796011,8.1269984 21.738027,8.0470118 22.437002,8.365005L22.437002,3.7940066 22.437002,3.7880099 22.437002,1.2910005C22.437002,1.0240022,22.621999,0.80700694,22.850029,0.80700688z"
-                                        Fill="{StaticResource brush-text}"
+                                        Fill="{StaticResource Brush-Text}"
                                         Stretch="Uniform" />
                                 </MenuItem.Icon>
                             </MenuItem>
@@ -306,8 +306,8 @@
                     Width="100"
                     Margin="5"
                     VerticalAlignment="Bottom"
-                    Background="{StaticResource brush-panel-bg}"
-                    BorderBrush="{StaticResource brush-panel-bd}"
+                    Background="{StaticResource Brush-Panel-BG}"
+                    BorderBrush="{StaticResource Brush-Panel-BD}"
                     BorderThickness="1">
                     <Border.ContextMenu>
                         <ContextMenu>
@@ -320,7 +320,7 @@
                             </MenuItem>
                         </ContextMenu>
                     </Border.ContextMenu>
-                    <TextBlock Style="{StaticResource textblock}" Text="右键菜单" />
+                    <TextBlock Style="{StaticResource TextBlock}" Text="右键菜单" />
                 </Border>
             </WrapPanel>
             <DataGrid
@@ -330,24 +330,41 @@
                 Margin="5,10,0,0"
                 HorizontalAlignment="Left" />
             <StackPanel Orientation="Horizontal">
-                <Expander Width="100" ExpandDirection="Down">
-                    <Border Background="{StaticResource brush-control-bg}" Height="100">
-                        <TextBlock Style="{StaticResource textblock}" Text="内容测试" />
+                <Expander
+                    Width="150"
+                    HorizontalContentAlignment="Center"
+                    ExpandDirection="Down"
+                    Header="展开或关闭">
+                    <Border Height="100" Background="{StaticResource Brush-Control-BG}">
+                        <TextBlock Style="{StaticResource TextBlock}" Text="内容测试" />
                     </Border>
                 </Expander>
-                <Expander Width="100" Margin="5,0,0,0" ExpandDirection="Up">
-                    <Border Background="{StaticResource brush-control-bg}" Height="100">
-                        <TextBlock Style="{StaticResource textblock}" Text="内容测试" />
+                <Expander
+                    Width="150"
+                    Margin="5,0,0,0"
+                    ExpandDirection="Up"
+                    Header="展开或关闭">
+                    <Border Height="100" Background="{StaticResource Brush-Control-BG}">
+                        <TextBlock Style="{StaticResource TextBlock}" Text="内容测试" />
                     </Border>
                 </Expander>
-                <Expander Height="100" Margin="5,0,0,0" ExpandDirection="Left">
-                    <Border Background="{StaticResource brush-control-bg}" Width="100" >
-                        <TextBlock Style="{StaticResource textblock}" Text="内容测试" />
+                <Expander
+                    Height="150"
+                    Margin="5,0,0,0"
+                    ExpandDirection="Left"
+                    Header="展开或关闭">
+                    <Border Width="100" Background="{StaticResource Brush-Control-BG}">
+                        <TextBlock Style="{StaticResource TextBlock}" Text="内容测试" />
                     </Border>
                 </Expander>
-                <Expander Height="100"  Margin="5,0,0,0" ExpandDirection="Right">
-                    <Border Background="{StaticResource brush-control-bg}" Width="100">
-                        <TextBlock Style="{StaticResource textblock}" Text="内容测试" />
+                <Expander
+                    Height="150"
+                    Margin="5,0,0,0"
+                    VerticalContentAlignment="Center"
+                    ExpandDirection="Right"
+                    Header="展开或关闭">
+                    <Border Width="100" Background="{StaticResource Brush-Control-BG}">
+                        <TextBlock Style="{StaticResource TextBlock}" Text="内容测试" />
                     </Border>
                 </Expander>
             </StackPanel>

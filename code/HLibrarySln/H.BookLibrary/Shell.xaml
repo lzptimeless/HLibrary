@@ -9,7 +9,7 @@
     Title="Shell"
     Width="1082"
     Height="700"
-    Style="{StaticResource window-shell}"
+    Style="{StaticResource Window-Shell}"
     mc:Ignorable="d">
     <Grid>
         <!--<Grid.RowDefinitions>

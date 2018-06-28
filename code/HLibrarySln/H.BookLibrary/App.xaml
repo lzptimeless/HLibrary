@@ -1,16 +1,16 @@
-﻿<Application x:Class="H.BookLibrary.App"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:H.BookLibrary"
-             xmlns:cvt="clr-namespace:H.BookLibrary.Converters"
-             StartupUri="Shell.xaml">
+﻿<Application
+    x:Class="H.BookLibrary.App"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:cvt="clr-namespace:H.BookLibrary.Converters"
+    xmlns:local="clr-namespace:H.BookLibrary"
+    StartupUri="Shell.xaml">
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="/Themes/Generic.xaml"/>
+                <ResourceDictionary Source="/Themes/Generic.xaml" />
             </ResourceDictionary.MergedDictionaries>
-            
-            <cvt:ArrayToTextConverter x:Key="converter-arrary-to-text"/>
+            <cvt:ArrayToTextConverter x:Key="converter-arrary-to-text" />
         </ResourceDictionary>
     </Application.Resources>
 </Application>

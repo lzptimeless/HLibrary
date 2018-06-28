@@ -6,176 +6,177 @@
     xmlns:sys="clr-namespace:System;assembly=mscorlib">
     <!--  公共颜色-开始  -->
     <!--  主色  -->
-    <Color x:Key="color-main">#000000</Color>
-    <SolidColorBrush x:Key="brush-main" Color="{StaticResource color-main}" />
+    <Color x:Key="Color-Main">#000000</Color>
+    <SolidColorBrush x:Key="Brush-Main" Color="{StaticResource Color-Main}" />
 
     <!--  强调色  -->
-    <Color x:Key="color-accent">#ED242C</Color>
-    <Color x:Key="color-accent-light">#ED575D</Color>
-    <Color x:Key="color-accent-deep">#C82129</Color>
-    <SolidColorBrush x:Key="brush-accent" Color="{StaticResource color-accent}" />
-    <SolidColorBrush x:Key="brush-accent-light" Color="{StaticResource color-accent-light}" />
-    <SolidColorBrush x:Key="brush-accent-deep" Color="{StaticResource color-accent-deep}" />
+    <Color x:Key="Color-Accent">#ED242C</Color>
+    <Color x:Key="Color-Accent-Light">#ED575D</Color>
+    <Color x:Key="Color-Accent-Deep">#C82129</Color>
+    <SolidColorBrush x:Key="Brush-Accent" Color="{StaticResource Color-Accent}" />
+    <SolidColorBrush x:Key="Brush-Accent-Light" Color="{StaticResource Color-Accent-Light}" />
+    <SolidColorBrush x:Key="Brush-Accent-Deep" Color="{StaticResource Color-Accent-Deep}" />
 
     <!--  透明色，作为渐变色的节点时会用到  -->
-    <Color x:Key="color-transparent">#00000000</Color>
-    <SolidColorBrush x:Key="brush-transparent" Color="{StaticResource color-transparent}" />
+    <Color x:Key="Color-Transparent">#00000000</Color>
+    <SolidColorBrush x:Key="Brush-Transparent" Color="{StaticResource Color-Transparent}" />
 
     <!--  文本色  -->
-    <Color x:Key="color-text">#E6E6E6</Color>
+    <Color x:Key="Color-Text">#E6E6E6</Color>
     <!--  用于disable状态，次要文字  -->
-    <Color x:Key="color-text-weak">#ABABAB</Color>
+    <Color x:Key="Color-Text-Weak">#ABABAB</Color>
     <!--  用于标题，强调文字  -->
-    <Color x:Key="color-text-highlight">#FFFFFF</Color>
+    <Color x:Key="Color-Text-Highlight">#FFFFFF</Color>
     <!--  文字选择背景色  -->
-    <Color x:Key="color-text-selection">#90FFFFFF</Color>
+    <Color x:Key="Color-Text-Selection">#90FFFFFF</Color>
     <!--  文字光标  -->
-    <Color x:Key="color-text-caret">#FFFFFF</Color>
+    <Color x:Key="Color-Text-Caret">#FFFFFF</Color>
     <!--  有深色背景的文本色  -->
-    <Color x:Key="color-text-fg">#E6E6E6</Color>
+    <Color x:Key="Color-Text-FG">#E6E6E6</Color>
     <!--  有深色背景的，用于disable状态，次要文字  -->
-    <Color x:Key="color-text-weak-fg">#ABABAB</Color>
+    <Color x:Key="Color-Text-Weak-FG">#ABABAB</Color>
     <!--  有深色背景的，用于标题，强调文字  -->
-    <Color x:Key="color-text-highlight-fg">#FFFFFF</Color>
+    <Color x:Key="Color-Text-Highlight-FG">#FFFFFF</Color>
     <!--  有深色背景的，文字选择背景色  -->
-    <Color x:Key="color-text-selection-fg">#90FFFFFF</Color>
+    <Color x:Key="Color-Text-Selection-FG">#90FFFFFF</Color>
     <!--  有深色背景的，文字光标  -->
-    <Color x:Key="color-text-caret-fg">#FFFFFF</Color>
-    <SolidColorBrush x:Key="brush-text" Color="{StaticResource color-text}" />
-    <SolidColorBrush x:Key="brush-text-weak" Color="{StaticResource color-text-weak}" />
-    <SolidColorBrush x:Key="brush-text-highlight" Color="{StaticResource color-text-highlight}" />
-    <SolidColorBrush x:Key="brush-text-selection" Color="{StaticResource color-text-selection}" />
-    <SolidColorBrush x:Key="brush-text-caret" Color="{StaticResource color-text-caret}" />
-    <SolidColorBrush x:Key="brush-text-fg" Color="{StaticResource color-text-fg}" />
-    <SolidColorBrush x:Key="brush-text-weak-fg" Color="{StaticResource color-text-weak-fg}" />
-    <SolidColorBrush x:Key="brush-text-highlight-fg" Color="{StaticResource color-text-highlight-fg}" />
-    <SolidColorBrush x:Key="brush-text-selection-fg" Color="{StaticResource color-text-selection-fg}" />
-    <SolidColorBrush x:Key="brush-text-caret-fg" Color="{StaticResource color-text-caret-fg}" />
+    <Color x:Key="Color-Text-Caret-FG">#FFFFFF</Color>
+    <SolidColorBrush x:Key="Brush-Text" Color="{StaticResource Color-Text}" />
+    <SolidColorBrush x:Key="Brush-Text-Weak" Color="{StaticResource Color-Text-Weak}" />
+    <SolidColorBrush x:Key="Brush-Text-Highlight" Color="{StaticResource Color-Text-Highlight}" />
+    <SolidColorBrush x:Key="Brush-Text-Selection" Color="{StaticResource Color-Text-Selection}" />
+    <SolidColorBrush x:Key="Brush-Text-Caret" Color="{StaticResource Color-Text-Caret}" />
+    <SolidColorBrush x:Key="Brush-Text-FG" Color="{StaticResource Color-Text-FG}" />
+    <SolidColorBrush x:Key="Brush-Text-Weak-FG" Color="{StaticResource Color-Text-Weak-FG}" />
+    <SolidColorBrush x:Key="Brush-Text-Highlight-FG" Color="{StaticResource Color-Text-Highlight-FG}" />
+    <SolidColorBrush x:Key="Brush-Text-Selection-FG" Color="{StaticResource Color-Text-Selection-FG}" />
+    <SolidColorBrush x:Key="Brush-Text-Caret-FG" Color="{StaticResource Color-Text-Caret-FG}" />
 
     <!--  通用控件色  -->
-    <Color x:Key="color-control-fg">#E6E6E6</Color>
-    <Color x:Key="color-control-bd">#40FFFFFF</Color>
-    <Color x:Key="color-control-bg">#20FFFFFF</Color>
-    <Color x:Key="color-control-hover-fg">#E6E6E6</Color>
-    <Color x:Key="color-control-hover-bd">#60FFFFFF</Color>
-    <Color x:Key="color-control-hover-bg">#20FFFFFF</Color>
-    <Color x:Key="color-control-press-fg">#E6E6E6</Color>
-    <Color x:Key="color-control-press-bd">#60FFFFFF</Color>
-    <Color x:Key="color-control-press-bg">#30FFFFFF</Color>
-    <Color x:Key="color-control-select-fg">#E6E6E6</Color>
-    <Color x:Key="color-control-select-bd">#20FFFFFF</Color>
-    <Color x:Key="color-control-select-bg">#20FFFFFF</Color>
-    <Color x:Key="color-control-disable-fg">#ABABAB</Color>
-    <Color x:Key="color-control-disable-bd">#00000000</Color>
-    <Color x:Key="color-control-disable-bg">#00000000</Color>
-    <SolidColorBrush x:Key="brush-control-fg" Color="{StaticResource color-control-fg}" />
-    <SolidColorBrush x:Key="brush-control-bd" Color="{StaticResource color-control-bd}" />
-    <SolidColorBrush x:Key="brush-control-bg" Color="{StaticResource color-control-bg}" />
-    <SolidColorBrush x:Key="brush-control-hover-fg" Color="{StaticResource color-control-hover-fg}" />
-    <SolidColorBrush x:Key="brush-control-hover-bd" Color="{StaticResource color-control-hover-bd}" />
-    <SolidColorBrush x:Key="brush-control-hover-bg" Color="{StaticResource color-control-hover-bg}" />
-    <SolidColorBrush x:Key="brush-control-press-fg" Color="{StaticResource color-control-press-fg}" />
-    <SolidColorBrush x:Key="brush-control-press-bd" Color="{StaticResource color-control-press-bd}" />
-    <SolidColorBrush x:Key="brush-control-press-bg" Color="{StaticResource color-control-press-bg}" />
-    <SolidColorBrush x:Key="brush-control-select-fg" Color="{StaticResource color-control-select-fg}" />
-    <SolidColorBrush x:Key="brush-control-select-bd" Color="{StaticResource color-control-select-bd}" />
-    <SolidColorBrush x:Key="brush-control-select-bg" Color="{StaticResource color-control-select-bg}" />
-    <SolidColorBrush x:Key="brush-control-disable-fg" Color="{StaticResource color-control-disable-fg}" />
-    <SolidColorBrush x:Key="brush-control-disable-bd" Color="{StaticResource color-control-disable-bd}" />
-    <SolidColorBrush x:Key="brush-control-disable-bg" Color="{StaticResource color-control-disable-bg}" />
-    <SolidColorBrush x:Key="brush-control-highlight-fg" Color="{StaticResource color-text-fg}" />
-    <SolidColorBrush x:Key="brush-control-highlight-bd" Color="{StaticResource color-accent-deep}" />
-    <SolidColorBrush x:Key="brush-control-highlight-bg" Color="{StaticResource color-accent}" />
-    <SolidColorBrush x:Key="brush-control-highlight-hover-fg" Color="{StaticResource color-text-fg}" />
-    <SolidColorBrush x:Key="brush-control-highlight-hover-bd" Color="{StaticResource color-accent-deep}" />
-    <SolidColorBrush x:Key="brush-control-highlight-hover-bg" Color="{StaticResource color-accent-light}" />
-    <SolidColorBrush x:Key="brush-control-highlight-press-fg" Color="{StaticResource color-text-fg}" />
-    <SolidColorBrush x:Key="brush-control-highlight-press-bd" Color="{StaticResource color-accent-deep}" />
-    <SolidColorBrush x:Key="brush-control-highlight-press-bg" Color="{StaticResource color-accent}" />
-    <SolidColorBrush x:Key="brush-control-highlight-disable-fg" Color="{StaticResource color-control-disable-fg}" />
-    <SolidColorBrush x:Key="brush-control-highlight-disable-bd" Color="{StaticResource color-control-disable-bd}" />
-    <SolidColorBrush x:Key="brush-control-highlight-disable-bg" Color="{StaticResource color-control-disable-bg}" />
+    <Color x:Key="Color-Control-FG">#E6E6E6</Color>
+    <Color x:Key="Color-Control-BD">#40FFFFFF</Color>
+    <Color x:Key="Color-Control-BG">#20FFFFFF</Color>
+    <Color x:Key="Color-Control-Hover-FG">#E6E6E6</Color>
+    <Color x:Key="Color-Control-Hover-BD">#60FFFFFF</Color>
+    <Color x:Key="Color-Control-Hover-BG">#20FFFFFF</Color>
+    <Color x:Key="Color-Control-Press-FG">#E6E6E6</Color>
+    <Color x:Key="Color-Control-Press-BD">#60FFFFFF</Color>
+    <Color x:Key="Color-Control-Press-BG">#30FFFFFF</Color>
+    <Color x:Key="Color-Control-Select-FG">#E6E6E6</Color>
+    <Color x:Key="Color-Control-Select-BD">#20FFFFFF</Color>
+    <Color x:Key="Color-Control-Select-BG">#20FFFFFF</Color>
+    <Color x:Key="Color-Control-Disable-FG">#ABABAB</Color>
+    <Color x:Key="Color-Control-Disable-BD">#00000000</Color>
+    <Color x:Key="Color-Control-Disable-BG">#00000000</Color>
+    <SolidColorBrush x:Key="Brush-Control-FG" Color="{StaticResource Color-Control-FG}" />
+    <SolidColorBrush x:Key="Brush-Control-BD" Color="{StaticResource Color-Control-BD}" />
+    <SolidColorBrush x:Key="Brush-Control-BG" Color="{StaticResource Color-Control-BG}" />
+    <SolidColorBrush x:Key="Brush-Control-Hover-FG" Color="{StaticResource Color-Control-Hover-FG}" />
+    <SolidColorBrush x:Key="Brush-Control-Hover-BD" Color="{StaticResource Color-Control-Hover-BD}" />
+    <SolidColorBrush x:Key="Brush-Control-Hover-BG" Color="{StaticResource Color-Control-Hover-BG}" />
+    <SolidColorBrush x:Key="Brush-Control-Press-FG" Color="{StaticResource Color-Control-Press-FG}" />
+    <SolidColorBrush x:Key="Brush-Control-Press-BD" Color="{StaticResource Color-Control-Press-BD}" />
+    <SolidColorBrush x:Key="Brush-Control-Press-BG" Color="{StaticResource Color-Control-Press-BG}" />
+    <SolidColorBrush x:Key="Brush-Control-Select-FG" Color="{StaticResource Color-Control-Select-FG}" />
+    <SolidColorBrush x:Key="Brush-Control-Select-BD" Color="{StaticResource Color-Control-Select-BD}" />
+    <SolidColorBrush x:Key="Brush-Control-Select-BG" Color="{StaticResource Color-Control-Select-BG}" />
+    <SolidColorBrush x:Key="Brush-Control-Disable-FG" Color="{StaticResource Color-Control-Disable-FG}" />
+    <SolidColorBrush x:Key="Brush-Control-Disable-BD" Color="{StaticResource Color-Control-Disable-BD}" />
+    <SolidColorBrush x:Key="Brush-Control-Disable-BG" Color="{StaticResource Color-Control-Disable-BG}" />
+    <SolidColorBrush x:Key="Brush-Control-Highlight-FG" Color="{StaticResource Color-Text-FG}" />
+    <SolidColorBrush x:Key="Brush-Control-Highlight-BD" Color="{StaticResource Color-Accent-Deep}" />
+    <SolidColorBrush x:Key="Brush-Control-Highlight-BG" Color="{StaticResource Color-Accent}" />
+    <SolidColorBrush x:Key="Brush-Control-Highlight-Hover-FG" Color="{StaticResource Color-Text-FG}" />
+    <SolidColorBrush x:Key="Brush-Control-Highlight-Hover-BD" Color="{StaticResource Color-Accent-Deep}" />
+    <SolidColorBrush x:Key="Brush-Control-Highlight-Hover-BG" Color="{StaticResource Color-Accent-Light}" />
+    <SolidColorBrush x:Key="Brush-Control-Highlight-Press-FG" Color="{StaticResource Color-Text-FG}" />
+    <SolidColorBrush x:Key="Brush-Control-Highlight-Press-BD" Color="{StaticResource Color-Accent-Deep}" />
+    <SolidColorBrush x:Key="Brush-Control-Highlight-Press-BG" Color="{StaticResource Color-Accent}" />
+    <SolidColorBrush x:Key="Brush-Control-Highlight-Disable-FG" Color="{StaticResource Color-Control-Disable-FG}" />
+    <SolidColorBrush x:Key="Brush-Control-Highlight-Disable-BD" Color="{StaticResource Color-Control-Disable-BD}" />
+    <SolidColorBrush x:Key="Brush-Control-Highlight-Disable-BG" Color="{StaticResource Color-Control-Disable-BG}" />
 
     <!--  通用容器色  -->
-    <Color x:Key="color-panel-bd">#3A3A3A</Color>
-    <Color x:Key="color-panel-bg">#1E1E1E</Color>
-    <Color x:Key="color-panel-alternate-bd">#4A4A4A</Color>
-    <Color x:Key="color-panel-alternate-bg">#2E2E2E</Color>
-    <Color x:Key="color-panel-hover-bd">#60FFFFFF</Color>
-    <Color x:Key="color-panel-hover-bg">#20FFFFFF</Color>
-    <Color x:Key="color-panel-select-bd">#20FFFFFF</Color>
-    <Color x:Key="color-panel-select-bg">#20FFFFFF</Color>
-    <Color x:Key="color-panel-disable-bd">#00000000</Color>
-    <Color x:Key="color-panel-disable-bg">#00000000</Color>
-    <SolidColorBrush x:Key="brush-panel-bd" Color="{StaticResource color-panel-bd}" />
-    <SolidColorBrush x:Key="brush-panel-bg" Color="{StaticResource color-panel-bg}" />
-    <SolidColorBrush x:Key="brush-panel-alternate-bd" Color="{StaticResource color-panel-alternate-bd}" />
-    <SolidColorBrush x:Key="brush-panel-alternate-bg" Color="{StaticResource color-panel-alternate-bg}" />
-    <SolidColorBrush x:Key="brush-panel-hover-bd" Color="{StaticResource color-panel-hover-bd}" />
-    <SolidColorBrush x:Key="brush-panel-hover-bg" Color="{StaticResource color-panel-hover-bg}" />
-    <SolidColorBrush x:Key="brush-panel-select-bd" Color="{StaticResource color-panel-select-bd}" />
-    <SolidColorBrush x:Key="brush-panel-select-bg" Color="{StaticResource color-panel-select-bg}" />
-    <SolidColorBrush x:Key="brush-panel-disable-bd" Color="{StaticResource color-panel-disable-bd}" />
-    <SolidColorBrush x:Key="brush-panel-disable-bg" Color="{StaticResource color-panel-disable-bg}" />
-    <SolidColorBrush x:Key="brush-panel-highlight-bd" Color="{StaticResource color-accent-deep}" />
-    <SolidColorBrush x:Key="brush-panel-highlight-bg" Color="{StaticResource color-accent}" />
+    <Color x:Key="Color-Panel-BD">#3A3A3A</Color>
+    <Color x:Key="Color-Panel-BG">#1E1E1E</Color>
+    <Color x:Key="Color-Panel-Alternate-BD">#4A4A4A</Color>
+    <Color x:Key="Color-Panel-Alternate-BG">#2E2E2E</Color>
+    <Color x:Key="Color-Panel-Hover-BD">#60FFFFFF</Color>
+    <Color x:Key="Color-Panel-Hover-BG">#20FFFFFF</Color>
+    <Color x:Key="Color-Panel-Select-BD">#20FFFFFF</Color>
+    <Color x:Key="Color-Panel-Select-BG">#20FFFFFF</Color>
+    <Color x:Key="Color-Panel-Disable-BD">#00000000</Color>
+    <Color x:Key="Color-Panel-Disable-BG">#00000000</Color>
+    <SolidColorBrush x:Key="Brush-Panel-BD" Color="{StaticResource Color-Panel-BD}" />
+    <SolidColorBrush x:Key="Brush-Panel-BG" Color="{StaticResource Color-Panel-BG}" />
+    <SolidColorBrush x:Key="Brush-Panel-Alternate-BD" Color="{StaticResource Color-Panel-Alternate-BD}" />
+    <SolidColorBrush x:Key="Brush-Panel-Alternate-BG" Color="{StaticResource Color-Panel-Alternate-BG}" />
+    <SolidColorBrush x:Key="Brush-Panel-Hover-BD" Color="{StaticResource Color-Panel-Hover-BD}" />
+    <SolidColorBrush x:Key="Brush-Panel-Hover-BG" Color="{StaticResource Color-Panel-Hover-BG}" />
+    <SolidColorBrush x:Key="Brush-Panel-Select-BD" Color="{StaticResource Color-Panel-Select-BD}" />
+    <SolidColorBrush x:Key="Brush-Panel-Select-BG" Color="{StaticResource Color-Panel-Select-BG}" />
+    <SolidColorBrush x:Key="Brush-Panel-Disable-BD" Color="{StaticResource Color-Panel-Disable-BD}" />
+    <SolidColorBrush x:Key="Brush-Panel-Disable-BG" Color="{StaticResource Color-Panel-Disable-BG}" />
+    <SolidColorBrush x:Key="Brush-Panel-Highlight-BD" Color="{StaticResource Color-Accent-Deep}" />
+    <SolidColorBrush x:Key="Brush-Panel-Highlight-BG" Color="{StaticResource Color-Accent}" />
 
     <!--  弹出层颜色  -->
-    <Color x:Key="color-popup-bd">#3A3A3A</Color>
-    <Color x:Key="color-popup-bg">#101010</Color>
-    <SolidColorBrush x:Key="brush-popup-bd" Color="{StaticResource color-popup-bd}" />
-    <SolidColorBrush x:Key="brush-popup-bg" Color="{StaticResource color-popup-bg}" />
+    <Color x:Key="Color-Popup-BD">#3A3A3A</Color>
+    <Color x:Key="Color-Popup-BG">#101010</Color>
+    <SolidColorBrush x:Key="Brush-Popup-BD" Color="{StaticResource Color-Popup-BD}" />
+    <SolidColorBrush x:Key="Brush-Popup-BG" Color="{StaticResource Color-Popup-BG}" />
 
     <!--  窗口色  -->
-    <Color x:Key="color-window-bd">#3A3A3A</Color>
-    <Color x:Key="color-window-bg">#1E1E1E</Color>
-    <SolidColorBrush x:Key="brush-window-bd" Color="{StaticResource color-window-bd}" />
-    <SolidColorBrush x:Key="brush-window-bg" Color="{StaticResource color-window-bg}" />
+    <Color x:Key="Color-Window-BD">#3A3A3A</Color>
+    <Color x:Key="Color-Window-BG">#1E1E1E</Color>
+    <SolidColorBrush x:Key="Brush-Window-BD" Color="{StaticResource Color-Window-BD}" />
+    <SolidColorBrush x:Key="Brush-Window-BG" Color="{StaticResource Color-Window-BG}" />
+
     <!--  公共颜色-结束  -->
 
     <!--  用到的图标  -->
-    <PathGeometry x:Key="icon-cut">M13.876871,20.849818L11.666832,26.864772C11.569847,27.307759 11.592857,27.772721 11.786828,28.044751 12.000819,28.357736 12.502837,28.477731 13.093845,28.357736 14.175884,28.13374 15.609856,27.055749 16.073909,24.76378 16.342893,23.460754 16.255856,22.476817 15.809869,21.840776L15.809869,21.841813C15.33489,21.166833,14.490889,20.935817,13.876871,20.849818z M6.0755872,11.797367C4.3400048,11.816226 3.1917004,12.630284 2.699784,13.42088 2.1037709,14.379855 2.4807879,15.137842 3.7377557,15.283898L10.001841,15.28988C10.147839,14.683868 10.217847,13.812905 9.743844,13.139877 9.3068284,12.500907 8.4128398,12.077877 7.099781,11.8739 6.7385358,11.817653 6.3969917,11.793875 6.0755872,11.797367z M20.679902,0L15.572868,15.597859 15.570854,15.598836 31.999995,16.258864 27.931971,19.085799 19.303914,19.521831 15.895868,18.065852 14.77385,18.031856 14.630844,18.481862C15.680901,18.68584 16.974856,19.185836 17.837899,20.425813 18.687882,21.639789 18.907916,23.263795 18.50392,25.253764 17.790902,28.734746 15.359854,30.325734 13.54386,30.701707 11.962855,31.027692 10.437819,30.438708 9.6458205,29.304748 9.2578172,28.746709 9.2778367,26.259736 9.3058519,26.152741L10.012828,24.244803 12.126858,17.98083 5.7267846,17.807859 3.6637806,17.857846C3.4997777,17.838864 1.0257599,16.92884 0.64575182,16.381848 -0.15027454,15.241845 -0.25824655,13.478864 0.59173577,12.108883 1.5807567,10.531934 3.9707896,8.8849173 7.4747838,9.4249507 9.4858464,9.730917 10.931841,10.510938 11.775842,11.720886 12.661835,12.987902 12.661835,14.413851 12.477874,15.471885L12.935884,15.494895 13.30985,14.367892 13.173862,10.714915 16.613891,2.8279734z</PathGeometry>
-    <PathGeometry x:Key="icon-copy">M12,8L12,30 28,30 28,14 22,14 22,8z M10,6L24,6 24,8 26,8 26,10 24,10 24,12 26,12 26,10 28,10 28,12 30,12 30,32 10,32z M0,0L10,0 10,2 12,2 12,4 8,4 8,2 2,2 2,20 8,20 8,22 0,22z</PathGeometry>
-    <PathGeometry x:Key="icon-paste">M15.780046,21.209021L23.000044,28.471234 23.000044,22.999996 25.000044,22.999996 25.000044,31.999996 16.000044,31.999996 16.000044,29.999996 21.700115,29.999996 14.362039,22.619015z M12.416057,1.9139996C11.419057,1.9139996,10.607057,2.6970005,10.607057,3.6590004L10.607057,4.6159992 6.8670568,4.6159992 6.8670568,8.0860004 17.966058,8.0860004 17.966058,4.6159992 14.224057,4.6159992 14.224057,3.6590004C14.224057,2.6970005,13.413057,1.9139996,12.416057,1.9139996z M12.416057,0C14.172057,0,15.653057,1.1469994,16.093057,2.7019997L19.966057,2.7019997 19.966057,3.9999828 25.000044,3.9999828 25.000044,10.99998 25.000044,19.845975 23.000063,17.845976 23.000063,10.99998 23.000063,5.9999828 19.966057,5.9999828 19.966057,10 4.8670559,10 4.8670559,5.9999828 2.0000067,5.9999828 2.0000067,29.999983 10.929038,29.999983 12.929045,31.999983 0,31.999983 0,3.9999828 4.8670559,3.9999828 4.8670559,2.7019997 8.7390566,2.7019997C9.1790566,1.1469994,10.660057,0,12.416057,0z</PathGeometry>
-    <PathGeometry x:Key="icon-downarrow-mini">M0,0 L3.5,3 L7,0</PathGeometry>
-    <PathGeometry x:Key="icon-uparrow-mini">M0,3 L3.5,0 L7,3</PathGeometry>
-    <PathGeometry x:Key="icon-rightarrow-mini">M0,0 L3,3.5 L0,7</PathGeometry>
-    <PathGeometry x:Key="icon-leftarrow-mini">M3,0 L0,3.5 L3,7</PathGeometry>
+    <PathGeometry x:Key="Icon-Cut">M13.876871,20.849818L11.666832,26.864772C11.569847,27.307759 11.592857,27.772721 11.786828,28.044751 12.000819,28.357736 12.502837,28.477731 13.093845,28.357736 14.175884,28.13374 15.609856,27.055749 16.073909,24.76378 16.342893,23.460754 16.255856,22.476817 15.809869,21.840776L15.809869,21.841813C15.33489,21.166833,14.490889,20.935817,13.876871,20.849818z M6.0755872,11.797367C4.3400048,11.816226 3.1917004,12.630284 2.699784,13.42088 2.1037709,14.379855 2.4807879,15.137842 3.7377557,15.283898L10.001841,15.28988C10.147839,14.683868 10.217847,13.812905 9.743844,13.139877 9.3068284,12.500907 8.4128398,12.077877 7.099781,11.8739 6.7385358,11.817653 6.3969917,11.793875 6.0755872,11.797367z M20.679902,0L15.572868,15.597859 15.570854,15.598836 31.999995,16.258864 27.931971,19.085799 19.303914,19.521831 15.895868,18.065852 14.77385,18.031856 14.630844,18.481862C15.680901,18.68584 16.974856,19.185836 17.837899,20.425813 18.687882,21.639789 18.907916,23.263795 18.50392,25.253764 17.790902,28.734746 15.359854,30.325734 13.54386,30.701707 11.962855,31.027692 10.437819,30.438708 9.6458205,29.304748 9.2578172,28.746709 9.2778367,26.259736 9.3058519,26.152741L10.012828,24.244803 12.126858,17.98083 5.7267846,17.807859 3.6637806,17.857846C3.4997777,17.838864 1.0257599,16.92884 0.64575182,16.381848 -0.15027454,15.241845 -0.25824655,13.478864 0.59173577,12.108883 1.5807567,10.531934 3.9707896,8.8849173 7.4747838,9.4249507 9.4858464,9.730917 10.931841,10.510938 11.775842,11.720886 12.661835,12.987902 12.661835,14.413851 12.477874,15.471885L12.935884,15.494895 13.30985,14.367892 13.173862,10.714915 16.613891,2.8279734z</PathGeometry>
+    <PathGeometry x:Key="Icon-Copy">M12,8L12,30 28,30 28,14 22,14 22,8z M10,6L24,6 24,8 26,8 26,10 24,10 24,12 26,12 26,10 28,10 28,12 30,12 30,32 10,32z M0,0L10,0 10,2 12,2 12,4 8,4 8,2 2,2 2,20 8,20 8,22 0,22z</PathGeometry>
+    <PathGeometry x:Key="Icon-Paste">M15.780046,21.209021L23.000044,28.471234 23.000044,22.999996 25.000044,22.999996 25.000044,31.999996 16.000044,31.999996 16.000044,29.999996 21.700115,29.999996 14.362039,22.619015z M12.416057,1.9139996C11.419057,1.9139996,10.607057,2.6970005,10.607057,3.6590004L10.607057,4.6159992 6.8670568,4.6159992 6.8670568,8.0860004 17.966058,8.0860004 17.966058,4.6159992 14.224057,4.6159992 14.224057,3.6590004C14.224057,2.6970005,13.413057,1.9139996,12.416057,1.9139996z M12.416057,0C14.172057,0,15.653057,1.1469994,16.093057,2.7019997L19.966057,2.7019997 19.966057,3.9999828 25.000044,3.9999828 25.000044,10.99998 25.000044,19.845975 23.000063,17.845976 23.000063,10.99998 23.000063,5.9999828 19.966057,5.9999828 19.966057,10 4.8670559,10 4.8670559,5.9999828 2.0000067,5.9999828 2.0000067,29.999983 10.929038,29.999983 12.929045,31.999983 0,31.999983 0,3.9999828 4.8670559,3.9999828 4.8670559,2.7019997 8.7390566,2.7019997C9.1790566,1.1469994,10.660057,0,12.416057,0z</PathGeometry>
+    <PathGeometry x:Key="Icon-DownArrow-Mini">M0,0 L3.5,3 L7,0</PathGeometry>
+    <PathGeometry x:Key="Icon-UpArrow-Mini">M0,3 L3.5,0 L7,3</PathGeometry>
+    <PathGeometry x:Key="Icon-RightArrow-Mini">M0,0 L3,3.5 L0,7</PathGeometry>
+    <PathGeometry x:Key="Icon-LeftArrow-Mini">M3,0 L0,3.5 L3,7</PathGeometry>
 
     <!--  用到的转换器  -->
-    <BooleanToVisibilityConverter x:Key="converter-bool-to-visibility" />
+    <BooleanToVisibilityConverter x:Key="Converter-Bool-To-Visibility" />
 
     <!--  Text  -->
-    <FontFamily x:Key="font">Microsoft YaHei UI</FontFamily>
-    <sys:Double x:Key="font-size">13</sys:Double>
-    <Style x:Key="textblock" TargetType="TextBlock">
-        <Setter Property="FontSize" Value="{StaticResource font-size}" />
-        <Setter Property="FontFamily" Value="{StaticResource font}" />
-        <Setter Property="Foreground" Value="{StaticResource brush-text}" />
+    <FontFamily x:Key="Font">Microsoft YaHei UI</FontFamily>
+    <sys:Double x:Key="Font-Size">13</sys:Double>
+    <Style x:Key="TextBlock" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="{StaticResource Font-Size}" />
+        <Setter Property="FontFamily" Value="{StaticResource Font}" />
+        <Setter Property="Foreground" Value="{StaticResource Brush-Text}" />
     </Style>
-    <Style x:Key="textblock-h1" TargetType="TextBlock">
+    <Style x:Key="TextBlock-H1" TargetType="TextBlock">
         <Setter Property="FontSize" Value="18" />
-        <Setter Property="FontFamily" Value="{StaticResource font}" />
-        <Setter Property="Foreground" Value="{StaticResource brush-text-highlight}" />
+        <Setter Property="FontFamily" Value="{StaticResource Font}" />
+        <Setter Property="Foreground" Value="{StaticResource Brush-Text-Highlight}" />
     </Style>
-    <Style x:Key="textblock-h2" TargetType="TextBlock">
+    <Style x:Key="TextBlock-H2" TargetType="TextBlock">
         <Setter Property="FontSize" Value="16" />
-        <Setter Property="FontFamily" Value="{StaticResource font}" />
-        <Setter Property="Foreground" Value="{StaticResource brush-text-highlight}" />
+        <Setter Property="FontFamily" Value="{StaticResource Font}" />
+        <Setter Property="Foreground" Value="{StaticResource Brush-Text-Highlight}" />
     </Style>
-    <Style x:Key="textblock-h3" TargetType="TextBlock">
+    <Style x:Key="TextBlock-H3" TargetType="TextBlock">
         <Setter Property="FontSize" Value="14" />
-        <Setter Property="FontFamily" Value="{StaticResource font}" />
-        <Setter Property="Foreground" Value="{StaticResource brush-text-highlight}" />
+        <Setter Property="FontFamily" Value="{StaticResource Font}" />
+        <Setter Property="Foreground" Value="{StaticResource Brush-Text-Highlight}" />
     </Style>
-    <Style x:Key="textblock-weak" TargetType="TextBlock">
+    <Style x:Key="TextBlock-Weak" TargetType="TextBlock">
         <Setter Property="FontSize" Value="12" />
-        <Setter Property="FontFamily" Value="{StaticResource font}" />
-        <Setter Property="Foreground" Value="{StaticResource brush-text-weak}" />
+        <Setter Property="FontFamily" Value="{StaticResource Font}" />
+        <Setter Property="Foreground" Value="{StaticResource Brush-Text-Weak}" />
     </Style>
 
     <!--  Button colors  -->
-    <Style x:Key="button" TargetType="Button">
+    <Style x:Key="Button" TargetType="Button">
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
@@ -192,29 +193,29 @@
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="Foreground" Value="{StaticResource brush-control-hover-fg}" />
-                            <Setter TargetName="HoverBg" Property="BorderBrush" Value="{StaticResource brush-control-hover-bd}" />
-                            <Setter TargetName="HoverBg" Property="Background" Value="{StaticResource brush-control-hover-bg}" />
+                            <Setter Property="Foreground" Value="{StaticResource Brush-Control-Hover-FG}" />
+                            <Setter TargetName="HoverBg" Property="BorderBrush" Value="{StaticResource Brush-Control-Hover-BD}" />
+                            <Setter TargetName="HoverBg" Property="Background" Value="{StaticResource Brush-Control-Hover-BG}" />
                         </Trigger>
                         <Trigger Property="IsPressed" Value="True">
-                            <Setter Property="Foreground" Value="{StaticResource brush-control-press-fg}" />
-                            <Setter TargetName="HoverBg" Property="BorderBrush" Value="{StaticResource brush-control-press-bd}" />
-                            <Setter TargetName="HoverBg" Property="Background" Value="{StaticResource brush-control-press-bg}" />
+                            <Setter Property="Foreground" Value="{StaticResource Brush-Control-Press-FG}" />
+                            <Setter TargetName="HoverBg" Property="BorderBrush" Value="{StaticResource Brush-Control-Press-BD}" />
+                            <Setter TargetName="HoverBg" Property="Background" Value="{StaticResource Brush-Control-Press-BG}" />
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
-                            <Setter Property="Foreground" Value="{StaticResource brush-control-disable-fg}" />
-                            <Setter TargetName="HoverBg" Property="BorderBrush" Value="{StaticResource brush-control-disable-bd}" />
-                            <Setter TargetName="HoverBg" Property="Background" Value="{StaticResource brush-control-disable-bg}" />
+                            <Setter Property="Foreground" Value="{StaticResource Brush-Control-Disable-FG}" />
+                            <Setter TargetName="HoverBg" Property="BorderBrush" Value="{StaticResource Brush-Control-Disable-BD}" />
+                            <Setter TargetName="HoverBg" Property="Background" Value="{StaticResource Brush-Control-Disable-BG}" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
-        <Setter Property="Background" Value="{StaticResource brush-control-bg}" />
-        <Setter Property="Foreground" Value="{StaticResource brush-control-fg}" />
-        <Setter Property="BorderBrush" Value="{StaticResource brush-control-bd}" />
-        <Setter Property="FontFamily" Value="{StaticResource font}" />
-        <Setter Property="FontSize" Value="{StaticResource font-size}" />
+        <Setter Property="Background" Value="{StaticResource Brush-Control-BG}" />
+        <Setter Property="Foreground" Value="{StaticResource Brush-Control-FG}" />
+        <Setter Property="BorderBrush" Value="{StaticResource Brush-Control-BD}" />
+        <Setter Property="FontFamily" Value="{StaticResource Font}" />
+        <Setter Property="FontSize" Value="{StaticResource Font-Size}" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="HorizontalContentAlignment" Value="Center" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
@@ -222,7 +223,7 @@
         <Setter Property="MinWidth" Value="60" />
         <Setter Property="Height" Value="25" />
     </Style>
-    <Style x:Key="button-highlight" TargetType="Button">
+    <Style x:Key="Button-Highlight" TargetType="Button">
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
@@ -239,29 +240,29 @@
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="Foreground" Value="{StaticResource brush-control-highlight-hover-fg}" />
-                            <Setter TargetName="HoverBg" Property="BorderBrush" Value="{StaticResource brush-control-highlight-hover-bd}" />
-                            <Setter TargetName="HoverBg" Property="Background" Value="{StaticResource brush-control-highlight-hover-bg}" />
+                            <Setter Property="Foreground" Value="{StaticResource Brush-Control-Highlight-Hover-FG}" />
+                            <Setter TargetName="HoverBg" Property="BorderBrush" Value="{StaticResource Brush-Control-Highlight-Hover-BD}" />
+                            <Setter TargetName="HoverBg" Property="Background" Value="{StaticResource Brush-Control-Highlight-Hover-BG}" />
                         </Trigger>
                         <Trigger Property="IsPressed" Value="True">
-                            <Setter Property="Foreground" Value="{StaticResource brush-control-highlight-press-fg}" />
-                            <Setter TargetName="HoverBg" Property="BorderBrush" Value="{StaticResource brush-control-highlight-press-bd}" />
-                            <Setter TargetName="HoverBg" Property="Background" Value="{StaticResource brush-control-highlight-press-bg}" />
+                            <Setter Property="Foreground" Value="{StaticResource Brush-Control-Highlight-Press-FG}" />
+                            <Setter TargetName="HoverBg" Property="BorderBrush" Value="{StaticResource Brush-Control-Highlight-Press-BD}" />
+                            <Setter TargetName="HoverBg" Property="Background" Value="{StaticResource Brush-Control-Highlight-Press-BG}" />
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
-                            <Setter Property="Foreground" Value="{StaticResource brush-control-highlight-disable-fg}" />
-                            <Setter TargetName="HoverBg" Property="BorderBrush" Value="{StaticResource brush-control-highlight-disable-bd}" />
-                            <Setter TargetName="HoverBg" Property="Background" Value="{StaticResource brush-control-highlight-disable-bg}" />
+                            <Setter Property="Foreground" Value="{StaticResource Brush-Control-Highlight-Disable-FG}" />
+                            <Setter TargetName="HoverBg" Property="BorderBrush" Value="{StaticResource Brush-Control-Highlight-Disable-BD}" />
+                            <Setter TargetName="HoverBg" Property="Background" Value="{StaticResource Brush-Control-Highlight-Disable-BG}" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
-        <Setter Property="Background" Value="{StaticResource brush-control-highlight-bg}" />
-        <Setter Property="Foreground" Value="{StaticResource brush-control-highlight-fg}" />
-        <Setter Property="BorderBrush" Value="{StaticResource brush-control-highlight-bd}" />
-        <Setter Property="FontFamily" Value="{StaticResource font}" />
-        <Setter Property="FontSize" Value="{StaticResource font-size}" />
+        <Setter Property="Background" Value="{StaticResource Brush-Control-Highlight-BG}" />
+        <Setter Property="Foreground" Value="{StaticResource Brush-Control-Highlight-FG}" />
+        <Setter Property="BorderBrush" Value="{StaticResource Brush-Control-Highlight-BD}" />
+        <Setter Property="FontFamily" Value="{StaticResource Font}" />
+        <Setter Property="FontSize" Value="{StaticResource Font-Size}" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="HorizontalContentAlignment" Value="Center" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
@@ -269,7 +270,7 @@
         <Setter Property="MinWidth" Value="60" />
         <Setter Property="Height" Value="25" />
     </Style>
-    <Style x:Key="button-path-fill" TargetType="Button">
+    <Style x:Key="Button-Path-Fill" TargetType="Button">
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
@@ -289,34 +290,34 @@
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="Path" Property="Fill" Value="{StaticResource brush-control-hover-fg}" />
-                            <Setter TargetName="HoverBg" Property="BorderBrush" Value="{StaticResource brush-control-hover-bd}" />
-                            <Setter TargetName="HoverBg" Property="Background" Value="{StaticResource brush-control-hover-bg}" />
+                            <Setter TargetName="Path" Property="Fill" Value="{StaticResource Brush-Control-Hover-FG}" />
+                            <Setter TargetName="HoverBg" Property="BorderBrush" Value="{StaticResource Brush-Control-Hover-BD}" />
+                            <Setter TargetName="HoverBg" Property="Background" Value="{StaticResource Brush-Control-Hover-BG}" />
                         </Trigger>
                         <Trigger Property="IsPressed" Value="True">
-                            <Setter TargetName="Path" Property="Fill" Value="{StaticResource brush-control-press-fg}" />
-                            <Setter TargetName="HoverBg" Property="BorderBrush" Value="{StaticResource brush-control-press-bd}" />
-                            <Setter TargetName="HoverBg" Property="Background" Value="{StaticResource brush-control-press-bg}" />
+                            <Setter TargetName="Path" Property="Fill" Value="{StaticResource Brush-Control-Press-FG}" />
+                            <Setter TargetName="HoverBg" Property="BorderBrush" Value="{StaticResource Brush-Control-Press-BD}" />
+                            <Setter TargetName="HoverBg" Property="Background" Value="{StaticResource Brush-Control-Press-BG}" />
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
-                            <Setter TargetName="Path" Property="Fill" Value="{StaticResource brush-control-disable-fg}" />
-                            <Setter TargetName="HoverBg" Property="BorderBrush" Value="{StaticResource brush-control-disable-bd}" />
-                            <Setter TargetName="HoverBg" Property="Background" Value="{StaticResource brush-transparent}" />
+                            <Setter TargetName="Path" Property="Fill" Value="{StaticResource Brush-Control-Disable-FG}" />
+                            <Setter TargetName="HoverBg" Property="BorderBrush" Value="{StaticResource Brush-Control-Disable-BD}" />
+                            <Setter TargetName="HoverBg" Property="Background" Value="{StaticResource Brush-Transparent}" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
-        <Setter Property="Background" Value="{StaticResource brush-transparent}" />
-        <Setter Property="Foreground" Value="{StaticResource brush-control-fg}" />
-        <Setter Property="BorderBrush" Value="{StaticResource brush-control-bd}" />
+        <Setter Property="Background" Value="{StaticResource Brush-Transparent}" />
+        <Setter Property="Foreground" Value="{StaticResource Brush-Control-FG}" />
+        <Setter Property="BorderBrush" Value="{StaticResource Brush-Control-BD}" />
         <Setter Property="BorderThickness" Value="0" />
         <Setter Property="HorizontalContentAlignment" Value="Stretch" />
         <Setter Property="VerticalContentAlignment" Value="Stretch" />
         <Setter Property="MinWidth" Value="12" />
         <Setter Property="MinHeight" Value="12" />
     </Style>
-    <Style x:Key="button-path-stroke" TargetType="Button">
+    <Style x:Key="Button-Path-Stroke" TargetType="Button">
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
@@ -336,27 +337,27 @@
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="Path" Property="Stroke" Value="{StaticResource brush-control-hover-fg}" />
-                            <Setter TargetName="HoverBg" Property="BorderBrush" Value="{StaticResource brush-control-hover-bd}" />
-                            <Setter TargetName="HoverBg" Property="Background" Value="{StaticResource brush-control-hover-bg}" />
+                            <Setter TargetName="Path" Property="Stroke" Value="{StaticResource Brush-Control-Hover-FG}" />
+                            <Setter TargetName="HoverBg" Property="BorderBrush" Value="{StaticResource Brush-Control-Hover-BD}" />
+                            <Setter TargetName="HoverBg" Property="Background" Value="{StaticResource Brush-Control-Hover-BG}" />
                         </Trigger>
                         <Trigger Property="IsPressed" Value="True">
-                            <Setter TargetName="Path" Property="Stroke" Value="{StaticResource brush-control-press-fg}" />
-                            <Setter TargetName="HoverBg" Property="BorderBrush" Value="{StaticResource brush-control-press-bd}" />
-                            <Setter TargetName="HoverBg" Property="Background" Value="{StaticResource brush-control-press-bg}" />
+                            <Setter TargetName="Path" Property="Stroke" Value="{StaticResource Brush-Control-Press-FG}" />
+                            <Setter TargetName="HoverBg" Property="BorderBrush" Value="{StaticResource Brush-Control-Press-BD}" />
+                            <Setter TargetName="HoverBg" Property="Background" Value="{StaticResource Brush-Control-Press-BG}" />
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
-                            <Setter TargetName="Path" Property="Stroke" Value="{StaticResource brush-control-disable-fg}" />
-                            <Setter TargetName="HoverBg" Property="BorderBrush" Value="{StaticResource brush-control-disable-bd}" />
-                            <Setter TargetName="HoverBg" Property="Background" Value="{StaticResource brush-transparent}" />
+                            <Setter TargetName="Path" Property="Stroke" Value="{StaticResource Brush-Control-Disable-FG}" />
+                            <Setter TargetName="HoverBg" Property="BorderBrush" Value="{StaticResource Brush-Control-Disable-BD}" />
+                            <Setter TargetName="HoverBg" Property="Background" Value="{StaticResource Brush-Transparent}" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
-        <Setter Property="Background" Value="{StaticResource brush-transparent}" />
-        <Setter Property="Foreground" Value="{StaticResource brush-control-fg}" />
-        <Setter Property="BorderBrush" Value="{StaticResource brush-control-bd}" />
+        <Setter Property="Background" Value="{StaticResource Brush-Transparent}" />
+        <Setter Property="Foreground" Value="{StaticResource Brush-Control-FG}" />
+        <Setter Property="BorderBrush" Value="{StaticResource Brush-Control-BD}" />
         <Setter Property="BorderThickness" Value="0" />
         <Setter Property="HorizontalContentAlignment" Value="Stretch" />
         <Setter Property="VerticalContentAlignment" Value="Stretch" />
@@ -365,11 +366,11 @@
     </Style>
     <Style
         x:Key="{x:Type Button}"
-        BasedOn="{StaticResource button}"
+        BasedOn="{StaticResource Button}"
         TargetType="{x:Type Button}" />
 
     <!--  Checkbox  -->
-    <Style x:Key="checkbox" TargetType="{x:Type CheckBox}">
+    <Style x:Key="CheckBox" TargetType="{x:Type CheckBox}">
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type CheckBox}">
@@ -389,7 +390,7 @@
                                         Width="10"
                                         Height="10"
                                         Data="M27.903015,0L32,4.0970465 12.369019,23.728029 11.685974,24.520998 0,14.441042 3.7819824,10.054994 11.330017,16.567019z"
-                                        Fill="{StaticResource brush-accent-light}"
+                                        Fill="{StaticResource Brush-Accent-Light}"
                                         SnapsToDevicePixels="False"
                                         Stretch="Uniform"
                                         Visibility="Collapsed" />
@@ -398,7 +399,7 @@
                                         Width="8"
                                         Height="8"
                                         Data="M 0,0 8,0 8,8 0,8 Z"
-                                        Fill="{StaticResource brush-accent-light}"
+                                        Fill="{StaticResource Brush-Accent-Light}"
                                         SnapsToDevicePixels="False"
                                         Stretch="Uniform"
                                         Visibility="Collapsed" />
@@ -422,10 +423,10 @@
                                             <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource brush-control-hover-fg}" />
                                         </ObjectAnimationUsingKeyFrames>-->
                                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="Border" Storyboard.TargetProperty="(Border.BorderBrush)">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource brush-control-hover-fg}" />
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource Brush-Control-Hover-FG}" />
                                         </ObjectAnimationUsingKeyFrames>
                                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="Border" Storyboard.TargetProperty="(Panel.Background)">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource brush-control-hover-bg}" />
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource Brush-Control-Hover-BG}" />
                                         </ObjectAnimationUsingKeyFrames>
                                     </Storyboard>
                                 </VisualState>
@@ -438,26 +439,26 @@
                                             <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource brush-control-press-fg}" />
                                         </ObjectAnimationUsingKeyFrames>-->
                                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="Border" Storyboard.TargetProperty="(Border.BorderBrush)">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource brush-control-press-fg}" />
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource Brush-Control-Press-FG}" />
                                         </ObjectAnimationUsingKeyFrames>
                                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="Border" Storyboard.TargetProperty="(Panel.Background)">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource brush-control-press-bg}" />
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource Brush-Control-Press-BG}" />
                                         </ObjectAnimationUsingKeyFrames>
                                     </Storyboard>
                                 </VisualState>
                                 <VisualState x:Name="Disabled">
                                     <Storyboard>
                                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="CheckMark" Storyboard.TargetProperty="(Path.Fill)">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource brush-control-disable-fg}" />
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource Brush-Control-Disable-FG}" />
                                         </ObjectAnimationUsingKeyFrames>
                                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="InderminateMark" Storyboard.TargetProperty="(Path.Fill)">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource brush-control-disable-fg}" />
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource Brush-Control-Disable-FG}" />
                                         </ObjectAnimationUsingKeyFrames>
                                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="Border" Storyboard.TargetProperty="(Border.BorderBrush)">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource brush-control-disable-fg}" />
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource Brush-Control-Disable-FG}" />
                                         </ObjectAnimationUsingKeyFrames>
                                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="Border" Storyboard.TargetProperty="(Panel.Background)">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource brush-control-disable-bg}" />
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource Brush-Control-Disable-BG}" />
                                         </ObjectAnimationUsingKeyFrames>
                                     </Storyboard>
                                 </VisualState>
@@ -486,20 +487,20 @@
         </Setter>
         <Setter Property="SnapsToDevicePixels" Value="true" />
         <Setter Property="OverridesDefaultStyle" Value="true" />
-        <Setter Property="Foreground" Value="{StaticResource brush-control-fg}" />
-        <Setter Property="BorderBrush" Value="{StaticResource brush-control-bd}" />
+        <Setter Property="Foreground" Value="{StaticResource Brush-Control-FG}" />
+        <Setter Property="BorderBrush" Value="{StaticResource Brush-Control-BD}" />
         <Setter Property="BorderThickness" Value="1" />
-        <Setter Property="Background" Value="{StaticResource brush-transparent}" />
-        <Setter Property="FontSize" Value="{StaticResource font-size}" />
-        <Setter Property="FontFamily" Value="{StaticResource font}" />
+        <Setter Property="Background" Value="{StaticResource Brush-Transparent}" />
+        <Setter Property="FontSize" Value="{StaticResource Font-Size}" />
+        <Setter Property="FontFamily" Value="{StaticResource Font}" />
     </Style>
     <Style
         x:Key="{x:Type CheckBox}"
-        BasedOn="{StaticResource checkbox}"
+        BasedOn="{StaticResource CheckBox}"
         TargetType="{x:Type CheckBox}" />
 
     <!--  RadioButton  -->
-    <Style x:Key="radiobutton" TargetType="{x:Type RadioButton}">
+    <Style x:Key="RadioButton" TargetType="{x:Type RadioButton}">
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type RadioButton}">
@@ -514,7 +515,7 @@
                                 <Ellipse
                                     x:Name="CheckMark"
                                     Margin="4"
-                                    Fill="{StaticResource brush-accent-light}"
+                                    Fill="{StaticResource Brush-Accent-Light}"
                                     Visibility="Collapsed" />
                             </Grid>
                         </BulletDecorator.Bullet>
@@ -532,10 +533,10 @@
                                             <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource brush-control-hover-fg}" />
                                         </ObjectAnimationUsingKeyFrames>-->
                                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="Border" Storyboard.TargetProperty="(Path.Stroke)">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource brush-control-hover-fg}" />
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource Brush-Control-Hover-FG}" />
                                         </ObjectAnimationUsingKeyFrames>
                                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="Border" Storyboard.TargetProperty="(Path.Fill)">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource brush-control-hover-bg}" />
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource Brush-Control-Hover-BG}" />
                                         </ObjectAnimationUsingKeyFrames>
                                     </Storyboard>
                                 </VisualState>
@@ -545,23 +546,23 @@
                                             <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource brush-control-press-fg}" />
                                         </ObjectAnimationUsingKeyFrames>-->
                                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="Border" Storyboard.TargetProperty="(Path.Stroke)">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource brush-control-press-fg}" />
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource Brush-Control-Press-FG}" />
                                         </ObjectAnimationUsingKeyFrames>
                                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="Border" Storyboard.TargetProperty="(Path.Fill)">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource brush-control-press-bg}" />
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource Brush-Control-Press-BG}" />
                                         </ObjectAnimationUsingKeyFrames>
                                     </Storyboard>
                                 </VisualState>
                                 <VisualState x:Name="Disabled">
                                     <Storyboard>
                                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="CheckMark" Storyboard.TargetProperty="(Path.Fill)">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource brush-control-disable-fg}" />
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource Brush-Control-Disable-FG}" />
                                         </ObjectAnimationUsingKeyFrames>
                                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="Border" Storyboard.TargetProperty="(Path.Stroke)">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource brush-control-disable-fg}" />
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource Brush-Control-Disable-FG}" />
                                         </ObjectAnimationUsingKeyFrames>
                                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="Border" Storyboard.TargetProperty="(Path.Fill)">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource brush-control-disable-bg}" />
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource Brush-Control-Disable-BG}" />
                                         </ObjectAnimationUsingKeyFrames>
                                     </Storyboard>
                                 </VisualState>
@@ -584,20 +585,20 @@
         </Setter>
         <Setter Property="SnapsToDevicePixels" Value="true" />
         <Setter Property="OverridesDefaultStyle" Value="true" />
-        <Setter Property="Foreground" Value="{StaticResource brush-control-fg}" />
-        <Setter Property="BorderBrush" Value="{StaticResource brush-control-bd}" />
+        <Setter Property="Foreground" Value="{StaticResource Brush-Control-FG}" />
+        <Setter Property="BorderBrush" Value="{StaticResource Brush-Control-BD}" />
         <Setter Property="BorderThickness" Value="1" />
-        <Setter Property="Background" Value="{StaticResource brush-transparent}" />
-        <Setter Property="FontSize" Value="{StaticResource font-size}" />
-        <Setter Property="FontFamily" Value="{StaticResource font}" />
+        <Setter Property="Background" Value="{StaticResource Brush-Transparent}" />
+        <Setter Property="FontSize" Value="{StaticResource Font-Size}" />
+        <Setter Property="FontFamily" Value="{StaticResource Font}" />
     </Style>
     <Style
         x:Key="{x:Type RadioButton}"
-        BasedOn="{StaticResource radiobutton}"
+        BasedOn="{StaticResource RadioButton}"
         TargetType="{x:Type RadioButton}" />
 
     <!--  Thumb  -->
-    <Style x:Key="thumb" TargetType="Thumb">
+    <Style x:Key="Thumb" TargetType="Thumb">
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Thumb">
@@ -612,30 +613,30 @@
                                 <VisualState Name="MouseOver">
                                     <Storyboard>
                                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="HitTag" Storyboard.TargetProperty="BorderBrush">
-                                            <DiscreteObjectKeyFrame KeyTime="0:0:0" Value="{StaticResource brush-control-hover-bd}" />
+                                            <DiscreteObjectKeyFrame KeyTime="0:0:0" Value="{StaticResource Brush-Control-Hover-BD}" />
                                         </ObjectAnimationUsingKeyFrames>
                                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="HitTag" Storyboard.TargetProperty="Background">
-                                            <DiscreteObjectKeyFrame KeyTime="0:0:0" Value="{StaticResource brush-control-hover-bg}" />
+                                            <DiscreteObjectKeyFrame KeyTime="0:0:0" Value="{StaticResource Brush-Control-Hover-BG}" />
                                         </ObjectAnimationUsingKeyFrames>
                                     </Storyboard>
                                 </VisualState>
                                 <VisualState Name="Pressed">
                                     <Storyboard>
                                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="HitTag" Storyboard.TargetProperty="BorderBrush">
-                                            <DiscreteObjectKeyFrame KeyTime="0:0:0" Value="{StaticResource brush-control-press-bd}" />
+                                            <DiscreteObjectKeyFrame KeyTime="0:0:0" Value="{StaticResource Brush-Control-Press-BD}" />
                                         </ObjectAnimationUsingKeyFrames>
                                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="HitTag" Storyboard.TargetProperty="Background">
-                                            <DiscreteObjectKeyFrame KeyTime="0:0:0" Value="{StaticResource brush-control-press-bg}" />
+                                            <DiscreteObjectKeyFrame KeyTime="0:0:0" Value="{StaticResource Brush-Control-Press-BG}" />
                                         </ObjectAnimationUsingKeyFrames>
                                     </Storyboard>
                                 </VisualState>
                                 <VisualState Name="Disabled">
                                     <Storyboard>
                                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="HitTag" Storyboard.TargetProperty="BorderBrush">
-                                            <DiscreteObjectKeyFrame KeyTime="0:0:0" Value="{StaticResource brush-control-disable-bd}" />
+                                            <DiscreteObjectKeyFrame KeyTime="0:0:0" Value="{StaticResource Brush-Control-Disable-BD}" />
                                         </ObjectAnimationUsingKeyFrames>
                                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="HitTag" Storyboard.TargetProperty="Background">
-                                            <DiscreteObjectKeyFrame KeyTime="0:0:0" Value="{StaticResource brush-control-disable-bg}" />
+                                            <DiscreteObjectKeyFrame KeyTime="0:0:0" Value="{StaticResource Brush-Control-Disable-BG}" />
                                         </ObjectAnimationUsingKeyFrames>
                                     </Storyboard>
                                 </VisualState>
@@ -647,8 +648,8 @@
         </Setter>
         <Setter Property="OverridesDefaultStyle" Value="True" />
         <Setter Property="BorderThickness" Value="0" />
-        <Setter Property="BorderBrush" Value="{StaticResource brush-control-bd}" />
-        <Setter Property="Background" Value="{StaticResource brush-control-bg}" />
+        <Setter Property="BorderBrush" Value="{StaticResource Brush-Control-BD}" />
+        <Setter Property="Background" Value="{StaticResource Brush-Control-BG}" />
     </Style>
 
     <!--  ToolTip  -->
@@ -676,18 +677,18 @@
         </Setter>
         <Setter Property="OverridesDefaultStyle" Value="true" />
         <Setter Property="HasDropShadow" Value="True" />
-        <Setter Property="Background" Value="{StaticResource brush-panel-bg}" />
-        <Setter Property="Foreground" Value="{StaticResource brush-control-fg}" />
-        <Setter Property="BorderBrush" Value="{StaticResource brush-panel-bd}" />
-        <Setter Property="FontFamily" Value="{StaticResource font}" />
-        <Setter Property="FontSize" Value="{StaticResource font-size}" />
+        <Setter Property="Background" Value="{StaticResource Brush-Panel-BG}" />
+        <Setter Property="Foreground" Value="{StaticResource Brush-Control-FG}" />
+        <Setter Property="BorderBrush" Value="{StaticResource Brush-Panel-BD}" />
+        <Setter Property="FontFamily" Value="{StaticResource Font}" />
+        <Setter Property="FontSize" Value="{StaticResource Font-Size}" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="HorizontalContentAlignment" Value="Left" />
         <Setter Property="VerticalContentAlignment" Value="Top" />
     </Style>
 
     <!--  ProgressBar  -->
-    <Style x:Key="progressbar" TargetType="{x:Type ProgressBar}">
+    <Style x:Key="ProgressBar" TargetType="{x:Type ProgressBar}">
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type ProgressBar}">
@@ -707,7 +708,7 @@
                                     Width="100"
                                     Margin="-100,0,0,0"
                                     HorizontalAlignment="Left"
-                                    Fill="{StaticResource brush-accent-deep}" />
+                                    Fill="{StaticResource Brush-Accent-Deep}" />
                             </Border>
                             <VisualStateManager.VisualStateGroups>
                                 <VisualStateGroup x:Name="CommonStates">
@@ -720,20 +721,20 @@
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
-        <Setter Property="Background" Value="{StaticResource brush-control-bg}" />
-        <Setter Property="Foreground" Value="{StaticResource brush-accent}" />
+        <Setter Property="Background" Value="{StaticResource Brush-Control-BG}" />
+        <Setter Property="Foreground" Value="{StaticResource Brush-Accent}" />
         <Setter Property="BorderThickness" Value="1" />
-        <Setter Property="BorderBrush" Value="{StaticResource brush-control-bd}" />
+        <Setter Property="BorderBrush" Value="{StaticResource Brush-Control-BD}" />
         <Setter Property="Height" Value="10" />
     </Style>
     <Style
         x:Key="{x:Type ProgressBar}"
-        BasedOn="{StaticResource progressbar}"
+        BasedOn="{StaticResource ProgressBar}"
         TargetType="{x:Type ProgressBar}" />
 
     <!--  ScrollBar  -->
-    <sys:Double x:Key="scrollbar-size">12</sys:Double>
-    <Style x:Key="button-scrollbar-line" TargetType="RepeatButton">
+    <sys:Double x:Key="ScrollBar-Size">12</sys:Double>
+    <Style x:Key="Button-ScrollBar-Line" TargetType="RepeatButton">
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="RepeatButton">
@@ -748,16 +749,16 @@
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="Path" Property="Stroke" Value="{StaticResource brush-control-hover-fg}" />
-                            <Setter TargetName="Border" Property="Background" Value="{StaticResource brush-control-hover-bg}" />
+                            <Setter TargetName="Path" Property="Stroke" Value="{StaticResource Brush-Control-Hover-FG}" />
+                            <Setter TargetName="Border" Property="Background" Value="{StaticResource Brush-Control-Hover-BG}" />
                         </Trigger>
                         <Trigger Property="IsPressed" Value="True">
-                            <Setter TargetName="Path" Property="Stroke" Value="{StaticResource brush-control-press-fg}" />
-                            <Setter TargetName="Border" Property="Background" Value="{StaticResource brush-control-press-bg}" />
+                            <Setter TargetName="Path" Property="Stroke" Value="{StaticResource Brush-Control-Press-FG}" />
+                            <Setter TargetName="Border" Property="Background" Value="{StaticResource Brush-Control-Press-BG}" />
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
-                            <Setter TargetName="Path" Property="Stroke" Value="{StaticResource brush-transparent}" />
-                            <Setter TargetName="Border" Property="Background" Value="{StaticResource brush-transparent}" />
+                            <Setter TargetName="Path" Property="Stroke" Value="{StaticResource Brush-Transparent}" />
+                            <Setter TargetName="Border" Property="Background" Value="{StaticResource Brush-Transparent}" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -768,14 +769,14 @@
         <Setter Property="IsTabStop" Value="False" />
         <Setter Property="HorizontalContentAlignment" Value="Center" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
-        <Setter Property="Background" Value="{StaticResource brush-transparent}" />
-        <Setter Property="Foreground" Value="{StaticResource brush-control-fg}" />
+        <Setter Property="Background" Value="{StaticResource Brush-Transparent}" />
+        <Setter Property="Foreground" Value="{StaticResource Brush-Control-FG}" />
     </Style>
-    <Style x:Key="button-scrollbar-page" TargetType="RepeatButton">
+    <Style x:Key="Button-ScrollBar-Page" TargetType="RepeatButton">
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="RepeatButton">
-                    <Border Background="{StaticResource brush-transparent}" />
+                    <Border Background="{StaticResource Brush-Transparent}" />
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
@@ -783,7 +784,7 @@
         <Setter Property="Focusable" Value="False" />
         <Setter Property="IsTabStop" Value="False" />
     </Style>
-    <ControlTemplate x:Key="scrollbar-vertical" TargetType="ScrollBar">
+    <ControlTemplate x:Key="ScrollBar-Vertical" TargetType="ScrollBar">
         <Border
             Background="{TemplateBinding Background}"
             BorderBrush="{TemplateBinding BorderBrush}"
@@ -797,14 +798,14 @@
                 <RepeatButton
                     Grid.Row="0"
                     Command="ScrollBar.LineUpCommand"
-                    Content="{StaticResource icon-uparrow-mini}"
-                    Style="{StaticResource button-scrollbar-line}" />
+                    Content="{StaticResource Icon-UpArrow-Mini}"
+                    Style="{StaticResource Button-ScrollBar-Line}" />
                 <Track
                     x:Name="PART_Track"
                     Grid.Row="1"
                     IsDirectionReversed="True">
                     <Track.DecreaseRepeatButton>
-                        <RepeatButton Command="ScrollBar.PageUpCommand" Style="{StaticResource button-scrollbar-page}" />
+                        <RepeatButton Command="ScrollBar.PageUpCommand" Style="{StaticResource Button-ScrollBar-Page}" />
                     </Track.DecreaseRepeatButton>
                     <Track.Thumb>
                         <Thumb
@@ -812,21 +813,21 @@
                             Focusable="True"
                             IsTabStop="False"
                             RenderTransformOrigin="0.5,0.5"
-                            Style="{StaticResource thumb}">
+                            Style="{StaticResource Thumb}">
                             <Thumb.RenderTransform>
                                 <ScaleTransform ScaleX="0.3" />
                             </Thumb.RenderTransform>
                         </Thumb>
                     </Track.Thumb>
                     <Track.IncreaseRepeatButton>
-                        <RepeatButton Command="ScrollBar.PageDownCommand" Style="{StaticResource button-scrollbar-page}" />
+                        <RepeatButton Command="ScrollBar.PageDownCommand" Style="{StaticResource Button-ScrollBar-Page}" />
                     </Track.IncreaseRepeatButton>
                 </Track>
                 <RepeatButton
                     Grid.Row="2"
                     Command="ScrollBar.LineDownCommand"
-                    Content="{StaticResource icon-downarrow-mini}"
-                    Style="{StaticResource button-scrollbar-line}" />
+                    Content="{StaticResource Icon-DownArrow-Mini}"
+                    Style="{StaticResource Button-ScrollBar-Line}" />
             </Grid>
             <VisualStateManager.VisualStateGroups>
                 <VisualStateGroup Name="CommonStates">
@@ -847,7 +848,7 @@
             </VisualStateManager.VisualStateGroups>
         </Border>
     </ControlTemplate>
-    <ControlTemplate x:Key="scrollbar-horizontal" TargetType="ScrollBar">
+    <ControlTemplate x:Key="ScrollBar-Horizontal" TargetType="ScrollBar">
         <Border
             Background="{TemplateBinding Background}"
             BorderBrush="{TemplateBinding BorderBrush}"
@@ -861,14 +862,14 @@
                 <RepeatButton
                     Grid.Column="0"
                     Command="ScrollBar.LineLeftCommand"
-                    Content="{StaticResource icon-leftarrow-mini}"
-                    Style="{StaticResource button-scrollbar-line}" />
+                    Content="{StaticResource Icon-LeftArrow-Mini}"
+                    Style="{StaticResource Button-ScrollBar-Line}" />
                 <Track
                     x:Name="PART_Track"
                     Grid.Column="1"
                     IsDirectionReversed="False">
                     <Track.DecreaseRepeatButton>
-                        <RepeatButton Command="ScrollBar.PageLeftCommand" Style="{StaticResource button-scrollbar-page}" />
+                        <RepeatButton Command="ScrollBar.PageLeftCommand" Style="{StaticResource Button-ScrollBar-Page}" />
                     </Track.DecreaseRepeatButton>
                     <Track.Thumb>
                         <Thumb
@@ -876,21 +877,21 @@
                             Focusable="True"
                             IsTabStop="False"
                             RenderTransformOrigin="0.5,0.5"
-                            Style="{StaticResource thumb}">
+                            Style="{StaticResource Thumb}">
                             <Thumb.RenderTransform>
                                 <ScaleTransform ScaleY="0.3" />
                             </Thumb.RenderTransform>
                         </Thumb>
                     </Track.Thumb>
                     <Track.IncreaseRepeatButton>
-                        <RepeatButton Command="ScrollBar.PageRightCommand" Style="{StaticResource button-scrollbar-page}" />
+                        <RepeatButton Command="ScrollBar.PageRightCommand" Style="{StaticResource Button-ScrollBar-Page}" />
                     </Track.IncreaseRepeatButton>
                 </Track>
                 <RepeatButton
                     Grid.Column="2"
                     Command="ScrollBar.LineRightCommand"
-                    Content="{StaticResource icon-rightarrow-mini}"
-                    Style="{StaticResource button-scrollbar-line}" />
+                    Content="{StaticResource Icon-RightArrow-Mini}"
+                    Style="{StaticResource Button-ScrollBar-Line}" />
             </Grid>
             <VisualStateManager.VisualStateGroups>
                 <VisualStateGroup Name="CommonStates">
@@ -911,33 +912,33 @@
             </VisualStateManager.VisualStateGroups>
         </Border>
     </ControlTemplate>
-    <Style x:Key="scrollbar" TargetType="ScrollBar">
+    <Style x:Key="ScrollBar" TargetType="ScrollBar">
         <Setter Property="OverridesDefaultStyle" Value="True" />
         <Setter Property="BorderThickness" Value="0" />
-        <Setter Property="BorderBrush" Value="{StaticResource brush-transparent}" />
-        <Setter Property="Background" Value="{StaticResource brush-transparent}" />
+        <Setter Property="BorderBrush" Value="{StaticResource Brush-Transparent}" />
+        <Setter Property="Background" Value="{StaticResource Brush-Transparent}" />
         <Style.Triggers>
             <Trigger Property="Orientation" Value="Horizontal">
                 <Setter Property="Width" Value="Auto" />
-                <Setter Property="Height" Value="{StaticResource scrollbar-size}" />
-                <Setter Property="Template" Value="{StaticResource scrollbar-horizontal}" />
+                <Setter Property="Height" Value="{StaticResource ScrollBar-Size}" />
+                <Setter Property="Template" Value="{StaticResource ScrollBar-Horizontal}" />
             </Trigger>
             <Trigger Property="Orientation" Value="Vertical">
-                <Setter Property="Width" Value="{StaticResource scrollbar-size}" />
+                <Setter Property="Width" Value="{StaticResource ScrollBar-Size}" />
                 <Setter Property="Height" Value="Auto" />
-                <Setter Property="Template" Value="{StaticResource scrollbar-vertical}" />
+                <Setter Property="Template" Value="{StaticResource ScrollBar-Vertical}" />
             </Trigger>
             <Trigger Property="IsMouseOver" Value="True">
-                <Setter Property="Background" Value="{StaticResource brush-control-bg}" />
+                <Setter Property="Background" Value="{StaticResource Brush-Control-BG}" />
             </Trigger>
             <Trigger Property="IsEnabled" Value="False">
-                <Setter Property="Background" Value="{StaticResource brush-transparent}" />
+                <Setter Property="Background" Value="{StaticResource Brush-Transparent}" />
             </Trigger>
         </Style.Triggers>
     </Style>
 
     <!--  ScrollViewer  -->
-    <Style x:Key="scrollviewer" TargetType="ScrollViewer">
+    <Style x:Key="ScrollViewer" TargetType="ScrollViewer">
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="ScrollViewer">
@@ -967,7 +968,7 @@
                                 Grid.Row="0"
                                 Grid.Column="1"
                                 Maximum="{TemplateBinding ScrollableHeight}"
-                                Style="{StaticResource scrollbar}"
+                                Style="{StaticResource ScrollBar}"
                                 ViewportSize="{TemplateBinding ViewportHeight}"
                                 Visibility="{TemplateBinding ComputedVerticalScrollBarVisibility}"
                                 Value="{TemplateBinding VerticalOffset}" />
@@ -977,7 +978,7 @@
                                 Grid.Column="0"
                                 Maximum="{TemplateBinding ScrollableWidth}"
                                 Orientation="Horizontal"
-                                Style="{StaticResource scrollbar}"
+                                Style="{StaticResource ScrollBar}"
                                 ViewportSize="{TemplateBinding ViewportWidth}"
                                 Visibility="{TemplateBinding ComputedHorizontalScrollBarVisibility}"
                                 Value="{TemplateBinding HorizontalOffset}" />
@@ -989,18 +990,18 @@
         <Setter Property="OverridesDefaultStyle" Value="True" />
         <Setter Property="Padding" Value="0" />
         <Setter Property="BorderThickness" Value="0" />
-        <Setter Property="BorderBrush" Value="{StaticResource brush-panel-bd}" />
-        <Setter Property="Background" Value="{StaticResource brush-transparent}" />
+        <Setter Property="BorderBrush" Value="{StaticResource Brush-Panel-BD}" />
+        <Setter Property="Background" Value="{StaticResource Brush-Transparent}" />
         <Setter Property="VerticalScrollBarVisibility" Value="Auto" />
         <Setter Property="HorizontalScrollBarVisibility" Value="Disabled" />
     </Style>
     <Style
         x:Key="{x:Type ScrollViewer}"
-        BasedOn="{StaticResource scrollviewer}"
+        BasedOn="{StaticResource ScrollViewer}"
         TargetType="{x:Type ScrollViewer}" />
 
     <!--  No scrollbar version  -->
-    <Style x:Key="scrollviewer-slim" TargetType="ScrollViewer">
+    <Style x:Key="ScrollViewer-Slim" TargetType="ScrollViewer">
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="ScrollViewer">
@@ -1021,14 +1022,14 @@
         <Setter Property="OverridesDefaultStyle" Value="True" />
         <Setter Property="Padding" Value="0" />
         <Setter Property="BorderThickness" Value="0" />
-        <Setter Property="BorderBrush" Value="{StaticResource brush-panel-bd}" />
-        <Setter Property="Background" Value="{StaticResource brush-transparent}" />
+        <Setter Property="BorderBrush" Value="{StaticResource Brush-Panel-BD}" />
+        <Setter Property="Background" Value="{StaticResource Brush-Transparent}" />
         <Setter Property="VerticalScrollBarVisibility" Value="Auto" />
         <Setter Property="HorizontalScrollBarVisibility" Value="Disabled" />
     </Style>
 
     <!--  TextBox  -->
-    <Style x:Key="textbox" TargetType="TextBox">
+    <Style x:Key="TextBox" TargetType="TextBox">
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="TextBox">
@@ -1043,31 +1044,31 @@
                         FontFamily="{TemplateBinding FontFamily}"
                         FontSize="{TemplateBinding FontSize}"
                         Foreground="{TemplateBinding Foreground}"
-                        Style="{StaticResource scrollviewer}" />
+                        Style="{StaticResource ScrollViewer}" />
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="PART_ContentHost" Property="BorderBrush" Value="{StaticResource brush-control-hover-bd}" />
+                            <Setter TargetName="PART_ContentHost" Property="BorderBrush" Value="{StaticResource Brush-Control-Hover-BD}" />
                         </Trigger>
                         <Trigger Property="IsKeyboardFocusWithin" Value="True">
-                            <Setter TargetName="PART_ContentHost" Property="BorderBrush" Value="{StaticResource brush-control-hover-bd}" />
+                            <Setter TargetName="PART_ContentHost" Property="BorderBrush" Value="{StaticResource Brush-Control-Hover-BD}" />
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
-                            <Setter TargetName="PART_ContentHost" Property="Background" Value="{StaticResource brush-transparent}" />
-                            <Setter TargetName="PART_ContentHost" Property="BorderBrush" Value="{StaticResource brush-transparent}" />
-                            <Setter Property="Foreground" Value="{StaticResource brush-text}" />
+                            <Setter TargetName="PART_ContentHost" Property="Background" Value="{StaticResource Brush-Transparent}" />
+                            <Setter TargetName="PART_ContentHost" Property="BorderBrush" Value="{StaticResource Brush-Transparent}" />
+                            <Setter Property="Foreground" Value="{StaticResource Brush-Text}" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
-        <Setter Property="Background" Value="{StaticResource brush-transparent}" />
-        <Setter Property="Foreground" Value="{StaticResource brush-text-highlight}" />
-        <Setter Property="BorderBrush" Value="{StaticResource brush-control-bd}" />
+        <Setter Property="Background" Value="{StaticResource Brush-Transparent}" />
+        <Setter Property="Foreground" Value="{StaticResource Brush-Text-Highlight}" />
+        <Setter Property="BorderBrush" Value="{StaticResource Brush-Control-BD}" />
         <Setter Property="BorderThickness" Value="1" />
-        <Setter Property="SelectionBrush" Value="{StaticResource brush-text-selection}" />
-        <Setter Property="CaretBrush" Value="{StaticResource brush-text-caret}" />
-        <Setter Property="FontFamily" Value="{StaticResource font}" />
-        <Setter Property="FontSize" Value="{StaticResource font-size}" />
+        <Setter Property="SelectionBrush" Value="{StaticResource Brush-Text-Selection}" />
+        <Setter Property="CaretBrush" Value="{StaticResource Brush-Text-Caret}" />
+        <Setter Property="FontFamily" Value="{StaticResource Font}" />
+        <Setter Property="FontSize" Value="{StaticResource Font-Size}" />
         <Setter Property="HorizontalContentAlignment" Value="Stretch" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="Padding" Value="4,0" />
@@ -1083,8 +1084,8 @@
                             <Path
                                 Width="16"
                                 Height="16"
-                                Data="{StaticResource icon-cut}"
-                                Fill="{StaticResource brush-control-fg}"
+                                Data="{StaticResource Icon-Cut}"
+                                Fill="{StaticResource Brush-Control-FG}"
                                 Stretch="Uniform" />
                         </MenuItem.Icon>
                     </MenuItem>
@@ -1096,8 +1097,8 @@
                             <Path
                                 Width="16"
                                 Height="16"
-                                Data="{StaticResource icon-copy}"
-                                Fill="{StaticResource brush-control-fg}"
+                                Data="{StaticResource Icon-Copy}"
+                                Fill="{StaticResource Brush-Control-FG}"
                                 Stretch="Uniform" />
                         </MenuItem.Icon>
                     </MenuItem>
@@ -1109,8 +1110,8 @@
                             <Path
                                 Width="16"
                                 Height="16"
-                                Data="{StaticResource icon-paste}"
-                                Fill="{StaticResource brush-control-fg}"
+                                Data="{StaticResource Icon-Paste}"
+                                Fill="{StaticResource Brush-Control-FG}"
                                 Stretch="Uniform" />
                         </MenuItem.Icon>
                     </MenuItem>
@@ -1120,101 +1121,331 @@
     </Style>
     <Style
         x:Key="{x:Type TextBox}"
-        BasedOn="{StaticResource textbox}"
+        BasedOn="{StaticResource TextBox}"
         TargetType="{x:Type TextBox}" />
 
     <!--  Expander  -->
-    <ControlTemplate x:Key="togglebutton-expander-downexpand" TargetType="{x:Type ToggleButton}">
+    <ControlTemplate x:Key="ToggleButton-Expander-DownDirection" TargetType="{x:Type ToggleButton}">
         <Border
-            x:Name="Border"
-            BorderThickness="0,0,1,0"
-            CornerRadius="2,0,0,0">
+            Background="{TemplateBinding Background}"
+            BorderBrush="{TemplateBinding BorderBrush}"
+            BorderThickness="{TemplateBinding BorderThickness}">
             <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
                 <Path
-                    x:Name="CollapsedArrow"
+                    x:Name="Arrow"
                     HorizontalAlignment="Center"
                     VerticalAlignment="Center"
-                    Data="M 0 0 L 4 4 L 8 0 Z"
-                    Fill="{StaticResource brush-control-fg}">
-                </Path>
-                <Path
-                    x:Name="ExpandededArrow"
-                    HorizontalAlignment="Center"
-                    VerticalAlignment="Center"
-                    Data="M 0 4 L 4 0 L 8 4 Z"
-                    Visibility="Collapsed"
-                    Fill="{StaticResource brush-control-fg}">
-                </Path>
+                    Data="{StaticResource Icon-DownArrow-Mini}"
+                    Stretch="None"
+                    Stroke="{TemplateBinding Foreground}"
+                    StrokeThickness="1" />
+                <ContentPresenter
+                    Grid.Column="1"
+                    Margin="{TemplateBinding Padding}"
+                    HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                    VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
             </Grid>
-            <VisualStateManager.VisualStateGroups>
-                <VisualStateGroup x:Name="CheckStates">
-                    <VisualState x:Name="Checked">
-                        <Storyboard>
-                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="CollapsedArrow" Storyboard.TargetProperty="(UIElement.Visibility)">
-                                <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Hidden}" />
-                            </ObjectAnimationUsingKeyFrames>
-                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ExpandededArrow" Storyboard.TargetProperty="(UIElement.Visibility)">
-                                <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Visible}" />
-                            </ObjectAnimationUsingKeyFrames>
-                        </Storyboard>
-                    </VisualState>
-                    <VisualState x:Name="Unchecked" />
-                    <VisualState x:Name="Indeterminate" />
-                </VisualStateGroup>
-            </VisualStateManager.VisualStateGroups>
         </Border>
+        <ControlTemplate.Triggers>
+            <Trigger Property="IsChecked" Value="True">
+                <Setter TargetName="Arrow" Property="Data" Value="{StaticResource Icon-UpArrow-Mini}" />
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Foreground" Value="{StaticResource Brush-Control-Disable-FG}" />
+                <Setter Property="BorderBrush" Value="{StaticResource Brush-Control-Disable-BD}" />
+                <Setter Property="Background" Value="{StaticResource Brush-Control-Disable-BG}" />
+            </Trigger>
+        </ControlTemplate.Triggers>
     </ControlTemplate>
-    <Style x:Key="{x:Type Expander}" TargetType="{x:Type Expander}">
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="{x:Type Expander}">
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition x:Name="ContentRow" Height="0" />
-                        </Grid.RowDefinitions>
-                        <Border
-                            x:Name="Border"
-                            Grid.Row="0"
-                            BorderThickness="1"
-                            CornerRadius="2,2,0,0">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="20" />
-                                    <ColumnDefinition Width="*" />
-                                </Grid.ColumnDefinitions>
-                                <ToggleButton
-                                    IsChecked="{Binding IsExpanded, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
-                                    OverridesDefaultStyle="True"
-                                    Template="{StaticResource ExpanderToggleButton}">
-                                </ToggleButton>
-                                <ContentPresenter
-                                    Grid.Column="1"
-                                    Margin="4"
-                                    ContentSource="Header"
-                                    RecognizesAccessKey="True" />
-                            </Grid>
-                        </Border>
-                        <Border
-                            x:Name="Content"
-                            Grid.Row="1"
-                            BorderThickness="1,0,1,1"
-                            CornerRadius="0,0,2,2">
-                            <ContentPresenter Margin="4" />
-                        </Border>
-                    </Grid>
-                    <ControlTemplate.Triggers>
-                        <Trigger Property="IsExpanded" Value="True">
-                            <Setter TargetName="ContentRow" Property="Height" Value="{Binding DesiredHeight, ElementName=Content}" />
-                        </Trigger>
-                    </ControlTemplate.Triggers>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
+    <ControlTemplate x:Key="ToggleButton-Expander-RightDirection" TargetType="{x:Type ToggleButton}">
+        <Border
+            Background="{TemplateBinding Background}"
+            BorderBrush="{TemplateBinding BorderBrush}"
+            BorderThickness="{TemplateBinding BorderThickness}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+                <Path
+                    x:Name="Arrow"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Data="{StaticResource Icon-RightArrow-Mini}"
+                    Stretch="None"
+                    Stroke="{TemplateBinding Foreground}"
+                    StrokeThickness="1" />
+                <ContentPresenter
+                    Grid.Row="1"
+                    Margin="{TemplateBinding Padding}"
+                    HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                    VerticalAlignment="{TemplateBinding VerticalContentAlignment}">
+                    <ContentPresenter.LayoutTransform>
+                        <RotateTransform Angle="90" CenterX="0.5" CenterY="0.5" />
+                    </ContentPresenter.LayoutTransform>
+                </ContentPresenter>
+            </Grid>
+        </Border>
+        <ControlTemplate.Triggers>
+            <Trigger Property="IsChecked" Value="True">
+                <Setter TargetName="Arrow" Property="Data" Value="{StaticResource Icon-LeftArrow-Mini}" />
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Foreground" Value="{StaticResource Brush-Control-Disable-FG}" />
+                <Setter Property="BorderBrush" Value="{StaticResource Brush-Control-Disable-BD}" />
+                <Setter Property="Background" Value="{StaticResource Brush-Control-Disable-BG}" />
+            </Trigger>
+        </ControlTemplate.Triggers>
+    </ControlTemplate>
+    <ControlTemplate x:Key="ToggleButton-Expander-LeftDirection" TargetType="{x:Type ToggleButton}">
+        <Border
+            Background="{TemplateBinding Background}"
+            BorderBrush="{TemplateBinding BorderBrush}"
+            BorderThickness="{TemplateBinding BorderThickness}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+                <Path
+                    x:Name="Arrow"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Data="{StaticResource Icon-LeftArrow-Mini}"
+                    Stretch="None"
+                    Stroke="{TemplateBinding Foreground}"
+                    StrokeThickness="1" />
+                <ContentPresenter
+                    Grid.Row="1"
+                    Margin="{TemplateBinding Padding}"
+                    HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                    VerticalAlignment="{TemplateBinding VerticalContentAlignment}">
+                    <ContentPresenter.LayoutTransform>
+                        <RotateTransform Angle="90" CenterX="0.5" CenterY="0.5" />
+                    </ContentPresenter.LayoutTransform>
+                </ContentPresenter>
+            </Grid>
+        </Border>
+        <ControlTemplate.Triggers>
+            <Trigger Property="IsChecked" Value="True">
+                <Setter TargetName="Arrow" Property="Data" Value="{StaticResource Icon-RightArrow-Mini}" />
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Foreground" Value="{StaticResource Brush-Control-Disable-FG}" />
+                <Setter Property="BorderBrush" Value="{StaticResource Brush-Control-Disable-BD}" />
+                <Setter Property="Background" Value="{StaticResource Brush-Control-Disable-BG}" />
+            </Trigger>
+        </ControlTemplate.Triggers>
+    </ControlTemplate>
+    <Style x:Key="ToggleButton-Expander" TargetType="ToggleButton">
+        <Setter Property="Template" Value="{StaticResource ToggleButton-Expander-DownDirection}" />
+        <Setter Property="Foreground" Value="{StaticResource Brush-Control-FG}" />
+        <Setter Property="BorderBrush" Value="{StaticResource Brush-Control-BD}" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Background" Value="{StaticResource Brush-Transparent}" />
+        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        <Setter Property="VerticalContentAlignment" Value="Stretch" />
+        <Setter Property="Padding" Value="10,0,0,0" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="FontFamily" Value="{StaticResource Font}" />
+        <Setter Property="FontSize" Value="{StaticResource Font-Size}" />
     </Style>
+    <ControlTemplate x:Key="Expander-DownDirection" TargetType="Expander">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <ToggleButton
+                x:Name="Expand"
+                Grid.Row="0"
+                HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                FontFamily="{TemplateBinding FontFamily}"
+                FontSize="{TemplateBinding FontSize}"
+                Foreground="{TemplateBinding Foreground}"
+                IsChecked="{Binding IsExpanded, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
+                Style="{StaticResource ToggleButton-Expander}">
+                <ContentPresenter ContentSource="Header" RecognizesAccessKey="True" />
+            </ToggleButton>
+            <Border
+                x:Name="Content"
+                Grid.Row="1"
+                Margin="0,10,0,0"
+                Background="{TemplateBinding Background}"
+                BorderBrush="{TemplateBinding BorderBrush}"
+                BorderThickness="{TemplateBinding BorderThickness}"
+                Visibility="Collapsed">
+                <ContentPresenter Margin="{TemplateBinding Padding}" />
+            </Border>
+        </Grid>
+        <ControlTemplate.Triggers>
+            <Trigger Property="IsExpanded" Value="True">
+                <Setter TargetName="Content" Property="Visibility" Value="Visible" />
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Foreground" Value="{StaticResource Brush-Control-Disable-FG}" />
+                <Setter Property="BorderBrush" Value="{StaticResource Brush-Control-Disable-BD}" />
+                <Setter Property="Background" Value="{StaticResource Brush-Control-Disable-BG}" />
+            </Trigger>
+        </ControlTemplate.Triggers>
+    </ControlTemplate>
+    <ControlTemplate x:Key="Expander-UpDirection" TargetType="Expander">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Border
+                x:Name="Content"
+                Grid.Row="0"
+                Margin="0,0,0,10"
+                Background="{TemplateBinding Background}"
+                BorderBrush="{TemplateBinding BorderBrush}"
+                BorderThickness="{TemplateBinding BorderThickness}"
+                Visibility="Collapsed">
+                <ContentPresenter Margin="{TemplateBinding Padding}" />
+            </Border>
+            <ToggleButton
+                x:Name="Expand"
+                Grid.Row="1"
+                HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                FontFamily="{TemplateBinding FontFamily}"
+                FontSize="{TemplateBinding FontSize}"
+                Foreground="{TemplateBinding Foreground}"
+                IsChecked="{Binding IsExpanded, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
+                Style="{StaticResource ToggleButton-Expander}">
+                <ContentPresenter ContentSource="Header" RecognizesAccessKey="True" />
+            </ToggleButton>
+        </Grid>
+        <ControlTemplate.Triggers>
+            <Trigger Property="IsExpanded" Value="True">
+                <Setter TargetName="Content" Property="Visibility" Value="Visible" />
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Foreground" Value="{StaticResource Brush-Control-Disable-FG}" />
+                <Setter Property="BorderBrush" Value="{StaticResource Brush-Control-Disable-BD}" />
+                <Setter Property="Background" Value="{StaticResource Brush-Control-Disable-BG}" />
+            </Trigger>
+        </ControlTemplate.Triggers>
+    </ControlTemplate>
+    <ControlTemplate x:Key="Expander-RightDirection" TargetType="Expander">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <ToggleButton
+                x:Name="Expand"
+                Grid.Column="0"
+                Padding="0,10,0,0"
+                VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                FontFamily="{TemplateBinding FontFamily}"
+                FontSize="{TemplateBinding FontSize}"
+                Foreground="{TemplateBinding Foreground}"
+                IsChecked="{Binding IsExpanded, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
+                Style="{StaticResource ToggleButton-Expander}"
+                Template="{StaticResource ToggleButton-Expander-RightDirection}">
+                <ContentPresenter ContentSource="Header" RecognizesAccessKey="True" />
+            </ToggleButton>
+            <Border
+                x:Name="Content"
+                Grid.Column="1"
+                Margin="10,0,0,0"
+                Background="{TemplateBinding Background}"
+                BorderBrush="{TemplateBinding BorderBrush}"
+                BorderThickness="{TemplateBinding BorderThickness}"
+                Visibility="Collapsed">
+                <ContentPresenter Margin="{TemplateBinding Padding}" />
+            </Border>
+
+        </Grid>
+        <ControlTemplate.Triggers>
+            <Trigger Property="IsExpanded" Value="True">
+                <Setter TargetName="Content" Property="Visibility" Value="Visible" />
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Foreground" Value="{StaticResource Brush-Control-Disable-FG}" />
+                <Setter Property="BorderBrush" Value="{StaticResource Brush-Control-Disable-BD}" />
+                <Setter Property="Background" Value="{StaticResource Brush-Control-Disable-BG}" />
+            </Trigger>
+        </ControlTemplate.Triggers>
+    </ControlTemplate>
+    <ControlTemplate x:Key="Expander-LeftDirection" TargetType="Expander">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <Border
+                x:Name="Content"
+                Grid.Column="0"
+                Margin="0,0,10,0"
+                Background="{TemplateBinding Background}"
+                BorderBrush="{TemplateBinding BorderBrush}"
+                BorderThickness="{TemplateBinding BorderThickness}"
+                Visibility="Collapsed">
+                <ContentPresenter Margin="{TemplateBinding Padding}" />
+            </Border>
+            <ToggleButton
+                x:Name="Expand"
+                Grid.Column="1"
+                Padding="0,10,0,0"
+                VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                FontFamily="{TemplateBinding FontFamily}"
+                FontSize="{TemplateBinding FontSize}"
+                Foreground="{TemplateBinding Foreground}"
+                IsChecked="{Binding IsExpanded, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
+                Style="{StaticResource ToggleButton-Expander}"
+                Template="{StaticResource ToggleButton-Expander-RightDirection}">
+                <ContentPresenter ContentSource="Header" RecognizesAccessKey="True" />
+            </ToggleButton>
+        </Grid>
+        <ControlTemplate.Triggers>
+            <Trigger Property="IsExpanded" Value="True">
+                <Setter TargetName="Content" Property="Visibility" Value="Visible" />
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Foreground" Value="{StaticResource Brush-Control-Disable-FG}" />
+                <Setter Property="BorderBrush" Value="{StaticResource Brush-Control-Disable-BD}" />
+                <Setter Property="Background" Value="{StaticResource Brush-Control-Disable-BG}" />
+            </Trigger>
+        </ControlTemplate.Triggers>
+    </ControlTemplate>
+    <Style x:Key="Expander" TargetType="{x:Type Expander}">
+        <Setter Property="ExpandDirection" Value="Down" />
+        <Setter Property="Template" Value="{StaticResource Expander-DownDirection}" />
+        <Setter Property="FontFamily" Value="{StaticResource Font}" />
+        <Setter Property="FontSize" Value="{StaticResource Font-Size}" />
+        <Setter Property="Foreground" Value="{StaticResource Brush-Control-FG}" />
+        <Setter Property="BorderBrush" Value="{StaticResource Brush-Control-BD}" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Background" Value="{StaticResource Brush-Transparent}" />
+        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        <Setter Property="VerticalContentAlignment" Value="Stretch" />
+        <Setter Property="Padding" Value="0,0,0,0" />
+        <Style.Triggers>
+            <Trigger Property="ExpandDirection" Value="Up">
+                <Setter Property="Template" Value="{StaticResource Expander-UpDirection}" />
+            </Trigger>
+            <Trigger Property="ExpandDirection" Value="Right">
+                <Setter Property="Template" Value="{StaticResource Expander-RightDirection}" />
+            </Trigger>
+            <Trigger Property="ExpandDirection" Value="Left">
+                <Setter Property="Template" Value="{StaticResource Expander-LeftDirection}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+    <Style
+        x:Key="{x:Type Expander}"
+        BasedOn="{StaticResource Expander}"
+        TargetType="{x:Type Expander}" />
 
     <!--  ListBox  -->
-    <Style x:Key="listboxitem" TargetType="ListBoxItem">
+    <Style x:Key="ListBoxItem" TargetType="ListBoxItem">
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="ListBoxItem">
@@ -1228,12 +1459,12 @@
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsSelected" Value="True">
-                            <Setter Property="BorderBrush" Value="{StaticResource brush-panel-select-bd}" />
-                            <Setter Property="Background" Value="{StaticResource brush-panel-select-bg}" />
+                            <Setter Property="BorderBrush" Value="{StaticResource Brush-Panel-Select-BD}" />
+                            <Setter Property="Background" Value="{StaticResource Brush-Panel-Select-BG}" />
                         </Trigger>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="BorderBrush" Value="{StaticResource brush-panel-hover-bd}" />
-                            <Setter Property="Background" Value="{StaticResource brush-panel-hover-bg}" />
+                            <Setter Property="BorderBrush" Value="{StaticResource Brush-Panel-Hover-BD}" />
+                            <Setter Property="Background" Value="{StaticResource Brush-Panel-Hover-BG}" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -1241,14 +1472,14 @@
         </Setter>
         <Setter Property="OverridesDefaultStyle" Value="True" />
         <Setter Property="BorderThickness" Value="2" />
-        <Setter Property="BorderBrush" Value="{StaticResource brush-transparent}" />
-        <Setter Property="Background" Value="{StaticResource brush-transparent}" />
-        <Setter Property="Foreground" Value="{StaticResource brush-control-fg}" />
-        <Setter Property="FontFamily" Value="{StaticResource font}" />
-        <Setter Property="FontSize" Value="{StaticResource font-size}" />
+        <Setter Property="BorderBrush" Value="{StaticResource Brush-Transparent}" />
+        <Setter Property="Background" Value="{StaticResource Brush-Transparent}" />
+        <Setter Property="Foreground" Value="{StaticResource Brush-Control-FG}" />
+        <Setter Property="FontFamily" Value="{StaticResource Font}" />
+        <Setter Property="FontSize" Value="{StaticResource Font-Size}" />
         <Setter Property="HorizontalContentAlignment" Value="Stretch" />
     </Style>
-    <Style x:Key="listbox" TargetType="ListBox">
+    <Style x:Key="ListBox" TargetType="ListBox">
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="ListBox">
@@ -1259,7 +1490,7 @@
                         Background="{TemplateBinding Background}"
                         BorderBrush="{TemplateBinding Background}"
                         BorderThickness="{TemplateBinding BorderThickness}"
-                        Style="{StaticResource scrollviewer}">
+                        Style="{StaticResource ScrollViewer}">
                         <ItemsPresenter />
                     </ScrollViewer>
                 </ControlTemplate>
@@ -1275,9 +1506,9 @@
         <Setter Property="OverridesDefaultStyle" Value="True" />
         <Setter Property="Padding" Value="0" />
         <Setter Property="BorderThickness" Value="0" />
-        <Setter Property="BorderBrush" Value="{StaticResource brush-panel-bd}" />
-        <Setter Property="Background" Value="{StaticResource brush-transparent}" />
-        <Setter Property="ItemContainerStyle" Value="{StaticResource listboxitem}" />
+        <Setter Property="BorderBrush" Value="{StaticResource Brush-Panel-BD}" />
+        <Setter Property="Background" Value="{StaticResource Brush-Transparent}" />
+        <Setter Property="ItemContainerStyle" Value="{StaticResource ListBoxItem}" />
         <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
         <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
         <Setter Property="VerticalContentAlignment" Value="Stretch" />
@@ -1285,11 +1516,11 @@
     </Style>
     <Style
         x:Key="{x:Type ListBox}"
-        BasedOn="{StaticResource listbox}"
+        BasedOn="{StaticResource ListBox}"
         TargetType="{x:Type ListBox}" />
 
     <!--  ComboBox  -->
-    <Style x:Key="togglebutton-combobox-popup" TargetType="ToggleButton">
+    <Style x:Key="ToggleButton-ComboBox-Popup" TargetType="ToggleButton">
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="ToggleButton">
@@ -1302,7 +1533,7 @@
                             Margin="0,0,6,0"
                             HorizontalAlignment="Right"
                             VerticalAlignment="Center"
-                            Data="{StaticResource icon-downarrow-mini}"
+                            Data="{StaticResource Icon-DownArrow-Mini}"
                             Stroke="{TemplateBinding Foreground}" />
                     </Border>
                     <ControlTemplate.Triggers>
@@ -1310,7 +1541,7 @@
                             <Setter TargetName="Arrow" Property="Visibility" Value="Hidden" />
                         </Trigger>
                         <Trigger Property="IsChecked" Value="True">
-                            <Setter TargetName="Arrow" Property="Data" Value="{StaticResource icon-uparrow-mini}" />
+                            <Setter TargetName="Arrow" Property="Data" Value="{StaticResource Icon-UpArrow-Mini}" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -1320,7 +1551,7 @@
         <Setter Property="ClickMode" Value="Press" />
         <Setter Property="BorderThickness" Value="0" />
     </Style>
-    <Style x:Key="textbox-combobox-edit" TargetType="TextBox">
+    <Style x:Key="TextBox-ComboBox-Edit" TargetType="TextBox">
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="TextBox">
@@ -1333,20 +1564,20 @@
                         BorderBrush="{TemplateBinding BorderBrush}"
                         BorderThickness="{TemplateBinding BorderThickness}"
                         Foreground="{TemplateBinding Foreground}"
-                        Style="{StaticResource scrollviewer-slim}" />
+                        Style="{StaticResource ScrollViewer-Slim}" />
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
         <Setter Property="BorderThickness" Value="0" />
-        <Setter Property="SelectionBrush" Value="{StaticResource brush-text-selection}" />
-        <Setter Property="CaretBrush" Value="{StaticResource brush-text-caret}" />
+        <Setter Property="SelectionBrush" Value="{StaticResource Brush-Text-Selection}" />
+        <Setter Property="CaretBrush" Value="{StaticResource Brush-Text-Caret}" />
         <Setter Property="HorizontalContentAlignment" Value="Stretch" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="Padding" Value="4,0" />
         <Setter Property="Height" Value="25" />
         <Setter Property="Focusable" Value="True" />
     </Style>
-    <Style x:Key="comboboxitem" TargetType="ComboBoxItem">
+    <Style x:Key="ComboBoxItem" TargetType="ComboBoxItem">
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="ComboBoxItem">
@@ -1359,23 +1590,23 @@
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="BorderBrush" Value="{StaticResource brush-panel-hover-bd}" />
-                            <Setter Property="Background" Value="{StaticResource brush-panel-hover-bg}" />
+                            <Setter Property="BorderBrush" Value="{StaticResource Brush-Panel-Hover-BD}" />
+                            <Setter Property="Background" Value="{StaticResource Brush-Panel-Hover-BG}" />
                         </Trigger>
                         <Trigger Property="IsSelected" Value="True">
-                            <Setter Property="BorderBrush" Value="{StaticResource brush-panel-select-bd}" />
-                            <Setter Property="Background" Value="{StaticResource brush-panel-select-bg}" />
+                            <Setter Property="BorderBrush" Value="{StaticResource Brush-Panel-Select-BD}" />
+                            <Setter Property="Background" Value="{StaticResource Brush-Panel-Select-BG}" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
-        <Setter Property="BorderBrush" Value="{StaticResource brush-panel-bd}" />
+        <Setter Property="BorderBrush" Value="{StaticResource Brush-Panel-BD}" />
         <Setter Property="BorderThickness" Value="0" />
-        <Setter Property="Background" Value="{StaticResource brush-transparent}" />
-        <Setter Property="Foreground" Value="{StaticResource brush-control-fg}" />
-        <Setter Property="FontFamily" Value="{StaticResource font}" />
-        <Setter Property="FontSize" Value="{StaticResource font-size}" />
+        <Setter Property="Background" Value="{StaticResource Brush-Transparent}" />
+        <Setter Property="Foreground" Value="{StaticResource Brush-Control-FG}" />
+        <Setter Property="FontFamily" Value="{StaticResource Font}" />
+        <Setter Property="FontSize" Value="{StaticResource Font-Size}" />
         <Setter Property="HorizontalContentAlignment" Value="Stretch" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="HorizontalAlignment" Value="Stretch" />
@@ -1383,7 +1614,7 @@
         <Setter Property="Padding" Value="5,0,5,0" />
         <Setter Property="Height" Value="25" />
     </Style>
-    <Style x:Key="combobox" TargetType="ComboBox">
+    <Style x:Key="ComboBox" TargetType="ComboBox">
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="ComboBox">
@@ -1395,12 +1626,12 @@
                             BorderThickness="{TemplateBinding BorderThickness}">
                             <Grid>
                                 <ToggleButton
-                                    Background="{StaticResource brush-transparent}"
+                                    Background="{StaticResource Brush-Transparent}"
                                     FontFamily="{TemplateBinding FontFamily}"
                                     FontSize="{TemplateBinding FontSize}"
                                     Foreground="{TemplateBinding Foreground}"
                                     IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
-                                    Style="{StaticResource togglebutton-combobox-popup}" />
+                                    Style="{StaticResource ToggleButton-ComboBox-Popup}" />
                                 <ContentPresenter
                                     x:Name="ContentSite"
                                     Margin="5,0,20,0"
@@ -1413,12 +1644,12 @@
                                 <TextBox
                                     x:Name="PART_EditableTextBox"
                                     Margin="0,0,20,0"
-                                    Background="{StaticResource brush-transparent}"
+                                    Background="{StaticResource Brush-Transparent}"
                                     FontFamily="{TemplateBinding FontFamily}"
                                     FontSize="{TemplateBinding FontSize}"
                                     Foreground="{TemplateBinding Foreground}"
                                     IsReadOnly="{TemplateBinding IsReadOnly}"
-                                    Style="{StaticResource textbox-combobox-edit}"
+                                    Style="{StaticResource TextBox-ComboBox-Edit}"
                                     Visibility="Hidden" />
                             </Grid>
                         </Border>
@@ -1432,28 +1663,28 @@
                             SnapsToDevicePixels="True">
                             <ScrollViewer
                                 HorizontalContentAlignment="Stretch"
-                                Background="{StaticResource brush-popup-bg}"
-                                BorderBrush="{StaticResource brush-popup-bd}"
+                                Background="{StaticResource Brush-Popup-BG}"
+                                BorderBrush="{StaticResource Brush-Popup-BD}"
                                 BorderThickness="1"
-                                Style="{StaticResource scrollviewer}">
+                                Style="{StaticResource ScrollViewer}">
                                 <ItemsPresenter KeyboardNavigation.DirectionalNavigation="Contained" />
                             </ScrollViewer>
                         </Popup>
                     </Grid>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="Foreground" Value="{StaticResource brush-control-hover-fg}" />
-                            <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource brush-control-hover-bd}" />
-                            <Setter TargetName="Border" Property="Background" Value="{StaticResource brush-control-hover-bg}" />
+                            <Setter Property="Foreground" Value="{StaticResource Brush-Control-Hover-FG}" />
+                            <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource Brush-Control-Hover-BD}" />
+                            <Setter TargetName="Border" Property="Background" Value="{StaticResource Brush-Control-Hover-BG}" />
                         </Trigger>
                         <Trigger Property="IsKeyboardFocusWithin" Value="True">
-                            <Setter Property="Foreground" Value="{StaticResource brush-control-hover-fg}" />
-                            <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource brush-control-hover-bd}" />
+                            <Setter Property="Foreground" Value="{StaticResource Brush-Control-Hover-FG}" />
+                            <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource Brush-Control-Hover-BD}" />
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
-                            <Setter Property="Foreground" Value="{StaticResource brush-control-fg}" />
-                            <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource brush-transparent}" />
-                            <Setter TargetName="Border" Property="Background" Value="{StaticResource brush-transparent}" />
+                            <Setter Property="Foreground" Value="{StaticResource Brush-Control-FG}" />
+                            <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource Brush-Transparent}" />
+                            <Setter TargetName="Border" Property="Background" Value="{StaticResource Brush-Transparent}" />
                         </Trigger>
                         <Trigger Property="IsEditable" Value="True">
                             <Setter TargetName="PART_EditableTextBox" Property="Visibility" Value="Visible" />
@@ -1470,18 +1701,18 @@
                 </ItemsPanelTemplate>
             </Setter.Value>
         </Setter>
-        <Setter Property="ItemContainerStyle" Value="{StaticResource comboboxitem}" />
-        <Setter Property="Foreground" Value="{StaticResource brush-control-fg}" />
-        <Setter Property="Background" Value="{StaticResource brush-transparent}" />
-        <Setter Property="BorderBrush" Value="{StaticResource brush-control-bd}" />
-        <Setter Property="FontFamily" Value="{StaticResource font}" />
-        <Setter Property="FontSize" Value="{StaticResource font-size}" />
+        <Setter Property="ItemContainerStyle" Value="{StaticResource ComboBoxItem}" />
+        <Setter Property="Foreground" Value="{StaticResource Brush-Control-FG}" />
+        <Setter Property="Background" Value="{StaticResource Brush-Transparent}" />
+        <Setter Property="BorderBrush" Value="{StaticResource Brush-Control-BD}" />
+        <Setter Property="FontFamily" Value="{StaticResource Font}" />
+        <Setter Property="FontSize" Value="{StaticResource Font-Size}" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="Height" Value="25" />
     </Style>
     <Style
         x:Key="{x:Type ComboBox}"
-        BasedOn="{StaticResource combobox}"
+        BasedOn="{StaticResource ComboBox}"
         TargetType="{x:Type ComboBox}" />
 
     <!--  Menu  -->
@@ -1499,8 +1730,8 @@
         <Setter Property="Height" Value="1" />
         <Setter Property="Margin" Value="30,2,2,2" />
         <Setter Property="BorderThickness" Value="0,1,0,0" />
-        <Setter Property="BorderBrush" Value="{StaticResource brush-panel-bd}" />
-        <Setter Property="Background" Value="{StaticResource brush-transparent}" />
+        <Setter Property="BorderBrush" Value="{StaticResource Brush-Panel-BD}" />
+        <Setter Property="Background" Value="{StaticResource Brush-Transparent}" />
     </Style>
     <ControlTemplate x:Key="{x:Static MenuItem.TopLevelHeaderTemplateKey}" TargetType="{x:Type MenuItem}">
         <Grid>
@@ -1528,11 +1759,11 @@
                 </Popup.Effect>
                 <ScrollViewer
                     Padding="2"
-                    Background="{StaticResource brush-popup-bg}"
-                    BorderBrush="{StaticResource brush-popup-bd}"
+                    Background="{StaticResource Brush-Popup-BG}"
+                    BorderBrush="{StaticResource Brush-Popup-BD}"
                     BorderThickness="1"
                     CanContentScroll="True"
-                    Style="{StaticResource scrollviewer}">
+                    Style="{StaticResource ScrollViewer}">
                     <ScrollViewer.Effect>
                         <DropShadowEffect />
                     </ScrollViewer.Effect>
@@ -1545,19 +1776,19 @@
                 <Setter TargetName="Popup" Property="PopupAnimation" Value="None" />
             </Trigger>
             <Trigger Property="IsHighlighted" Value="true">
-                <Setter Property="Foreground" Value="{StaticResource brush-control-hover-fg}" />
-                <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource brush-panel-hover-bd}" />
-                <Setter TargetName="Border" Property="Background" Value="{StaticResource brush-panel-hover-bg}" />
+                <Setter Property="Foreground" Value="{StaticResource Brush-Control-Hover-FG}" />
+                <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource Brush-Panel-Hover-BD}" />
+                <Setter TargetName="Border" Property="Background" Value="{StaticResource Brush-Panel-Hover-BG}" />
             </Trigger>
             <Trigger Property="IsSubmenuOpen" Value="true">
-                <Setter Property="Foreground" Value="{StaticResource brush-control-hover-fg}" />
-                <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource brush-popup-bd}" />
-                <Setter TargetName="Border" Property="Background" Value="{StaticResource brush-popup-bg}" />
+                <Setter Property="Foreground" Value="{StaticResource Brush-Control-Hover-FG}" />
+                <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource Brush-Popup-BD}" />
+                <Setter TargetName="Border" Property="Background" Value="{StaticResource Brush-Popup-BG}" />
             </Trigger>
             <Trigger Property="IsEnabled" Value="False">
-                <Setter Property="Foreground" Value="{StaticResource brush-control-disable-fg}" />
-                <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource brush-panel-disable-bd}" />
-                <Setter TargetName="Border" Property="Background" Value="{StaticResource brush-panel-disable-bg}" />
+                <Setter Property="Foreground" Value="{StaticResource Brush-Control-Disable-FG}" />
+                <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource Brush-Panel-Disable-BD}" />
+                <Setter TargetName="Border" Property="Background" Value="{StaticResource Brush-Panel-Disable-BG}" />
             </Trigger>
         </ControlTemplate.Triggers>
     </ControlTemplate>
@@ -1576,14 +1807,14 @@
         </Border>
         <ControlTemplate.Triggers>
             <Trigger Property="IsHighlighted" Value="true">
-                <Setter Property="Foreground" Value="{StaticResource brush-control-hover-fg}" />
-                <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource brush-panel-hover-bd}" />
-                <Setter TargetName="Border" Property="Background" Value="{StaticResource brush-panel-hover-bg}" />
+                <Setter Property="Foreground" Value="{StaticResource Brush-Control-Hover-FG}" />
+                <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource Brush-Panel-Hover-BD}" />
+                <Setter TargetName="Border" Property="Background" Value="{StaticResource Brush-Panel-Hover-BG}" />
             </Trigger>
             <Trigger Property="IsEnabled" Value="False">
-                <Setter Property="Foreground" Value="{StaticResource brush-control-disable-fg}" />
-                <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource brush-panel-disable-bd}" />
-                <Setter TargetName="Border" Property="Background" Value="{StaticResource brush-panel-disable-bg}" />
+                <Setter Property="Foreground" Value="{StaticResource Brush-Control-Disable-FG}" />
+                <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource Brush-Panel-Disable-BD}" />
+                <Setter TargetName="Border" Property="Background" Value="{StaticResource Brush-Panel-Disable-BG}" />
             </Trigger>
         </ControlTemplate.Triggers>
     </ControlTemplate>
@@ -1614,7 +1845,7 @@
                     Margin="6,0,6,0"
                     HorizontalAlignment="Left"
                     VerticalAlignment="Center"
-                    Background="{StaticResource brush-transparent}"
+                    Background="{StaticResource Brush-Transparent}"
                     BorderBrush="{TemplateBinding Foreground}"
                     BorderThickness="1"
                     Visibility="Collapsed">
@@ -1623,7 +1854,7 @@
                         Width="10"
                         Height="10"
                         Data="M27.903015,0L32,4.0970465 12.369019,23.728029 11.685974,24.520998 0,14.441042 3.7819824,10.054994 11.330017,16.567019z"
-                        Fill="{StaticResource brush-accent-light}"
+                        Fill="{StaticResource Brush-Accent-Light}"
                         SnapsToDevicePixels="False"
                         Stretch="Uniform"
                         Visibility="Hidden" />
@@ -1657,14 +1888,14 @@
                 <Setter TargetName="Icon" Property="Visibility" Value="Hidden" />
             </Trigger>
             <Trigger Property="IsHighlighted" Value="true">
-                <Setter Property="Foreground" Value="{StaticResource brush-control-hover-fg}" />
-                <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource brush-panel-hover-bd}" />
-                <Setter TargetName="Border" Property="Background" Value="{StaticResource brush-panel-hover-bg}" />
+                <Setter Property="Foreground" Value="{StaticResource Brush-Control-Hover-FG}" />
+                <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource Brush-Panel-Hover-BD}" />
+                <Setter TargetName="Border" Property="Background" Value="{StaticResource Brush-Panel-Hover-BG}" />
             </Trigger>
             <Trigger Property="IsEnabled" Value="False">
-                <Setter Property="Foreground" Value="{StaticResource brush-control-disable-fg}" />
-                <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource brush-panel-disable-bd}" />
-                <Setter TargetName="Border" Property="Background" Value="{StaticResource brush-panel-disable-bg}" />
+                <Setter Property="Foreground" Value="{StaticResource Brush-Control-Disable-FG}" />
+                <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource Brush-Panel-Disable-BD}" />
+                <Setter TargetName="Border" Property="Background" Value="{StaticResource Brush-Panel-Disable-BG}" />
             </Trigger>
         </ControlTemplate.Triggers>
     </ControlTemplate>
@@ -1708,7 +1939,7 @@
                         Grid.Column="3"
                         HorizontalAlignment="Center"
                         VerticalAlignment="Center"
-                        Data="{StaticResource icon-rightarrow-mini}"
+                        Data="{StaticResource Icon-RightArrow-Mini}"
                         Stroke="{TemplateBinding Foreground}" />
                 </Grid>
             </Border>
@@ -1722,11 +1953,11 @@
                 PopupAnimation="Fade">
                 <ScrollViewer
                     Padding="2"
-                    Background="{StaticResource brush-popup-bg}"
-                    BorderBrush="{StaticResource brush-popup-bd}"
+                    Background="{StaticResource Brush-Popup-BG}"
+                    BorderBrush="{StaticResource Brush-Popup-BD}"
                     BorderThickness="1"
                     CanContentScroll="True"
-                    Style="{StaticResource scrollviewer}">
+                    Style="{StaticResource ScrollViewer}">
                     <ItemsPresenter KeyboardNavigation.DirectionalNavigation="Cycle" />
                 </ScrollViewer>
             </Popup>
@@ -1736,28 +1967,28 @@
                 <Setter TargetName="Icon" Property="Visibility" Value="Collapsed" />
             </Trigger>
             <Trigger Property="IsHighlighted" Value="true">
-                <Setter Property="Foreground" Value="{StaticResource brush-control-hover-fg}" />
-                <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource brush-panel-hover-bd}" />
-                <Setter TargetName="Border" Property="Background" Value="{StaticResource brush-panel-hover-bg}" />
+                <Setter Property="Foreground" Value="{StaticResource Brush-Control-Hover-FG}" />
+                <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource Brush-Panel-Hover-BD}" />
+                <Setter TargetName="Border" Property="Background" Value="{StaticResource Brush-Panel-Hover-BG}" />
             </Trigger>
             <Trigger Property="IsEnabled" Value="False">
-                <Setter Property="Foreground" Value="{StaticResource brush-control-disable-fg}" />
-                <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource brush-panel-disable-bd}" />
-                <Setter TargetName="Border" Property="Background" Value="{StaticResource brush-panel-disable-bg}" />
+                <Setter Property="Foreground" Value="{StaticResource Brush-Control-Disable-FG}" />
+                <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource Brush-Panel-Disable-BD}" />
+                <Setter TargetName="Border" Property="Background" Value="{StaticResource Brush-Panel-Disable-BG}" />
             </Trigger>
         </ControlTemplate.Triggers>
     </ControlTemplate>
     <Style x:Key="{x:Type MenuItem}" TargetType="{x:Type MenuItem}">
         <Setter Property="OverridesDefaultStyle" Value="True" />
-        <Setter Property="Foreground" Value="{StaticResource brush-control-fg}" />
-        <Setter Property="BorderBrush" Value="{StaticResource brush-transparent}" />
-        <Setter Property="Background" Value="{StaticResource brush-transparent}" />
+        <Setter Property="Foreground" Value="{StaticResource Brush-Control-FG}" />
+        <Setter Property="BorderBrush" Value="{StaticResource Brush-Transparent}" />
+        <Setter Property="Background" Value="{StaticResource Brush-Transparent}" />
         <Setter Property="BorderThickness" Value="0" />
         <Setter Property="Padding" Value="0" />
         <Setter Property="HorizontalContentAlignment" Value="Stretch" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
-        <Setter Property="FontFamily" Value="{StaticResource font}" />
-        <Setter Property="FontSize" Value="{StaticResource font-size}" />
+        <Setter Property="FontFamily" Value="{StaticResource Font}" />
+        <Setter Property="FontSize" Value="{StaticResource Font-Size}" />
         <Setter Property="Height" Value="23" />
         <Style.Triggers>
             <Trigger Property="Role" Value="TopLevelHeader">
@@ -1794,8 +2025,8 @@
             </Setter.Value>
         </Setter>
         <Setter Property="BorderThickness" Value="0" />
-        <Setter Property="BorderBrush" Value="{StaticResource brush-panel-bd}" />
-        <Setter Property="Background" Value="{StaticResource brush-panel-bg}" />
+        <Setter Property="BorderBrush" Value="{StaticResource Brush-Panel-BD}" />
+        <Setter Property="Background" Value="{StaticResource Brush-Panel-BG}" />
         <Setter Property="Padding" Value="0" />
         <Setter Property="HorizontalContentAlignment" Value="Stretch" />
         <Setter Property="VerticalContentAlignment" Value="Stretch" />
@@ -1823,8 +2054,8 @@
         <Setter Property="Grid.IsSharedSizeScope" Value="true" />
         <Setter Property="HasDropShadow" Value="True" />
         <Setter Property="BorderThickness" Value="1" />
-        <Setter Property="BorderBrush" Value="{StaticResource brush-popup-bd}" />
-        <Setter Property="Background" Value="{StaticResource brush-popup-bg}" />
+        <Setter Property="BorderBrush" Value="{StaticResource Brush-Popup-BD}" />
+        <Setter Property="Background" Value="{StaticResource Brush-Popup-BG}" />
         <Setter Property="Padding" Value="2" />
         <Setter Property="HorizontalContentAlignment" Value="Stretch" />
         <Setter Property="VerticalContentAlignment" Value="Stretch" />
@@ -1838,16 +2069,16 @@
                     <Grid>
                         <Rectangle
                             x:Name="Border"
-                            Fill="{StaticResource brush-control-bg}"
+                            Fill="{StaticResource Brush-Control-BG}"
                             SnapsToDevicePixels="True"
-                            Stroke="{StaticResource brush-control-bd}"
+                            Stroke="{StaticResource Brush-Control-BD}"
                             StrokeThickness="1" />
                         <Polygon
                             x:Name="Arrow"
                             Margin="8,8,3,3"
                             HorizontalAlignment="Right"
                             VerticalAlignment="Bottom"
-                            Fill="{StaticResource brush-control-fg}"
+                            Fill="{StaticResource Brush-Control-FG}"
                             Opacity="0.15"
                             Points="0,10 10,10 10,0"
                             Stretch="Uniform" />
@@ -1857,14 +2088,14 @@
                                 <VisualState x:Name="MouseOver">
                                     <Storyboard>
                                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="Border" Storyboard.TargetProperty="(Shape.Fill)">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource brush-control-hover-bg}" />
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource Brush-Control-Hover-BG}" />
                                         </ObjectAnimationUsingKeyFrames>
                                     </Storyboard>
                                 </VisualState>
                                 <VisualState x:Name="Pressed">
                                     <Storyboard>
                                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="Border" Storyboard.TargetProperty="(Shape.Fill)">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource brush-control-press-bg}" />
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource Brush-Control-Press-BG}" />
                                         </ObjectAnimationUsingKeyFrames>
                                     </Storyboard>
                                 </VisualState>
@@ -1884,15 +2115,15 @@
     </Style>
     <Style x:Key="{x:Type DataGrid}" TargetType="{x:Type DataGrid}">
         <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" />
-        <Setter Property="BorderBrush" Value="{StaticResource brush-panel-bd}" />
-        <Setter Property="Background" Value="{StaticResource brush-panel-bg}" />
+        <Setter Property="BorderBrush" Value="{StaticResource Brush-Panel-BD}" />
+        <Setter Property="Background" Value="{StaticResource Brush-Panel-BG}" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="RowDetailsVisibilityMode" Value="VisibleWhenSelected" />
         <Setter Property="ScrollViewer.CanContentScroll" Value="true" />
         <Setter Property="ScrollViewer.PanningMode" Value="Both" />
         <Setter Property="Stylus.IsFlicksEnabled" Value="False" />
-        <Setter Property="HorizontalGridLinesBrush" Value="{StaticResource brush-panel-bd}" />
-        <Setter Property="VerticalGridLinesBrush" Value="{StaticResource brush-panel-bd}" />
+        <Setter Property="HorizontalGridLinesBrush" Value="{StaticResource Brush-Panel-BD}" />
+        <Setter Property="VerticalGridLinesBrush" Value="{StaticResource Brush-Panel-BD}" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type DataGrid}">
@@ -1905,7 +2136,7 @@
                         SnapsToDevicePixels="True">
                         <ScrollViewer
                             x:Name="DG_ScrollViewer"
-                            Background="{StaticResource brush-transparent}"
+                            Background="{StaticResource Brush-Transparent}"
                             Focusable="false">
                             <ScrollViewer.Template>
                                 <ControlTemplate TargetType="{x:Type ScrollViewer}">
@@ -1944,7 +2175,7 @@
                                             Grid.Column="2"
                                             Maximum="{TemplateBinding ScrollableHeight}"
                                             Orientation="Vertical"
-                                            Style="{StaticResource scrollbar}"
+                                            Style="{StaticResource ScrollBar}"
                                             ViewportSize="{TemplateBinding ViewportHeight}"
                                             Visibility="{TemplateBinding ComputedVerticalScrollBarVisibility}"
                                             Value="{Binding VerticalOffset, Mode=OneWay, RelativeSource={RelativeSource TemplatedParent}}" />
@@ -1958,7 +2189,7 @@
                                                 Grid.Column="1"
                                                 Maximum="{TemplateBinding ScrollableWidth}"
                                                 Orientation="Horizontal"
-                                                Style="{StaticResource scrollbar}"
+                                                Style="{StaticResource ScrollBar}"
                                                 ViewportSize="{TemplateBinding ViewportWidth}"
                                                 Visibility="{TemplateBinding ComputedHorizontalScrollBarVisibility}"
                                                 Value="{Binding HorizontalOffset, Mode=OneWay, RelativeSource={RelativeSource TemplatedParent}}" />
@@ -1973,10 +2204,10 @@
                                 <VisualState x:Name="Disabled">
                                     <Storyboard>
                                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="border" Storyboard.TargetProperty="(Border.BorderBrush)">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource brush-panel-disable-bd}" />
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource Brush-Panel-Disable-BD}" />
                                         </ObjectAnimationUsingKeyFrames>
                                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="border" Storyboard.TargetProperty="(Panel.Background)">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource brush-panel-disable-bg}" />
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource Brush-Panel-Disable-BG}" />
                                         </ObjectAnimationUsingKeyFrames>
                                     </Storyboard>
                                 </VisualState>
@@ -2000,8 +2231,8 @@
                     <Border
                         x:Name="border"
                         Padding="{TemplateBinding Padding}"
-                        Background="{StaticResource brush-transparent}"
-                        BorderBrush="{StaticResource brush-transparent}"
+                        Background="{StaticResource Brush-Transparent}"
+                        BorderBrush="{StaticResource Brush-Transparent}"
                         BorderThickness="0"
                         SnapsToDevicePixels="True">
                         <ContentPresenter
@@ -2018,10 +2249,10 @@
                                 <VisualState x:Name="Current">
                                     <Storyboard>
                                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="border" Storyboard.TargetProperty="(Border.BorderBrush)">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource brush-panel-select-bd}" />
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource Brush-Panel-Select-BD}" />
                                         </ObjectAnimationUsingKeyFrames>
                                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="border" Storyboard.TargetProperty="(Border.Background)">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource brush-panel-select-bg}" />
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource Brush-Panel-Select-BG}" />
                                         </ObjectAnimationUsingKeyFrames>
                                     </Storyboard>
                                 </VisualState>
@@ -2031,9 +2262,9 @@
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
-        <Setter Property="FontFamily" Value="{StaticResource font}" />
-        <Setter Property="FontSize" Value="{StaticResource font-size}" />
-        <Setter Property="Foreground" Value="{StaticResource brush-control-fg}" />
+        <Setter Property="FontFamily" Value="{StaticResource Font}" />
+        <Setter Property="FontSize" Value="{StaticResource Font-Size}" />
+        <Setter Property="Foreground" Value="{StaticResource Brush-Control-FG}" />
         <Setter Property="HorizontalContentAlignment" Value="Stretch" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="Padding" Value="10,0" />
@@ -2078,10 +2309,10 @@
                                 <VisualState x:Name="Normal_AlternatingRow">
                                     <Storyboard>
                                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="DGR_Border" Storyboard.TargetProperty="(Border.BorderBrush)">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource brush-panel-alternate-bd}" />
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource Brush-Panel-Alternate-BD}" />
                                         </ObjectAnimationUsingKeyFrames>
                                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="DGR_Border" Storyboard.TargetProperty="(Panel.Background)">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource brush-panel-alternate-bg}" />
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource Brush-Panel-Alternate-BG}" />
                                         </ObjectAnimationUsingKeyFrames>
                                     </Storyboard>
                                 </VisualState>
@@ -2095,70 +2326,70 @@
                                 <VisualState x:Name="Normal_Selected">
                                     <Storyboard>
                                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="DGR_Border" Storyboard.TargetProperty="(Border.BorderBrush)">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource brush-panel-select-bd}" />
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource Brush-Panel-Select-BD}" />
                                         </ObjectAnimationUsingKeyFrames>
                                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="DGR_Border" Storyboard.TargetProperty="(Panel.Background)">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource brush-panel-select-bg}" />
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource Brush-Panel-Select-BG}" />
                                         </ObjectAnimationUsingKeyFrames>
                                     </Storyboard>
                                 </VisualState>
                                 <VisualState x:Name="Unfocused_Selected">
                                     <Storyboard>
                                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="DGR_Border" Storyboard.TargetProperty="(Border.BorderBrush)">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource brush-panel-select-bd}" />
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource Brush-Panel-Select-BD}" />
                                         </ObjectAnimationUsingKeyFrames>
                                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="DGR_Border" Storyboard.TargetProperty="(Panel.Background)">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource brush-panel-select-bg}" />
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource Brush-Panel-Select-BG}" />
                                         </ObjectAnimationUsingKeyFrames>
                                     </Storyboard>
                                 </VisualState>
                                 <VisualState x:Name="Normal_Editing">
                                     <Storyboard>
                                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="DGR_Border" Storyboard.TargetProperty="(Border.BorderBrush)">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource brush-panel-hover-bd}" />
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource Brush-Panel-Hover-BD}" />
                                         </ObjectAnimationUsingKeyFrames>
                                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="DGR_Border" Storyboard.TargetProperty="(Panel.Background)">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource brush-panel-hover-bg}" />
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource Brush-Panel-Hover-BG}" />
                                         </ObjectAnimationUsingKeyFrames>
                                     </Storyboard>
                                 </VisualState>
                                 <VisualState x:Name="MouseOver_Editing">
                                     <Storyboard>
                                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="DGR_Border" Storyboard.TargetProperty="(Border.BorderBrush)">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource brush-panel-hover-bd}" />
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource Brush-Panel-Hover-BD}" />
                                         </ObjectAnimationUsingKeyFrames>
                                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="DGR_Border" Storyboard.TargetProperty="(Panel.Background)">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource brush-panel-hover-bg}" />
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource Brush-Panel-Hover-BG}" />
                                         </ObjectAnimationUsingKeyFrames>
                                     </Storyboard>
                                 </VisualState>
                                 <VisualState x:Name="MouseOver_Unfocused_Editing">
                                     <Storyboard>
                                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="DGR_Border" Storyboard.TargetProperty="(Border.BorderBrush)">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource brush-panel-hover-bd}" />
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource Brush-Panel-Hover-BD}" />
                                         </ObjectAnimationUsingKeyFrames>
                                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="DGR_Border" Storyboard.TargetProperty="(Panel.Background)">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource brush-panel-hover-bg}" />
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource Brush-Panel-Hover-BG}" />
                                         </ObjectAnimationUsingKeyFrames>
                                     </Storyboard>
                                 </VisualState>
                                 <VisualState x:Name="Unfocused_Editing">
                                     <Storyboard>
                                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="DGR_Border" Storyboard.TargetProperty="(Border.BorderBrush)">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource brush-panel-hover-bd}" />
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource Brush-Panel-Hover-BD}" />
                                         </ObjectAnimationUsingKeyFrames>
                                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="DGR_Border" Storyboard.TargetProperty="(Panel.Background)">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource brush-panel-hover-bg}" />
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource Brush-Panel-Hover-BG}" />
                                         </ObjectAnimationUsingKeyFrames>
                                     </Storyboard>
                                 </VisualState>
                                 <VisualState x:Name="MouseOver">
                                     <Storyboard>
                                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="DGR_Border" Storyboard.TargetProperty="(Border.BorderBrush)">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource brush-panel-hover-bd}" />
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource Brush-Panel-Hover-BD}" />
                                         </ObjectAnimationUsingKeyFrames>
                                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="DGR_Border" Storyboard.TargetProperty="(Panel.Background)">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource brush-panel-hover-bg}" />
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource Brush-Panel-Hover-BG}" />
                                         </ObjectAnimationUsingKeyFrames>
                                     </Storyboard>
                                 </VisualState>
@@ -2171,20 +2402,20 @@
                                 <VisualState x:Name="MouseOver_Selected">
                                     <Storyboard>
                                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="DGR_Border" Storyboard.TargetProperty="(Border.BorderBrush)">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource brush-panel-hover-bd}" />
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource Brush-Panel-Hover-BD}" />
                                         </ObjectAnimationUsingKeyFrames>
                                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="DGR_Border" Storyboard.TargetProperty="(Panel.Background)">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource brush-panel-hover-bg}" />
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource Brush-Panel-Hover-BG}" />
                                         </ObjectAnimationUsingKeyFrames>
                                     </Storyboard>
                                 </VisualState>
                                 <VisualState x:Name="MouseOver_Unfocused_Selected">
                                     <Storyboard>
                                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="DGR_Border" Storyboard.TargetProperty="(Border.BorderBrush)">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource brush-panel-hover-bd}" />
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource Brush-Panel-Hover-BD}" />
                                         </ObjectAnimationUsingKeyFrames>
                                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="DGR_Border" Storyboard.TargetProperty="(Panel.Background)">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource brush-panel-hover-bg}" />
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource Brush-Panel-Hover-BG}" />
                                         </ObjectAnimationUsingKeyFrames>
                                     </Storyboard>
                                 </VisualState>
@@ -2194,7 +2425,7 @@
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
-        <Setter Property="Background" Value="{StaticResource brush-panel-bg}" />
+        <Setter Property="Background" Value="{StaticResource Brush-Panel-BG}" />
         <Setter Property="SnapsToDevicePixels" Value="true" />
         <!--<Setter Property="Height" Value="22" />-->
         <Setter Property="Validation.ErrorTemplate" Value="{x:Null}" />
@@ -2204,16 +2435,16 @@
                     <TextBlock
                         Margin="2,0,0,0"
                         VerticalAlignment="Center"
-                        Foreground="{StaticResource brush-accent}"
-                        Style="{StaticResource textblock}"
+                        Foreground="{StaticResource Brush-Accent}"
+                        Style="{StaticResource TextBlock}"
                         Text="!" />
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
     </Style>
-    <Style x:Key="thumb-rowheadergripper" TargetType="{x:Type Thumb}">
+    <Style x:Key="Thumb-RowHeaderGripper" TargetType="{x:Type Thumb}">
         <Setter Property="Height" Value="8" />
-        <Setter Property="Background" Value="{StaticResource brush-transparent}" />
+        <Setter Property="Background" Value="{StaticResource Brush-Transparent}" />
         <Setter Property="Cursor" Value="SizeNS" />
         <Setter Property="Template">
             <Setter.Value>
@@ -2231,25 +2462,25 @@
                         <Border
                             x:Name="rowHeaderBorder"
                             Width="10"
-                            Background="{StaticResource brush-control-bg}"
-                            BorderBrush="{StaticResource brush-control-bd}"
+                            Background="{StaticResource Brush-Control-BG}"
+                            BorderBrush="{StaticResource Brush-Control-BD}"
                             BorderThickness="1">
                             <StackPanel Orientation="Horizontal">
                                 <ContentPresenter VerticalAlignment="Center" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
                                 <Control
                                     SnapsToDevicePixels="false"
                                     Template="{Binding ValidationErrorTemplate, RelativeSource={RelativeSource AncestorType={x:Type DataGridRow}}}"
-                                    Visibility="{Binding (Validation.HasError), Converter={StaticResource converter-bool-to-visibility}, RelativeSource={RelativeSource AncestorType={x:Type DataGridRow}}}" />
+                                    Visibility="{Binding (Validation.HasError), Converter={StaticResource Converter-Bool-To-Visibility}, RelativeSource={RelativeSource AncestorType={x:Type DataGridRow}}}" />
                             </StackPanel>
                         </Border>
                         <Thumb
                             x:Name="PART_TopHeaderGripper"
                             VerticalAlignment="Top"
-                            Style="{StaticResource thumb-rowheadergripper}" />
+                            Style="{StaticResource Thumb-RowHeaderGripper}" />
                         <Thumb
                             x:Name="PART_BottomHeaderGripper"
                             VerticalAlignment="Bottom"
-                            Style="{StaticResource thumb-rowheadergripper}" />
+                            Style="{StaticResource Thumb-RowHeaderGripper}" />
                         <VisualStateManager.VisualStateGroups>
                             <!--
                                 This example does not specify an appearance for every
@@ -2265,10 +2496,10 @@
                                 <VisualState x:Name="MouseOver">
                                     <Storyboard>
                                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="rowHeaderBorder" Storyboard.TargetProperty="(Border.BorderBrush)">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource brush-control-hover-bd}" />
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource Brush-Control-Hover-BD}" />
                                         </ObjectAnimationUsingKeyFrames>
                                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="rowHeaderBorder" Storyboard.TargetProperty="(Panel.Background)">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource brush-control-hover-bg}" />
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource Brush-Control-Hover-BG}" />
                                         </ObjectAnimationUsingKeyFrames>
                                     </Storyboard>
                                 </VisualState>
@@ -2290,9 +2521,9 @@
             </Setter.Value>
         </Setter>
     </Style>
-    <Style x:Key="thumb-columnheadergripper" TargetType="{x:Type Thumb}">
+    <Style x:Key="Thumb-ColumnHeaderGripper" TargetType="{x:Type Thumb}">
         <Setter Property="Width" Value="8" />
-        <Setter Property="Background" Value="{StaticResource brush-transparent}" />
+        <Setter Property="Background" Value="{StaticResource Brush-Transparent}" />
         <Setter Property="Cursor" Value="SizeWE" />
         <Setter Property="Template">
             <Setter.Value>
@@ -2322,24 +2553,24 @@
                         <Thumb
                             x:Name="PART_LeftHeaderGripper"
                             HorizontalAlignment="Left"
-                            Style="{StaticResource thumb-columnheadergripper}" />
+                            Style="{StaticResource Thumb-ColumnHeaderGripper}" />
                         <Thumb
                             x:Name="PART_RightHeaderGripper"
                             HorizontalAlignment="Right"
-                            Style="{StaticResource thumb-columnheadergripper}" />
+                            Style="{StaticResource Thumb-ColumnHeaderGripper}" />
                     </Grid>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
-        <Setter Property="Background" Value="{StaticResource brush-transparent}" />
-        <Setter Property="BorderBrush" Value="{StaticResource brush-control-bd}" />
+        <Setter Property="Background" Value="{StaticResource Brush-Transparent}" />
+        <Setter Property="BorderBrush" Value="{StaticResource Brush-Control-BD}" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="Padding" Value="10,0" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="HorizontalContentAlignment" Value="Center" />
-        <Setter Property="FontFamily" Value="{StaticResource font}" />
-        <Setter Property="FontSize" Value="{StaticResource font-size}" />
-        <Setter Property="Foreground" Value="{StaticResource brush-control-fg}" />
+        <Setter Property="FontFamily" Value="{StaticResource Font}" />
+        <Setter Property="FontSize" Value="{StaticResource Font-Size}" />
+        <Setter Property="Foreground" Value="{StaticResource Brush-Control-FG}" />
         <Setter Property="Height" Value="25" />
     </Style>
     <Style x:Key="{x:Type DataGridColumnHeadersPresenter}" TargetType="{x:Type DataGridColumnHeadersPresenter}">
@@ -2356,7 +2587,7 @@
     </Style>
 
     <!--  Window  -->
-    <Style x:Key="window-shell" TargetType="Window">
+    <Style x:Key="Window-Shell" TargetType="Window">
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Window">
@@ -2394,7 +2625,7 @@
                                     <RowDefinition Height="30" />
                                     <RowDefinition />
                                 </Grid.RowDefinitions>
-                                <Grid Background="{StaticResource brush-accent}">
+                                <Grid Background="{StaticResource Brush-Accent}">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition />
                                         <ColumnDefinition Width="Auto" />
@@ -2408,7 +2639,7 @@
                                             x:Name="BtnMinimize"
                                             Width="30"
                                             Padding="8"
-                                            Style="{StaticResource button-path-fill}">
+                                            Style="{StaticResource Button-Path-Fill}">
                                             <Button.Content>
                                                 <PathGeometry>M7.9750088,17.000004L24.024009,17.000004C24.577003,17.000004 25.024009,17.447025 25.024009,18.000004 25.024009,18.552982 24.577003,19.000004 24.024009,19.000004L7.9750088,19.000004C7.4219998,19.000004 6.9750087,18.552982 6.9750089,18.000004 6.9750087,17.447025 7.4219998,17.000004 7.9750088,17.000004z M2,2L2,26 30,26 30,2z M0,0L32,0 32,28 0,28z</PathGeometry>
                                             </Button.Content>
@@ -2417,7 +2648,7 @@
                                             x:Name="BtnMaximize"
                                             Width="30"
                                             Padding="8"
-                                            Style="{StaticResource button-path-fill}">
+                                            Style="{StaticResource Button-Path-Fill}">
                                             <Button.Content>
                                                 <PathGeometry>M1.9999998,8.009992L1.9999998,29.99999 24,29.99999 24,8.009992z M6.9999855,2L6.9999855,6.0099912 26,6.0099912 26,25.004003 29.999985,25.004003 29.999985,2z M4.9999855,0L31.999985,0 31.999985,27.004003 26,27.004003 26,31.99999 0,31.99999 0,6.0099912 4.9999855,6.0099912z</PathGeometry>
                                             </Button.Content>
@@ -2426,7 +2657,7 @@
                                             x:Name="BtnRestore"
                                             Width="30"
                                             Padding="8"
-                                            Style="{StaticResource button-path-fill}"
+                                            Style="{StaticResource Button-Path-Fill}"
                                             Visibility="Collapsed">
                                             <Button.Content>
                                                 <PathGeometry>M2.401001,9.1999828L2.401001,29.599002 24.003998,29.599002 24.003998,9.1999828z M0,5.5999762L26.395996,5.5999762 26.395996,31.994998 0,31.994998z M10.852997,0L32,0 32,21.596988 29.598022,21.596988 29.598022,2.3999938 10.85202,2.3999938z</PathGeometry>
@@ -2436,7 +2667,7 @@
                                             x:Name="BtnClose"
                                             Width="30"
                                             Padding="9"
-                                            Style="{StaticResource button-path-fill}">
+                                            Style="{StaticResource Button-Path-Fill}">
                                             <Button.Content>
                                                 <PathGeometry>M1.442037,0L16.002031,14.585751 30.588022,0.025996563 32.001024,1.4409965 17.414783,16.001002 31.97503,30.587006 30.560022,32 15.999268,17.413969 1.4130009,31.973999 0,30.558998 14.586494,15.998742 0.027028472,1.4140019z</PathGeometry>
                                             </Button.Content>
@@ -2473,7 +2704,7 @@
         </Setter>
         <Setter Property="SnapsToDevicePixels" Value="True" />
         <Setter Property="BorderThickness" Value="1" />
-        <Setter Property="BorderBrush" Value="{StaticResource brush-window-bd}" />
-        <Setter Property="Background" Value="{StaticResource brush-window-bg}" />
+        <Setter Property="BorderBrush" Value="{StaticResource Brush-Window-BD}" />
+        <Setter Property="Background" Value="{StaticResource Brush-Window-BG}" />
     </Style>
 </ResourceDictionary>
