@@ -87,12 +87,16 @@
     <Compile Include="ViewModels\BookDetailViewModel.cs" />
     <Compile Include="ViewModels\BookDownloadViewModel.cs" />
     <Compile Include="ViewModels\PageControlModel.cs" />
+    <Compile Include="ViewModels\PageGalleryViewModel.cs" />
     <Compile Include="ViewModels\ViewModelBase.cs" />
     <Compile Include="Views\BookDetailView.xaml.cs">
       <DependentUpon>BookDetailView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\BookDownloadView.xaml.cs">
       <DependentUpon>BookDownloadView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\PageGalleryView.xaml.cs">
+      <DependentUpon>PageGalleryView.xaml</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
@@ -138,6 +142,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\BookDownloadView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\PageGalleryView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
