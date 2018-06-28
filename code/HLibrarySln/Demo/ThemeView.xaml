@@ -9,7 +9,7 @@
     xmlns:sys="clr-namespace:System;assembly=mscorlib"
     Title="Theme View"
     Width="800"
-    Height="600"
+    Height="1000"
     Style="{StaticResource window-shell}"
     mc:Ignorable="d">
     <Window.Resources>
@@ -329,6 +329,28 @@
                 Height="150"
                 Margin="5,10,0,0"
                 HorizontalAlignment="Left" />
+            <StackPanel Orientation="Horizontal">
+                <Expander Width="100" ExpandDirection="Down">
+                    <Border Background="{StaticResource brush-control-bg}" Height="100">
+                        <TextBlock Style="{StaticResource textblock}" Text="内容测试" />
+                    </Border>
+                </Expander>
+                <Expander Width="100" Margin="5,0,0,0" ExpandDirection="Up">
+                    <Border Background="{StaticResource brush-control-bg}" Height="100">
+                        <TextBlock Style="{StaticResource textblock}" Text="内容测试" />
+                    </Border>
+                </Expander>
+                <Expander Height="100" Margin="5,0,0,0" ExpandDirection="Left">
+                    <Border Background="{StaticResource brush-control-bg}" Width="100" >
+                        <TextBlock Style="{StaticResource textblock}" Text="内容测试" />
+                    </Border>
+                </Expander>
+                <Expander Height="100"  Margin="5,0,0,0" ExpandDirection="Right">
+                    <Border Background="{StaticResource brush-control-bg}" Width="100">
+                        <TextBlock Style="{StaticResource textblock}" Text="内容测试" />
+                    </Border>
+                </Expander>
+            </StackPanel>
         </StackPanel>
     </ScrollViewer>
 </Window>

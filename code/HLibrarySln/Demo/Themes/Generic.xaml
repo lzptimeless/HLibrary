@@ -137,6 +137,10 @@
     <PathGeometry x:Key="icon-cut">M13.876871,20.849818L11.666832,26.864772C11.569847,27.307759 11.592857,27.772721 11.786828,28.044751 12.000819,28.357736 12.502837,28.477731 13.093845,28.357736 14.175884,28.13374 15.609856,27.055749 16.073909,24.76378 16.342893,23.460754 16.255856,22.476817 15.809869,21.840776L15.809869,21.841813C15.33489,21.166833,14.490889,20.935817,13.876871,20.849818z M6.0755872,11.797367C4.3400048,11.816226 3.1917004,12.630284 2.699784,13.42088 2.1037709,14.379855 2.4807879,15.137842 3.7377557,15.283898L10.001841,15.28988C10.147839,14.683868 10.217847,13.812905 9.743844,13.139877 9.3068284,12.500907 8.4128398,12.077877 7.099781,11.8739 6.7385358,11.817653 6.3969917,11.793875 6.0755872,11.797367z M20.679902,0L15.572868,15.597859 15.570854,15.598836 31.999995,16.258864 27.931971,19.085799 19.303914,19.521831 15.895868,18.065852 14.77385,18.031856 14.630844,18.481862C15.680901,18.68584 16.974856,19.185836 17.837899,20.425813 18.687882,21.639789 18.907916,23.263795 18.50392,25.253764 17.790902,28.734746 15.359854,30.325734 13.54386,30.701707 11.962855,31.027692 10.437819,30.438708 9.6458205,29.304748 9.2578172,28.746709 9.2778367,26.259736 9.3058519,26.152741L10.012828,24.244803 12.126858,17.98083 5.7267846,17.807859 3.6637806,17.857846C3.4997777,17.838864 1.0257599,16.92884 0.64575182,16.381848 -0.15027454,15.241845 -0.25824655,13.478864 0.59173577,12.108883 1.5807567,10.531934 3.9707896,8.8849173 7.4747838,9.4249507 9.4858464,9.730917 10.931841,10.510938 11.775842,11.720886 12.661835,12.987902 12.661835,14.413851 12.477874,15.471885L12.935884,15.494895 13.30985,14.367892 13.173862,10.714915 16.613891,2.8279734z</PathGeometry>
     <PathGeometry x:Key="icon-copy">M12,8L12,30 28,30 28,14 22,14 22,8z M10,6L24,6 24,8 26,8 26,10 24,10 24,12 26,12 26,10 28,10 28,12 30,12 30,32 10,32z M0,0L10,0 10,2 12,2 12,4 8,4 8,2 2,2 2,20 8,20 8,22 0,22z</PathGeometry>
     <PathGeometry x:Key="icon-paste">M15.780046,21.209021L23.000044,28.471234 23.000044,22.999996 25.000044,22.999996 25.000044,31.999996 16.000044,31.999996 16.000044,29.999996 21.700115,29.999996 14.362039,22.619015z M12.416057,1.9139996C11.419057,1.9139996,10.607057,2.6970005,10.607057,3.6590004L10.607057,4.6159992 6.8670568,4.6159992 6.8670568,8.0860004 17.966058,8.0860004 17.966058,4.6159992 14.224057,4.6159992 14.224057,3.6590004C14.224057,2.6970005,13.413057,1.9139996,12.416057,1.9139996z M12.416057,0C14.172057,0,15.653057,1.1469994,16.093057,2.7019997L19.966057,2.7019997 19.966057,3.9999828 25.000044,3.9999828 25.000044,10.99998 25.000044,19.845975 23.000063,17.845976 23.000063,10.99998 23.000063,5.9999828 19.966057,5.9999828 19.966057,10 4.8670559,10 4.8670559,5.9999828 2.0000067,5.9999828 2.0000067,29.999983 10.929038,29.999983 12.929045,31.999983 0,31.999983 0,3.9999828 4.8670559,3.9999828 4.8670559,2.7019997 8.7390566,2.7019997C9.1790566,1.1469994,10.660057,0,12.416057,0z</PathGeometry>
+    <PathGeometry x:Key="icon-downarrow-mini">M0,0 L3.5,3 L7,0</PathGeometry>
+    <PathGeometry x:Key="icon-uparrow-mini">M0,3 L3.5,0 L7,3</PathGeometry>
+    <PathGeometry x:Key="icon-rightarrow-mini">M0,0 L3,3.5 L0,7</PathGeometry>
+    <PathGeometry x:Key="icon-leftarrow-mini">M3,0 L0,3.5 L3,7</PathGeometry>
 
     <!--  用到的转换器  -->
     <BooleanToVisibilityConverter x:Key="converter-bool-to-visibility" />
@@ -793,7 +797,7 @@
                 <RepeatButton
                     Grid.Row="0"
                     Command="ScrollBar.LineUpCommand"
-                    Content="M0,3 L3.5,0 L7,3"
+                    Content="{StaticResource icon-uparrow-mini}"
                     Style="{StaticResource button-scrollbar-line}" />
                 <Track
                     x:Name="PART_Track"
@@ -821,7 +825,7 @@
                 <RepeatButton
                     Grid.Row="2"
                     Command="ScrollBar.LineDownCommand"
-                    Content="M0,0 L3.5,3 L7,0"
+                    Content="{StaticResource icon-downarrow-mini}"
                     Style="{StaticResource button-scrollbar-line}" />
             </Grid>
             <VisualStateManager.VisualStateGroups>
@@ -857,7 +861,7 @@
                 <RepeatButton
                     Grid.Column="0"
                     Command="ScrollBar.LineLeftCommand"
-                    Content="M3,0 L0,3.5 L3,7"
+                    Content="{StaticResource icon-leftarrow-mini}"
                     Style="{StaticResource button-scrollbar-line}" />
                 <Track
                     x:Name="PART_Track"
@@ -885,7 +889,7 @@
                 <RepeatButton
                     Grid.Column="2"
                     Command="ScrollBar.LineRightCommand"
-                    Content="M0,0 L3,3.5 L0,7"
+                    Content="{StaticResource icon-rightarrow-mini}"
                     Style="{StaticResource button-scrollbar-line}" />
             </Grid>
             <VisualStateManager.VisualStateGroups>
@@ -1119,6 +1123,96 @@
         BasedOn="{StaticResource textbox}"
         TargetType="{x:Type TextBox}" />
 
+    <!--  Expander  -->
+    <ControlTemplate x:Key="togglebutton-expander-downexpand" TargetType="{x:Type ToggleButton}">
+        <Border
+            x:Name="Border"
+            BorderThickness="0,0,1,0"
+            CornerRadius="2,0,0,0">
+            <Grid>
+                <Path
+                    x:Name="CollapsedArrow"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Data="M 0 0 L 4 4 L 8 0 Z"
+                    Fill="{StaticResource brush-control-fg}">
+                </Path>
+                <Path
+                    x:Name="ExpandededArrow"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Data="M 0 4 L 4 0 L 8 4 Z"
+                    Visibility="Collapsed"
+                    Fill="{StaticResource brush-control-fg}">
+                </Path>
+            </Grid>
+            <VisualStateManager.VisualStateGroups>
+                <VisualStateGroup x:Name="CheckStates">
+                    <VisualState x:Name="Checked">
+                        <Storyboard>
+                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="CollapsedArrow" Storyboard.TargetProperty="(UIElement.Visibility)">
+                                <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Hidden}" />
+                            </ObjectAnimationUsingKeyFrames>
+                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ExpandededArrow" Storyboard.TargetProperty="(UIElement.Visibility)">
+                                <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Visible}" />
+                            </ObjectAnimationUsingKeyFrames>
+                        </Storyboard>
+                    </VisualState>
+                    <VisualState x:Name="Unchecked" />
+                    <VisualState x:Name="Indeterminate" />
+                </VisualStateGroup>
+            </VisualStateManager.VisualStateGroups>
+        </Border>
+    </ControlTemplate>
+    <Style x:Key="{x:Type Expander}" TargetType="{x:Type Expander}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Expander}">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition x:Name="ContentRow" Height="0" />
+                        </Grid.RowDefinitions>
+                        <Border
+                            x:Name="Border"
+                            Grid.Row="0"
+                            BorderThickness="1"
+                            CornerRadius="2,2,0,0">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="20" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <ToggleButton
+                                    IsChecked="{Binding IsExpanded, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
+                                    OverridesDefaultStyle="True"
+                                    Template="{StaticResource ExpanderToggleButton}">
+                                </ToggleButton>
+                                <ContentPresenter
+                                    Grid.Column="1"
+                                    Margin="4"
+                                    ContentSource="Header"
+                                    RecognizesAccessKey="True" />
+                            </Grid>
+                        </Border>
+                        <Border
+                            x:Name="Content"
+                            Grid.Row="1"
+                            BorderThickness="1,0,1,1"
+                            CornerRadius="0,0,2,2">
+                            <ContentPresenter Margin="4" />
+                        </Border>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsExpanded" Value="True">
+                            <Setter TargetName="ContentRow" Property="Height" Value="{Binding DesiredHeight, ElementName=Content}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
     <!--  ListBox  -->
     <Style x:Key="listboxitem" TargetType="ListBoxItem">
         <Setter Property="Template">
@@ -1195,7 +1289,7 @@
         TargetType="{x:Type ListBox}" />
 
     <!--  ComboBox  -->
-    <Style x:Key="combobox-togglebutton" TargetType="ToggleButton">
+    <Style x:Key="togglebutton-combobox-popup" TargetType="ToggleButton">
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="ToggleButton">
@@ -1208,7 +1302,7 @@
                             Margin="0,0,6,0"
                             HorizontalAlignment="Right"
                             VerticalAlignment="Center"
-                            Data="M0,0 L3.5,3 L7,0"
+                            Data="{StaticResource icon-downarrow-mini}"
                             Stroke="{TemplateBinding Foreground}" />
                     </Border>
                     <ControlTemplate.Triggers>
@@ -1216,11 +1310,7 @@
                             <Setter TargetName="Arrow" Property="Visibility" Value="Hidden" />
                         </Trigger>
                         <Trigger Property="IsChecked" Value="True">
-                            <Setter TargetName="Arrow" Property="Data">
-                                <Setter.Value>
-                                    <PathGeometry>M0,3 L3.5,0 L7,3</PathGeometry>
-                                </Setter.Value>
-                            </Setter>
+                            <Setter TargetName="Arrow" Property="Data" Value="{StaticResource icon-uparrow-mini}" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -1230,7 +1320,7 @@
         <Setter Property="ClickMode" Value="Press" />
         <Setter Property="BorderThickness" Value="0" />
     </Style>
-    <Style x:Key="combobox-textbox" TargetType="TextBox">
+    <Style x:Key="textbox-combobox-edit" TargetType="TextBox">
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="TextBox">
@@ -1310,7 +1400,7 @@
                                     FontSize="{TemplateBinding FontSize}"
                                     Foreground="{TemplateBinding Foreground}"
                                     IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
-                                    Style="{StaticResource combobox-togglebutton}" />
+                                    Style="{StaticResource togglebutton-combobox-popup}" />
                                 <ContentPresenter
                                     x:Name="ContentSite"
                                     Margin="5,0,20,0"
@@ -1328,7 +1418,7 @@
                                     FontSize="{TemplateBinding FontSize}"
                                     Foreground="{TemplateBinding Foreground}"
                                     IsReadOnly="{TemplateBinding IsReadOnly}"
-                                    Style="{StaticResource combobox-textbox}"
+                                    Style="{StaticResource textbox-combobox-edit}"
                                     Visibility="Hidden" />
                             </Grid>
                         </Border>
@@ -1618,7 +1708,7 @@
                         Grid.Column="3"
                         HorizontalAlignment="Center"
                         VerticalAlignment="Center"
-                        Data="M0,0 L3,3.5 L0,7"
+                        Data="{StaticResource icon-rightarrow-mini}"
                         Stroke="{TemplateBinding Foreground}" />
                 </Grid>
             </Border>
