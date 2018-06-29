@@ -651,6 +651,7 @@
         <Setter Property="BorderBrush" Value="{StaticResource Brush-Control-BD}" />
         <Setter Property="Background" Value="{StaticResource Brush-Control-BG}" />
     </Style>
+    <Style x:Key="{x:Type Thumb}" TargetType="Thumb" BasedOn="{StaticResource Thumb}"/>
 
     <!--  ToolTip  -->
     <Style x:Key="{x:Type ToolTip}" TargetType="ToolTip">
@@ -1161,6 +1162,42 @@
             </Trigger>
         </ControlTemplate.Triggers>
     </ControlTemplate>
+    <ControlTemplate x:Key="ToggleButton-Expander-UpDirection" TargetType="{x:Type ToggleButton}">
+        <Border
+            Background="{TemplateBinding Background}"
+            BorderBrush="{TemplateBinding BorderBrush}"
+            BorderThickness="{TemplateBinding BorderThickness}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <Path
+                    x:Name="Arrow"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Data="{StaticResource Icon-UpArrow-Mini}"
+                    Stretch="None"
+                    Stroke="{TemplateBinding Foreground}"
+                    StrokeThickness="1" />
+                <ContentPresenter
+                    Grid.Column="1"
+                    Margin="{TemplateBinding Padding}"
+                    HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                    VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+            </Grid>
+        </Border>
+        <ControlTemplate.Triggers>
+            <Trigger Property="IsChecked" Value="True">
+                <Setter TargetName="Arrow" Property="Data" Value="{StaticResource Icon-DownArrow-Mini}" />
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Foreground" Value="{StaticResource Brush-Control-Disable-FG}" />
+                <Setter Property="BorderBrush" Value="{StaticResource Brush-Control-Disable-BD}" />
+                <Setter Property="Background" Value="{StaticResource Brush-Control-Disable-BG}" />
+            </Trigger>
+        </ControlTemplate.Triggers>
+    </ControlTemplate>
     <ControlTemplate x:Key="ToggleButton-Expander-RightDirection" TargetType="{x:Type ToggleButton}">
         <Border
             Background="{TemplateBinding Background}"
@@ -1260,45 +1297,6 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
-            <ToggleButton
-                x:Name="Expand"
-                Grid.Row="0"
-                HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                FontFamily="{TemplateBinding FontFamily}"
-                FontSize="{TemplateBinding FontSize}"
-                Foreground="{TemplateBinding Foreground}"
-                IsChecked="{Binding IsExpanded, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
-                Style="{StaticResource ToggleButton-Expander}">
-                <ContentPresenter ContentSource="Header" RecognizesAccessKey="True" />
-            </ToggleButton>
-            <Border
-                x:Name="Content"
-                Grid.Row="1"
-                Margin="0,10,0,0"
-                Background="{TemplateBinding Background}"
-                BorderBrush="{TemplateBinding BorderBrush}"
-                BorderThickness="{TemplateBinding BorderThickness}"
-                Visibility="Collapsed">
-                <ContentPresenter Margin="{TemplateBinding Padding}" />
-            </Border>
-        </Grid>
-        <ControlTemplate.Triggers>
-            <Trigger Property="IsExpanded" Value="True">
-                <Setter TargetName="Content" Property="Visibility" Value="Visible" />
-            </Trigger>
-            <Trigger Property="IsEnabled" Value="False">
-                <Setter Property="Foreground" Value="{StaticResource Brush-Control-Disable-FG}" />
-                <Setter Property="BorderBrush" Value="{StaticResource Brush-Control-Disable-BD}" />
-                <Setter Property="Background" Value="{StaticResource Brush-Control-Disable-BG}" />
-            </Trigger>
-        </ControlTemplate.Triggers>
-    </ControlTemplate>
-    <ControlTemplate x:Key="Expander-UpDirection" TargetType="Expander">
-        <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
             <Border
                 x:Name="Content"
                 Grid.Row="0"
@@ -1332,36 +1330,34 @@
             </Trigger>
         </ControlTemplate.Triggers>
     </ControlTemplate>
-    <ControlTemplate x:Key="Expander-RightDirection" TargetType="Expander">
+    <ControlTemplate x:Key="Expander-UpDirection" TargetType="Expander">
         <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
             <ToggleButton
                 x:Name="Expand"
-                Grid.Column="0"
-                Padding="0,10,0,0"
-                VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                Grid.Row="0"
+                HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                 FontFamily="{TemplateBinding FontFamily}"
                 FontSize="{TemplateBinding FontSize}"
                 Foreground="{TemplateBinding Foreground}"
                 IsChecked="{Binding IsExpanded, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
                 Style="{StaticResource ToggleButton-Expander}"
-                Template="{StaticResource ToggleButton-Expander-RightDirection}">
+                Template="{StaticResource ToggleButton-Expander-UpDirection}">
                 <ContentPresenter ContentSource="Header" RecognizesAccessKey="True" />
             </ToggleButton>
             <Border
                 x:Name="Content"
-                Grid.Column="1"
-                Margin="10,0,0,0"
+                Grid.Row="1"
+                Margin="0,10,0,0"
                 Background="{TemplateBinding Background}"
                 BorderBrush="{TemplateBinding BorderBrush}"
                 BorderThickness="{TemplateBinding BorderThickness}"
                 Visibility="Collapsed">
                 <ContentPresenter Margin="{TemplateBinding Padding}" />
             </Border>
-
         </Grid>
         <ControlTemplate.Triggers>
             <Trigger Property="IsExpanded" Value="True">
@@ -1374,7 +1370,7 @@
             </Trigger>
         </ControlTemplate.Triggers>
     </ControlTemplate>
-    <ControlTemplate x:Key="Expander-LeftDirection" TargetType="Expander">
+    <ControlTemplate x:Key="Expander-RightDirection" TargetType="Expander">
         <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
@@ -1403,6 +1399,47 @@
                 Template="{StaticResource ToggleButton-Expander-RightDirection}">
                 <ContentPresenter ContentSource="Header" RecognizesAccessKey="True" />
             </ToggleButton>
+        </Grid>
+        <ControlTemplate.Triggers>
+            <Trigger Property="IsExpanded" Value="True">
+                <Setter TargetName="Content" Property="Visibility" Value="Visible" />
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Foreground" Value="{StaticResource Brush-Control-Disable-FG}" />
+                <Setter Property="BorderBrush" Value="{StaticResource Brush-Control-Disable-BD}" />
+                <Setter Property="Background" Value="{StaticResource Brush-Control-Disable-BG}" />
+            </Trigger>
+        </ControlTemplate.Triggers>
+    </ControlTemplate>
+    <ControlTemplate x:Key="Expander-LeftDirection" TargetType="Expander">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <ToggleButton
+                x:Name="Expand"
+                Grid.Column="0"
+                Padding="0,10,0,0"
+                VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                FontFamily="{TemplateBinding FontFamily}"
+                FontSize="{TemplateBinding FontSize}"
+                Foreground="{TemplateBinding Foreground}"
+                IsChecked="{Binding IsExpanded, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
+                Style="{StaticResource ToggleButton-Expander}"
+                Template="{StaticResource ToggleButton-Expander-LeftDirection}">
+                <ContentPresenter ContentSource="Header" RecognizesAccessKey="True" />
+            </ToggleButton>
+            <Border
+                x:Name="Content"
+                Grid.Column="1"
+                Margin="10,0,0,0"
+                Background="{TemplateBinding Background}"
+                BorderBrush="{TemplateBinding BorderBrush}"
+                BorderThickness="{TemplateBinding BorderThickness}"
+                Visibility="Collapsed">
+                <ContentPresenter Margin="{TemplateBinding Padding}" />
+            </Border>
         </Grid>
         <ControlTemplate.Triggers>
             <Trigger Property="IsExpanded" Value="True">

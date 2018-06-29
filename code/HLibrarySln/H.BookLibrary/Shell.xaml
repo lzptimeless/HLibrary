@@ -32,6 +32,6 @@
                 Click="DownloadButton_Click"
                 Content="下载" />
         </StackPanel>-->
-        <ContentControl x:Name="PageHost" Grid.Row="1" />
+        <Grid x:Name="PageHost"></Grid>
     </Grid>
 </Window>

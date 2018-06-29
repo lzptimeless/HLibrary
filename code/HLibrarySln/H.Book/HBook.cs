@@ -262,7 +262,7 @@ namespace H.Book
             }
         }
 
-        public async void ReadCoverAsync(Func<Stream, Task> readAction, [CallerFilePath] string callerFilePath = "", [CallerMemberName] string callerName = "")
+        public async Task ReadCoverAsync(Func<Stream, Task> readAction, [CallerFilePath] string callerFilePath = "", [CallerMemberName] string callerName = "")
         {
             var wt = _lock.WaitAsync(true, Timeout.InfiniteTimeSpan, CancellationToken.None, CreateReceiver(callerFilePath, callerName));
             await wt;
@@ -353,7 +353,7 @@ namespace H.Book
             }
         }
 
-        public async void ReadCoverThumbnailAsync(Func<Stream, Task> readerAction, [CallerFilePath] string callerFilePath = "", [CallerMemberName] string callerName = "")
+        public async Task ReadCoverThumbnailAsync(Func<Stream, Task> readerAction, [CallerFilePath] string callerFilePath = "", [CallerMemberName] string callerName = "")
         {
             var wt = _lock.WaitAsync(true, Timeout.InfiniteTimeSpan, CancellationToken.None, CreateReceiver(callerFilePath, callerName));
             await wt;
@@ -505,7 +505,7 @@ namespace H.Book
                 var metadata = page.ContentMetadata;
                 var fileStatus = metadata.FileStatus;
                 var appendix = metadata.GetThumbnail();
-                if (appendix != null)
+                if (appendix == null)
                 {
                     await readerAction.Invoke(null);
                     return true;
@@ -860,7 +860,7 @@ namespace H.Book
         /// <param name="callerName">不需要设置</param>
         /// <exception cref="InitException">没有加载数据或，创建数据</exception>
         /// <exception cref="IOWriteFailedException">数据在之前的写入操作中可能已经损坏</exception>
-        void ReadCoverAsync(Func<Stream, Task> readAction, [CallerFilePath] string callerFilePath = "", [CallerMemberName] string callerName = "");
+        Task ReadCoverAsync(Func<Stream, Task> readAction, [CallerFilePath] string callerFilePath = "", [CallerMemberName] string callerName = "");
         /// <summary>
         /// 获取封面副本
         /// </summary>
@@ -878,7 +878,7 @@ namespace H.Book
         /// <param name="callerName">不需要设置</param>
         /// <exception cref="InitException">没有加载数据或，创建数据</exception>
         /// <exception cref="IOWriteFailedException">数据在之前的写入操作中可能已经损坏</exception>
-        void ReadCoverThumbnailAsync(Func<Stream, Task> readerAction, [CallerFilePath] string callerFilePath = "", [CallerMemberName] string callerName = "");
+        Task ReadCoverThumbnailAsync(Func<Stream, Task> readerAction, [CallerFilePath] string callerFilePath = "", [CallerMemberName] string callerName = "");
         /// <summary>
         /// 获取封面缩略图副本
         /// </summary>

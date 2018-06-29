@@ -28,6 +28,12 @@ namespace H.BookLibrary.Views
             Unloaded += BookDetailView_Unloaded;
         }
 
+        public void PagesScrollToTop()
+        {
+            var sv = UITree.FindDescendant<ScrollViewer>(PageListBox);
+            if (sv != null) sv.ScrollToTop();
+        }
+
         private void BookDetailView_Loaded(object sender, RoutedEventArgs e)
         {
             var vm = DataContext as ViewModelBase;

@@ -10,7 +10,7 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="/Themes/Generic.xaml" />
             </ResourceDictionary.MergedDictionaries>
-            <cvt:ArrayToTextConverter x:Key="converter-arrary-to-text" />
+            <cvt:ArrayToTextConverter x:Key="Converter-Arrary-To-Text" />
         </ResourceDictionary>
     </Application.Resources>
 </Application>

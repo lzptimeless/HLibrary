@@ -23,6 +23,8 @@ namespace Demo
         {
             InitializeComponent();
 
+            Height = 700;
+
             List<DemoData> datas = new List<DemoData>(new []{
                 new DemoData { Property1="属性1", Property2="属性2",Property3="属性3",Property4="属性4",Property5="属性5" },
                 new DemoData { Property1="属性1", Property2="属性2",Property3="属性3",Property4="属性4",Property5="属性5" },

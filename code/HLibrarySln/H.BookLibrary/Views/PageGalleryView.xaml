@@ -5,25 +5,63 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:H.BookLibrary.Views"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vm="clr-namespace:H.BookLibrary.ViewModels"
+    d:DataContext="{d:DesignInstance vm:PageGalleryViewModel,
+                                     IsDesignTimeCreatable=False}"
     d:DesignHeight="700"
     d:DesignWidth="1000"
     mc:Ignorable="d">
     <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition />
-            <RowDefinition Height="Auto" />
-        </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto" />
-            <ColumnDefinition />
-            <ColumnDefinition Width="Auto" />
-        </Grid.ColumnDefinitions>
         <!--  当前页面  -->
-        <Image Grid.RowSpan="3" Grid.ColumnSpan="3" />
+        <Canvas
+            x:Name="PageImageCanvas"
+            Grid.RowSpan="3"
+            Grid.ColumnSpan="3"
+            SizeChanged="PageImageCanvas_SizeChanged">
+            <Grid x:Name="PageImageHost">
+                <Image x:Name="PageImage" />
+                <Thumb
+                    x:Name="PageDragThumb"
+                    Cursor="Hand"
+                    DragDelta="PageDragThumb_DragDelta">
+                    <Thumb.Template>
+                        <ControlTemplate TargetType="Thumb">
+                            <Border Background="{StaticResource Brush-Transparent}" />
+                        </ControlTemplate>
+                    </Thumb.Template>
+                </Thumb>
+            </Grid>
+        </Canvas>
+        <!--  左边栏  -->
+        <Grid Grid.Row="1" HorizontalAlignment="Left">
+            <!--  背景色  -->
+            <Rectangle Fill="{StaticResource Brush-Main}" Opacity="0.5" />
+            <Button
+                Width="80"
+                Height="60"
+                Margin="20,0,10,0"
+                Command="{Binding PrePageCommand}"
+                Content="&lt;上一页" />
+        </Grid>
+        <!--  右边栏  -->
+        <Grid Grid.Row="1" HorizontalAlignment="Right">
+            <!--  背景色  -->
+            <Rectangle Fill="{StaticResource Brush-Main}" Opacity="0.5" />
+            <Button
+                Width="80"
+                Height="60"
+                Margin="10,0,20,0"
+                Command="{Binding NextPageCommand}"
+                Content="下一页&gt;" />
+        </Grid>
         <!--  上边栏  -->
-        <Grid Grid.Row="0" Grid.ColumnSpan="3">
-            <Grid Margin="100,20,100,0">
+        <Grid Grid.Row="0" VerticalAlignment="Top">
+            <!--  背景色  -->
+            <Rectangle
+                Grid.ColumnSpan="2"
+                Fill="{StaticResource Brush-Main}"
+                Opacity="0.5" />
+            <Grid Margin="100,20,100,10">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition />
                     <ColumnDefinition Width="Auto" />
@@ -33,13 +71,13 @@
                     Style="{StaticResource TextBlock}"
                     TextAlignment="Center"
                     TextWrapping="Wrap">
-                    <Run />
+                    <Run Text="{Binding CurrentPage.Index}" />
                     <Run Text="|" />
-                    <Run />
+                    <Run Text="{Binding CurrentPage.Artist}" />
                     <Run Text="|" />
-                    <Run />
+                    <Run Text="{Binding CurrentPage.Characters, Converter={StaticResource Converter-Arrary-To-Text}}" />
                     <Run Text="|" />
-                    <Run />
+                    <Run Text="{Binding CurrentPage.Tags, Converter={StaticResource Converter-Arrary-To-Text}}" />
                 </TextBlock>
                 <StackPanel
                     Grid.Column="1"
@@ -50,27 +88,16 @@
                         VerticalAlignment="Center"
                         Style="{StaticResource TextBlock}"
                         Text="显示模式：" />
-                    <ComboBox Width="100" />
+                    <ComboBox
+                        Width="80"
+                        DisplayMemberPath="Text"
+                        ItemsSource="{Binding PageStretches}"
+                        SelectedValue="{Binding CurrentPageStretch}"
+                        SelectedValuePath="Value" />
                 </StackPanel>
             </Grid>
         </Grid>
         <!--  下边栏  -->
         <!--<Grid Grid.Row="2" Grid.ColumnSpan="3"></Grid>-->
-        <!--  左边栏  -->
-        <Grid Grid.Row="1" Grid.Column="0">
-            <Button
-                Width="80"
-                Height="60"
-                Margin="20,0,0,0"
-                Content="&lt;上一页" />
-        </Grid>
-        <!--  右边栏  -->
-        <Grid Grid.Row="1" Grid.Column="2">
-            <Button
-                Width="80"
-                Height="60"
-                Margin="0,0,20,0"
-                Content="下一页&gt;" />
-        </Grid>
     </Grid>
 </UserControl>

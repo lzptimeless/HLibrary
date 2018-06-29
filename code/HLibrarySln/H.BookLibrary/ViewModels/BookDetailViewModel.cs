@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows;
 using System.Windows.Media.Imaging;
 using System.IO;
+using H.BookLibrary.Views;
 
 namespace H.BookLibrary.ViewModels
 {
@@ -649,6 +650,61 @@ namespace H.BookLibrary.ViewModels
             }
         }
         #endregion
+
+        #region GoPageGalleryCommand
+        /// <summary>
+        /// GoPageGallery command
+        /// </summary>
+        private DelegateCommand<PageControlModel> _goPageGalleryCommand;
+        /// <summary>
+        /// Get <see cref="GoPageGalleryCommand"/>
+        /// </summary>
+        public ICommand GoPageGalleryCommand
+        {
+            get
+            {
+                if (this._goPageGalleryCommand == null)
+                {
+                    this._goPageGalleryCommand = new DelegateCommand<PageControlModel>(this.GoPageGallery, this.CanGoPageGallery);
+                }
+
+                return this._goPageGalleryCommand;
+            }
+        }
+
+        private void GoPageGallery(PageControlModel e)
+        {
+            try
+            {
+                // Do command
+                PageGalleryViewModel vm = new PageGalleryViewModel(_book, e.Index);
+                vm.ViewManager = ViewManager;
+                PageGalleryView view = new PageGalleryView();
+                view.DataContext = vm;
+                vm.Init(view);
+
+                ViewManager.MainViewGo(view);
+            }
+            catch (Exception ex)
+            {
+                // Do exception work, print log.
+                Output.Print("GoPageGallery failed." + Environment.NewLine + ex.ToString());
+            }
+        }
+
+        private bool CanGoPageGallery(PageControlModel e)
+        {
+            return e != null;
+        }
+
+        private void RaiseGoPageGalleryCanExecuteChanged()
+        {
+            if (this._goPageGalleryCommand != null)
+            {
+                this._goPageGalleryCommand.RaiseCanExecuteChanged();
+            }
+        }
+        #endregion
         #endregion
 
         #region public methods
@@ -676,20 +732,26 @@ namespace H.BookLibrary.ViewModels
         #region private methods
         private async Task LoadCover()
         {
-            using (var thumStream = await _book.GetCoverThumbnailCopyAsync())
+            await _book.ReadCoverThumbnailAsync(async s =>
             {
-                CoverThumb = await CreateImage(thumStream);
-            }
-
-            using (var thumStream = await _book.GetCoverCopyAsync())
+                if (s != null)
+                    CoverThumb = await BookImageHelper.CreateImageAsync(s);
+                else
+                    Output.Print("Cover thumbnial is null.");
+            });
+            await _book.ReadCoverAsync(async s =>
             {
-                Cover = await CreateImage(thumStream);
-            }
+                if (s != null)
+                    Cover = await BookImageHelper.CreateImageAsync(s);
+                else
+                    Output.Print("Cover is null.");
+            });
         }
 
         private async Task LoadGalleryPages()
         {
             Pages.Clear();
+            if (View is BookDetailView) (View as BookDetailView).PagesScrollToTop();
 
             if (GalleryPageIndexes.Count == 0)
             {
@@ -721,30 +783,17 @@ namespace H.BookLibrary.ViewModels
                 pvm.Artist = ph.Artist;
                 pvm.Characters = ph.Charachters;
                 pvm.Tags = ph.Tags;
-                using (var thumStream = await _book.GetThumbnailCopyAsync(ph.ID))
+                bool res = await _book.ReadThumbnailAsync(ph.ID, async s =>
                 {
-                    pvm.Thumb = await CreateImage(thumStream);
-                }
+                    if (s != null)
+                        pvm.Thumb = await BookImageHelper.CreateImageAsync(s);
+                    else
+                        Output.Print($"Page thumbnail is null, index={i}");
+                });
+                if (!res) Output.Print($"Read page thumbnail failed, index={i}");
 
                 Pages.Add(pvm);
             }
-        }
-
-        private static Task<BitmapImage> CreateImage(Stream stream)
-        {
-            return Task.Run(() =>
-            {
-                if (stream == null) return null;
-
-                BitmapImage bitmap = new BitmapImage();
-                bitmap.BeginInit();
-                bitmap.StreamSource = stream;
-                bitmap.CacheOption = BitmapCacheOption.OnLoad;
-                bitmap.CreateOptions = BitmapCreateOptions.None;
-                bitmap.EndInit();
-                bitmap.Freeze();
-                return bitmap;
-            });
         }
 
         private async Task GalleryUpdatePageInfo()
