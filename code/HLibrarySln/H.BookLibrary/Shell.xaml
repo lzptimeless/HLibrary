@@ -9,8 +9,23 @@
     Title="Shell"
     Width="1082"
     Height="700"
+    d:DataContext="{d:DesignInstance Type=local:ShellModel,
+                                     IsDesignTimeCreatable=False}"
     Style="{StaticResource Window-Shell}"
     mc:Ignorable="d">
+    <Window.Tag>
+        <Grid>
+            <StackPanel Orientation="Horizontal" WindowChrome.IsHitTestVisibleInChrome="True">
+                <Button
+                    x:Name="MainViewBackButton"
+                    Width="30"
+                    Padding="8"
+                    Command="{Binding MainViewBackCommand}"
+                    Content="{StaticResource Icon-LeftArrow-Mini}"
+                    Style="{StaticResource Button-Path-Stroke}" />
+            </StackPanel>
+        </Grid>
+    </Window.Tag>
     <Grid>
         <!--<Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -32,6 +47,6 @@
                 Click="DownloadButton_Click"
                 Content="下载" />
         </StackPanel>-->
-        <Grid x:Name="PageHost"></Grid>
+        <Grid x:Name="PageHost" ClipToBounds="True" />
     </Grid>
 </Window>

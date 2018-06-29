@@ -683,7 +683,7 @@ namespace H.BookLibrary.ViewModels
                 view.DataContext = vm;
                 vm.Init(view);
 
-                ViewManager.MainViewGo(view);
+                ViewManager.MainViewForward(view);
             }
             catch (Exception ex)
             {

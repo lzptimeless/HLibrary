@@ -25,10 +25,25 @@ namespace H.BookLibrary
         public Shell()
         {
             InitializeComponent();
+
+            ShellModel model = new ShellModel(this);
+            DataContext = model;
+
             Loaded += Shell_Loaded;
+            KeyUp += Shell_KeyUp;
         }
 
-        public void MainViewGo(FrameworkElement view)
+        public void MainViewSet(FrameworkElement view)
+        {
+            if (view == null) throw new ArgumentNullException("view");
+
+            // 移除所有页面
+            PageHost.Children.Clear();
+            // 添加新页面
+            PageHost.Children.Add(view);
+        }
+
+        public void MainViewForward(FrameworkElement view)
         {
             if (view == null) throw new ArgumentNullException("view");
 
@@ -44,6 +59,9 @@ namespace H.BookLibrary
 
         public void MainViewBack()
         {
+            // 页面只剩一个时保留
+            if (PageHost.Children.Count == 1) return;
+
             // 移除当前页面
             if (PageHost.Children.Count > 0)
                 PageHost.Children.RemoveAt(PageHost.Children.Count - 1);
@@ -53,6 +71,15 @@ namespace H.BookLibrary
             {
                 var preView = PageHost.Children[PageHost.Children.Count - 1];
                 preView.Visibility = Visibility.Visible;
+            }
+        }
+
+        private void Shell_KeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Back)
+            {
+                e.Handled = true;
+                MainViewBack();
             }
         }
 
@@ -66,7 +93,7 @@ namespace H.BookLibrary
             view.DataContext = vm;
             vm.Init(view);
 
-            MainViewGo(view);
+            MainViewSet(view);
         }
 
         private void DownloadButton_Click(object sender, RoutedEventArgs e)

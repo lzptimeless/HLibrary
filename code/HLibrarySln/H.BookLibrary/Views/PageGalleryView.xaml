@@ -17,13 +17,16 @@
             x:Name="PageImageCanvas"
             Grid.RowSpan="3"
             Grid.ColumnSpan="3"
-            SizeChanged="PageImageCanvas_SizeChanged">
+            SizeChanged="PageImageCanvas_SizeChanged"
+            KeyboardNavigation.DirectionalNavigation="Contained">
             <Grid x:Name="PageImageHost">
                 <Image x:Name="PageImage" />
                 <Thumb
                     x:Name="PageDragThumb"
-                    Cursor="Hand"
-                    DragDelta="PageDragThumb_DragDelta">
+                    Cursor="ScrollAll"
+                    DragDelta="PageDragThumb_DragDelta"
+                    Focusable="True"
+                    MouseWheel="PageDragThumb_MouseWheel">
                     <Thumb.Template>
                         <ControlTemplate TargetType="Thumb">
                             <Border Background="{StaticResource Brush-Transparent}" />

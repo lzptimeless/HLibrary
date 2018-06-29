@@ -9,7 +9,8 @@ namespace H.BookLibrary
 {
     public interface IViewManager
     {
-        void MainViewGo(FrameworkElement view);
+        void MainViewSet(FrameworkElement view);
+        void MainViewForward(FrameworkElement view);
         void MainViewBack();
     }
 }

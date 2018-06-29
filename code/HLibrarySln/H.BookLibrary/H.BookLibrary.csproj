@@ -72,7 +72,7 @@
     <Compile Include="Common\LanguageHelper.cs" />
     <Compile Include="Common\Output.cs" />
     <Compile Include="Common\UITree.cs" />
-    <Compile Include="Common\ViewManager.cs" />
+    <Compile Include="Common\IViewManager.cs" />
     <Compile Include="Converters\ArrayToTextConverter.cs" />
     <Compile Include="Html\HtmlReader.cs" />
     <Compile Include="Html\HtmlWriter.cs" />
@@ -86,6 +86,7 @@
     <Compile Include="Shell.xaml.cs">
       <DependentUpon>Shell.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ShellModel.cs" />
     <Compile Include="ViewModels\BookDetailViewModel.cs" />
     <Compile Include="ViewModels\BookDownloadViewModel.cs" />
     <Compile Include="Common\BookImageHelper.cs" />

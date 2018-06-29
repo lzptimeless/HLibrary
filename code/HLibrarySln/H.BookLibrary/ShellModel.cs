@@ -1,0 +1,87 @@
+﻿using Prism.Commands;
+using Prism.Mvvm;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Input;
+
+namespace H.BookLibrary
+{
+    public class ShellModel : BindableBase
+    {
+        #region fields
+        private IViewManager _viewManager;
+        #endregion
+
+        public ShellModel(IViewManager viewManager)
+        {
+            _viewManager = viewManager;
+        }
+
+        #region properties
+
+        #endregion
+
+        #region commands
+        #region MainViewBackCommand
+
+        /// <summary>
+        /// MainViewBack command
+        /// </summary>
+        private DelegateCommand _mainViewBackCommand;
+        /// <summary>
+        /// Get <see cref="MainViewBackCommand"/>
+        /// </summary>
+        public ICommand MainViewBackCommand
+        {
+            get
+            {
+                if (this._mainViewBackCommand == null)
+                {
+                    this._mainViewBackCommand = new DelegateCommand(this.MainViewBack, this.CanMainViewBack);
+                }
+
+                return this._mainViewBackCommand;
+            }
+        }
+
+        private void MainViewBack()
+        {
+            try
+            {
+                // Do command
+                _viewManager.MainViewBack();
+            }
+            catch (Exception ex)
+            {
+                // Do exception work, print log.
+                Output.Print("MainViewBack failed." + Environment.NewLine + ex.ToString());
+            }
+        }
+
+        private bool CanMainViewBack()
+        {
+            return true;
+        }
+
+        private void RaiseMainViewBackCanExecuteChanged()
+        {
+            if (this._mainViewBackCommand != null)
+            {
+                this._mainViewBackCommand.RaiseCanExecuteChanged();
+            }
+        }
+        #endregion
+        #endregion
+
+        #region public methods
+
+        #endregion
+
+        #region private methods
+
+        #endregion
+    }
+}
