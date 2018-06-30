@@ -1,5 +1,6 @@
 ﻿using H.Book;
 using H.BookLibrary.Views;
+using Prism.Mvvm;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,9 +19,9 @@ namespace H.BookLibrary.ViewModels
         private HitomiBookDownloader _downloader;
         #endregion
 
-        public BookDownloadViewModel(string bookid)
+        public BookDownloadViewModel()
         {
-            _bookID = bookid;
+            _bookID = "955625";
         }
 
         #region properties
@@ -118,5 +119,13 @@ namespace H.BookLibrary.ViewModels
             }
         }
         #endregion
+    }
+
+    public class BookDownloadItemModel : BindableBase
+    {
+        public BookDownloadItemModel()
+        { }
+
+
     }
 }

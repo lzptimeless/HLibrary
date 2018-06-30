@@ -224,7 +224,8 @@ namespace H.BookLibrary
             var xcover = xcovercloumn.Elements().Where(x => x.Name == "div" && x.Attribute("class").Value == "cover").First();
             _coverUrl = xcover.Descendants().Where(x => x.Name == "img").Select(i => i.Attribute("src").Value).First().Trim();
 
-            var xgallery = xcontent.Elements().Where(x => x.Name == "div" && x.Attribute("class").Value.Contains("manga-gallery")).First();
+            Regex galleryClassRegex = new Regex(@"gallery\s+[\w-]*gallery\s+");
+            var xgallery = xcontent.Elements().Where(x => x.Name == "div" && x.Attribute("class") != null && galleryClassRegex.IsMatch(x.Attribute("class").Value)).First();
 
             string[] booknames = xgallery.Element("h1").Element("a").Value.Split(new[] { " | " }, StringSplitOptions.RemoveEmptyEntries).Select(s => s.Trim()).ToArray();
             if (booknames.Length > 0)

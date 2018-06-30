@@ -113,7 +113,7 @@ namespace H.BookLibrary.ViewModels
             try
             {
                 // Do command
-                BookDownloadViewModel vm = new BookDownloadViewModel("");
+                BookDownloadViewModel vm = new BookDownloadViewModel();
                 vm.ViewManager = ViewManager;
                 BookDownloadView view = new BookDownloadView();
                 view.DataContext = vm;
