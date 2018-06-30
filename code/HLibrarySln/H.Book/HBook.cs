@@ -35,6 +35,11 @@ namespace H.Book
         private Exception CreateInitFailedEx() { return new InitException("HBook load or create failed", _loadEx ?? _createEx); }
         private Exception CreateInitErrorEx() { return IsInitFailed() ? CreateInitFailedEx() : new InitException("Not load or create", null); }
 
+        private int _isLoadHeaderOnly;
+        private bool IsLoadHeaderOnly() { return Volatile.Read(ref _isLoadHeaderOnly) == 1; }
+        private bool MakeLoadHeaderOnly() { return Interlocked.CompareExchange(ref _isLoadHeaderOnly, 1, 0) == 0; }
+        private Exception CreateLoadHeaderOnlyEx() { return new LoadHeaderOnlyException("Only header loaded"); }
+
         private Exception _ioWriteEx;
         private bool IsIOWriteFailed() { return _ioWriteEx != null; }
         private Exception CreateIOWriteFailedEx() { return new IOWriteFailedException("A IO write error ocurred, data maybe damaged", _ioWriteEx); }
@@ -62,10 +67,18 @@ namespace H.Book
 
         public Task InitAsync([CallerFilePath] string callerFilePath = "", [CallerMemberName] string callerName = "")
         {
+            return InitAsync(false, callerFilePath, callerName);
+        }
+
+        public Task InitAsync(bool loadHeaderOnly, [CallerFilePath] string callerFilePath = "", [CallerMemberName] string callerName = "")
+        {
             if (_mode == HBookMode.Create)
                 return CreateAsync(callerFilePath, callerName);
             else if (_mode == HBookMode.Open)
-                return LoadAsync(callerFilePath, callerName);
+            {
+                if (loadHeaderOnly) return LoadHeaderOnlyAsync(callerFilePath, callerName);
+                else return LoadAsync(callerFilePath, callerName);
+            }
             else
                 throw new NotSupportedException($"Not supported mode:{_mode}");
         }
@@ -135,6 +148,47 @@ namespace H.Book
                         throw new InvalidDataException($"Not support control code: {cc}");
                 }// while (0 != (cc = ReadNextControlCode(_stream)))
 
+                MakeInitialized();
+            }
+            catch (Exception ex)
+            {
+                if (!IsInitialized()) Interlocked.CompareExchange(ref _loadEx, ex, null);
+                throw ex;
+            }
+            finally
+            {
+                _lock.Release(wt);
+            }
+        }
+
+        public async Task LoadHeaderOnlyAsync([CallerFilePath] string callerFilePath = "", [CallerMemberName] string callerName = "")
+        {
+            var wt = _lock.WaitAsync(true, Timeout.InfiniteTimeSpan, CancellationToken.None, CreateReceiver(callerFilePath, callerName));
+            await wt;
+            try
+            {
+                if (IsDisposed()) throw CreateDisposedEx();
+                if (IsInitFailed()) throw CreateInitFailedEx();
+                if (IsInitialized()) throw new ApplicationException("This HBook already initialized");
+
+                int readedLen = 0;
+                // 验证文件头
+                byte[] startCode = new byte[HMetadataConstant.StartCode.Length];
+                readedLen = await _stream.ReadAsync(startCode, 0, startCode.Length);
+                if (!startCode.SequenceEqual(HMetadataConstant.StartCode))
+                {
+                    _stream.Dispose();
+                    _stream = null;
+                    throw new InvalidDataException("StartCode error, this is not a HBook");
+                }
+                // 读取头
+                await _headerMetadata.LoadAsync(_stream);
+                // 读取索引
+                await _indexMetadata.LoadAsync(_stream);
+                // 读取封面
+                await _coverMetadata.LoadAsync(_stream);
+
+                MakeLoadHeaderOnly();
                 MakeInitialized();
             }
             catch (Exception ex)
@@ -415,6 +469,7 @@ namespace H.Book
                 if (IsDisposed()) throw CreateDisposedEx();
                 if (IsInitError()) throw CreateInitErrorEx();
                 if (IsIOWriteFailed()) throw CreateIOWriteFailedEx();
+                if (IsLoadHeaderOnly()) throw CreateLoadHeaderOnlyEx();
 
                 return _pages.GetPageHeaders();
             }
@@ -433,6 +488,7 @@ namespace H.Book
                 if (IsDisposed()) throw CreateDisposedEx();
                 if (IsInitError()) throw CreateInitErrorEx();
                 if (IsIOWriteFailed()) throw CreateIOWriteFailedEx();
+                if (IsLoadHeaderOnly()) throw CreateLoadHeaderOnlyEx();
 
                 var page = _pages[id];
                 if (page == null) return false;
@@ -466,6 +522,7 @@ namespace H.Book
                 if (IsDisposed()) throw CreateDisposedEx();
                 if (IsInitError()) throw CreateInitErrorEx();
                 if (IsIOWriteFailed()) throw CreateIOWriteFailedEx();
+                if (IsLoadHeaderOnly()) throw CreateLoadHeaderOnlyEx();
 
                 var page = _pages[id];
                 if (page == null) throw ExceptionFactory.CreatePageNotFoundEx(id);
@@ -498,6 +555,7 @@ namespace H.Book
                 if (IsDisposed()) throw CreateDisposedEx();
                 if (IsInitError()) throw CreateInitErrorEx();
                 if (IsIOWriteFailed()) throw CreateIOWriteFailedEx();
+                if (IsLoadHeaderOnly()) throw CreateLoadHeaderOnlyEx();
 
                 var page = _pages[id];
                 if (page == null) return false;
@@ -531,6 +589,7 @@ namespace H.Book
                 if (IsDisposed()) throw CreateDisposedEx();
                 if (IsInitError()) throw CreateInitErrorEx();
                 if (IsIOWriteFailed()) throw CreateIOWriteFailedEx();
+                if (IsLoadHeaderOnly()) throw CreateLoadHeaderOnlyEx();
 
                 var page = _pages[id];
                 if (page == null) throw ExceptionFactory.CreatePageNotFoundEx(id);
@@ -571,6 +630,7 @@ namespace H.Book
                 if (IsDisposed()) throw CreateDisposedEx();
                 if (IsInitError()) throw CreateInitErrorEx();
                 if (IsIOWriteFailed()) throw CreateIOWriteFailedEx();
+                if (IsLoadHeaderOnly()) throw CreateLoadHeaderOnlyEx();
 
                 _stream.Seek(0, SeekOrigin.End);
                 // 写入页头
@@ -631,6 +691,7 @@ namespace H.Book
                 if (IsDisposed()) throw CreateDisposedEx();
                 if (IsInitError()) throw CreateInitErrorEx();
                 if (IsIOWriteFailed()) throw CreateIOWriteFailedEx();
+                if (IsLoadHeaderOnly()) throw CreateLoadHeaderOnlyEx();
 
                 var page = _pages[id];
                 if (page == null) return false;
@@ -663,6 +724,7 @@ namespace H.Book
                 if (IsDisposed()) throw CreateDisposedEx();
                 if (IsInitError()) throw CreateInitErrorEx();
                 if (IsIOWriteFailed()) throw CreateIOWriteFailedEx();
+                if (IsLoadHeaderOnly()) throw CreateLoadHeaderOnlyEx();
 
                 var page = _pages[id];
                 if (page == null) throw ExceptionFactory.CreatePageNotFoundEx(id);
@@ -833,6 +895,16 @@ namespace H.Book
         /// <exception cref="InvalidDataException">文件起始标识错误，或发现重复ID的页面，或发现不支持控制码</exception>
         Task InitAsync([CallerFilePath] string callerFilePath = "", [CallerMemberName] string callerName = "");
         /// <summary>
+        /// 从文件中加载
+        /// </summary>
+        /// <param name="callerFilePath">不需要设置</param>
+        /// <param name="callerName">不需要设置</param>
+        /// <param name="loadHeaderOnly">如果加载书本，只加载头信息，封面，之后只能对头信息和封面进行读写</param>
+        /// <returns></returns>
+        /// <exception cref="ApplicationException">已经初始化了</exception>
+        /// <exception cref="InvalidDataException">文件起始标识错误，或发现重复ID的页面，或发现不支持控制码</exception>
+        Task InitAsync(bool loadHeaderOnly, [CallerFilePath] string callerFilePath = "", [CallerMemberName] string callerName = "");
+        /// <summary>
         /// 获取头信息
         /// </summary>
         /// <param name="callerFilePath">不需要设置</param>
@@ -907,6 +979,7 @@ namespace H.Book
         /// <returns>页面头</returns>
         /// <exception cref="InitException">没有加载数据或，创建数据</exception>
         /// <exception cref="IOWriteFailedException">数据在之前的写入操作中可能已经损坏</exception>
+        /// <exception cref="LoadHeaderOnlyException">初始化时只加载了头和封面信息，页面信息处于未知状态，无法进行操作</exception>
         Task<IHPageHeader[]> GetPageHeadersAsync([CallerFilePath] string callerFilePath = "", [CallerMemberName] string callerName = "");
         /// <summary>
         /// 读取页面图像，返回true时图像也有可能为null
@@ -918,6 +991,7 @@ namespace H.Book
         /// <returns>返回true：读取成功，false：这个页面不存在</returns>
         /// <exception cref="InitException">没有加载数据或，创建数据</exception>
         /// <exception cref="IOWriteFailedException">数据在之前的写入操作中可能已经损坏</exception>
+        /// <exception cref="LoadHeaderOnlyException">初始化时只加载了头和封面信息，页面信息处于未知状态，无法进行操作</exception>
         Task<bool> ReadPageAsync(Guid id, Func<Stream, Task> readerAction, [CallerFilePath] string callerFilePath = "", [CallerMemberName] string callerName = "");
         /// <summary>
         /// 获取页面图像副本
@@ -929,6 +1003,7 @@ namespace H.Book
         /// <exception cref="PageNotFoundException">没有找到这个页面</exception>
         /// <exception cref="InitException">没有加载数据或，创建数据</exception>
         /// <exception cref="IOWriteFailedException">数据在之前的写入操作中可能已经损坏</exception>
+        /// <exception cref="LoadHeaderOnlyException">初始化时只加载了头和封面信息，页面信息处于未知状态，无法进行操作</exception>
         Task<Stream> GetPageCopyAsync(Guid id, [CallerFilePath] string callerFilePath = "", [CallerMemberName] string callerName = "");
         /// <summary>
         /// 读取页面缩略图
@@ -940,6 +1015,7 @@ namespace H.Book
         /// <returns>ture：找到页面，false：没有找到页面</returns>
         /// <exception cref="InitException">没有加载数据或，创建数据</exception>
         /// <exception cref="IOWriteFailedException">数据在之前的写入操作中可能已经损坏</exception>
+        /// <exception cref="LoadHeaderOnlyException">初始化时只加载了头和封面信息，页面信息处于未知状态，无法进行操作</exception>
         Task<bool> ReadThumbnailAsync(Guid id, Func<Stream, Task> readerAction, [CallerFilePath] string callerFilePath = "", [CallerMemberName] string callerName = "");
         /// <summary>
         /// 获取页面缩略图副本
@@ -951,6 +1027,7 @@ namespace H.Book
         /// <exception cref="PageNotFoundException">没有找到页面</exception>
         /// <exception cref="InitException">没有加载数据或，创建数据</exception>
         /// <exception cref="IOWriteFailedException">数据在之前的写入操作中可能已经损坏</exception>
+        /// <exception cref="LoadHeaderOnlyException">初始化时只加载了头和封面信息，页面信息处于未知状态，无法进行操作</exception>
         Task<Stream> GetThumbnailCopyAsync(Guid id, [CallerFilePath] string callerFilePath = "", [CallerMemberName] string callerName = "");
         /// <summary>
         /// 添加页面
@@ -967,6 +1044,7 @@ namespace H.Book
         /// <exception cref="ApplicationException">未知异常导致添加失败</exception>
         /// <exception cref="InitException">没有加载数据或，创建数据</exception>
         /// <exception cref="IOWriteFailedException">数据在之前的写入操作中可能已经损坏</exception>
+        /// <exception cref="LoadHeaderOnlyException">初始化时只加载了头和封面信息，页面信息处于未知状态，无法进行操作</exception>
         Task<Guid> AddPageAsync(HPageHeaderSetting header, Stream thumbnail, Stream content, [CallerFilePath] string callerFilePath = "", [CallerMemberName] string callerName = "");
         /// <summary>
         /// 删除页面
@@ -977,6 +1055,7 @@ namespace H.Book
         /// <returns>返回true：删除成功，false：找不到这个页面</returns>
         /// <exception cref="InitException">没有加载数据或，创建数据</exception>
         /// <exception cref="IOWriteFailedException">数据在之前的写入操作中可能已经损坏</exception>
+        /// <exception cref="LoadHeaderOnlyException">初始化时只加载了头和封面信息，页面信息处于未知状态，无法进行操作</exception>
         Task<bool> DeletePageAsync(Guid id, [CallerFilePath] string callerFilePath = "", [CallerMemberName] string callerName = "");
         /// <summary>
         /// 修改页面头信息
@@ -990,6 +1069,7 @@ namespace H.Book
         /// <exception cref="ArgumentException">头信息太大了，超出可用空间</exception>
         /// <exception cref="InitException">没有加载数据或，创建数据</exception>
         /// <exception cref="IOWriteFailedException">数据在之前的写入操作中可能已经损坏</exception>
+        /// <exception cref="LoadHeaderOnlyException">初始化时只加载了头和封面信息，页面信息处于未知状态，无法进行操作</exception>
         Task<bool> SetPageHeaderAsync(Guid id, HPageHeaderSetting header, [CallerFilePath] string callerFilePath = "", [CallerMemberName] string callerName = "");
     }
 }

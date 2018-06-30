@@ -87,10 +87,12 @@
       <DependentUpon>Shell.xaml</DependentUpon>
     </Compile>
     <Compile Include="ShellModel.cs" />
+    <Compile Include="ViewModels\AllBookViewModel.cs" />
     <Compile Include="ViewModels\BookDetailViewModel.cs" />
     <Compile Include="ViewModels\BookDownloadViewModel.cs" />
     <Compile Include="Common\BookImageHelper.cs" />
-    <Compile Include="ViewModels\PageControlModel.cs" />
+    <Compile Include="ViewModels\BookMiniModel.cs" />
+    <Compile Include="ViewModels\PageMinModel.cs" />
     <Compile Include="ViewModels\PageGalleryViewModel.cs" />
     <Compile Include="ViewModels\SelectionModel.cs" />
     <Compile Include="ViewModels\ViewModelBase.cs" />

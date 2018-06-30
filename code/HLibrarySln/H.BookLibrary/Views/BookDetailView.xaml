@@ -259,7 +259,7 @@
                     </ItemsPanelTemplate>
                 </ListBox.ItemsPanel>
                 <ListBox.ItemTemplate>
-                    <DataTemplate DataType="{x:Type vm:PageControlModel}">
+                    <DataTemplate DataType="{x:Type vm:PageMinModel}">
                         <!--  图像宽高比0.69  -->
                         <Grid Width="200" Height="326">
                             <Grid.RowDefinitions>

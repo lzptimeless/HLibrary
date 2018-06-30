@@ -8,7 +8,7 @@ using System.Windows.Media;
 
 namespace H.BookLibrary.ViewModels
 {
-    public class PageControlModel : BindableBase
+    public class PageMinModel : BindableBase
     {
         #region Index
         /// <summary>

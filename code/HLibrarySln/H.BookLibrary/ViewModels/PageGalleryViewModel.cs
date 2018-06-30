@@ -39,11 +39,11 @@ namespace H.BookLibrary.ViewModels
         /// Property name of <see cref="CurrentPage"/>
         /// </summary>
         public const string CurrentPagePropertyName = "CurrentPage";
-        private PageControlModel _currentPage;
+        private PageMinModel _currentPage;
         /// <summary>
         /// Get or set <see cref="CurrentPage"/>
         /// </summary>
-        public PageControlModel CurrentPage
+        public PageMinModel CurrentPage
         {
             get { return this._currentPage; }
             set
@@ -290,7 +290,7 @@ namespace H.BookLibrary.ViewModels
             }
 
             var ph = _pageHeaders[CurrentPageIndex];
-            PageControlModel pcm = new PageControlModel();
+            PageMinModel pcm = new PageMinModel();
             pcm.Index = CurrentPageIndex;
             pcm.Artist = ph.Artist;
             pcm.Characters = ph.Charachters;

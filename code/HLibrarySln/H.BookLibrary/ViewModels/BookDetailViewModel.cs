@@ -258,11 +258,11 @@ namespace H.BookLibrary.ViewModels
         #endregion
 
         #region Pages
-        private ObservableCollection<PageControlModel> _pages = new ObservableCollection<PageControlModel>();
+        private ObservableCollection<PageMinModel> _pages = new ObservableCollection<PageMinModel>();
         /// <summary>
         /// Get or set <see cref="Pages"/>
         /// </summary>
-        public ObservableCollection<PageControlModel> Pages
+        public ObservableCollection<PageMinModel> Pages
         {
             get { return _pages; }
         }
@@ -357,28 +357,6 @@ namespace H.BookLibrary.ViewModels
 
                 _galleryPageSizes = value;
                 RaisePropertyChanged(GalleryPageSizesPropertyName);
-            }
-        }
-        #endregion
-
-        #region IsShowPropertyPanel
-        /// <summary>
-        /// Property name of <see cref="IsShowPropertyPanel"/>
-        /// </summary>
-        public const string IsShowPropertyPanelPropertyName = "IsShowPropertyPanel";
-        private bool _isShowPropertyPanel;
-        /// <summary>
-        /// Get or set <see cref="IsShowPropertyPanel"/>
-        /// </summary>
-        public bool IsShowPropertyPanel
-        {
-            get { return _isShowPropertyPanel; }
-            set
-            {
-                if (_isShowPropertyPanel == value) return;
-
-                _isShowPropertyPanel = value;
-                RaisePropertyChanged(IsShowPropertyPanelPropertyName);
             }
         }
         #endregion
@@ -655,7 +633,7 @@ namespace H.BookLibrary.ViewModels
         /// <summary>
         /// GoPageGallery command
         /// </summary>
-        private DelegateCommand<PageControlModel> _goPageGalleryCommand;
+        private DelegateCommand<PageMinModel> _goPageGalleryCommand;
         /// <summary>
         /// Get <see cref="GoPageGalleryCommand"/>
         /// </summary>
@@ -665,14 +643,14 @@ namespace H.BookLibrary.ViewModels
             {
                 if (this._goPageGalleryCommand == null)
                 {
-                    this._goPageGalleryCommand = new DelegateCommand<PageControlModel>(this.GoPageGallery, this.CanGoPageGallery);
+                    this._goPageGalleryCommand = new DelegateCommand<PageMinModel>(this.GoPageGallery, this.CanGoPageGallery);
                 }
 
                 return this._goPageGalleryCommand;
             }
         }
 
-        private void GoPageGallery(PageControlModel e)
+        private void GoPageGallery(PageMinModel e)
         {
             try
             {
@@ -692,7 +670,7 @@ namespace H.BookLibrary.ViewModels
             }
         }
 
-        private bool CanGoPageGallery(PageControlModel e)
+        private bool CanGoPageGallery(PageMinModel e)
         {
             return e != null;
         }
@@ -778,7 +756,7 @@ namespace H.BookLibrary.ViewModels
             {
                 var ph = _pageHeaderInfos[i];
                 var thumbImg = await _book.GetThumbnailCopyAsync(ph.ID);
-                PageControlModel pvm = new PageControlModel();
+                PageMinModel pvm = new PageMinModel();
                 pvm.Index = i;
                 pvm.Artist = ph.Artist;
                 pvm.Characters = ph.Charachters;

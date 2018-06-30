@@ -45,6 +45,7 @@
     <Compile Include="Exception\InvalidBufferException.cs" />
     <Compile Include="Exception\InvalidPropertyException.cs" />
     <Compile Include="Exception\IOWriteFailedException.cs" />
+    <Compile Include="Exception\LoadHeaderOnlyException.cs" />
     <Compile Include="Exception\PageNotFoundException.cs" />
     <Compile Include="Exception\ReadPropertyException.cs" />
     <Compile Include="Exception\WritePropertyException.cs" />
