@@ -23,6 +23,11 @@
                     Command="{Binding MainViewBackCommand}"
                     Content="{StaticResource Icon-LeftArrow-Mini}"
                     Style="{StaticResource Button-Path-Stroke}" />
+                <TextBlock
+                    x:Name="BreadcrumbTextBlock"
+                    Margin="10,0,0,0"
+                    VerticalAlignment="Center"
+                    Style="{StaticResource TextBlock}" />
             </StackPanel>
         </Grid>
     </Window.Tag>

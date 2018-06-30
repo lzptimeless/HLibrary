@@ -19,7 +19,7 @@ namespace H.BookLibrary.Views
     /// <summary>
     /// Interaction logic for PageGalleryView.xaml
     /// </summary>
-    public partial class PageGalleryView : UserControl
+    public partial class PageGalleryView : UserControl, IView
     {
         #region fields
         private Window _ownerWindow;
@@ -31,7 +31,23 @@ namespace H.BookLibrary.Views
 
             Loaded += PageGalleryView_Loaded;
             Unloaded += PageGalleryView_Unloaded;
+
+            Title = "页面浏览";
         }
+
+        #region properties
+        #region Title
+        private string _title;
+        /// <summary>
+        /// Get or set <see cref="Title"/>
+        /// </summary>
+        public string Title
+        {
+            get { return _title; }
+            set { _title = value; }
+        }
+        #endregion
+        #endregion
 
         public void SetPageImage(ImageSource src, Stretch stretch)
         {
@@ -139,6 +155,9 @@ namespace H.BookLibrary.Views
                     e.Handled = true;
                     vm.PrePageCommand.Execute(null);
                 }
+
+                // 防止焦点乱跑触发了别的控件事件
+                if (!PageDragThumb.IsFocused) PageDragThumb.Focus();
             }
             else if (e.Key == Key.Right)
             {
@@ -148,6 +167,9 @@ namespace H.BookLibrary.Views
                     e.Handled = true;
                     vm.NextPageCommand.Execute(null);
                 }
+
+                // 防止焦点乱跑触发了别的控件事件
+                if (!PageDragThumb.IsFocused) PageDragThumb.Focus();
             }
         }
 

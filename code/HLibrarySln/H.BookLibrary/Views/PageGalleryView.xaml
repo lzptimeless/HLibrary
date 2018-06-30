@@ -11,20 +11,41 @@
     d:DesignHeight="700"
     d:DesignWidth="1000"
     mc:Ignorable="d">
+    <UserControl.Resources>
+        <Style x:Key="ContentControl-MouseOverDisplay" TargetType="ContentControl">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ContentControl">
+                        <ContentPresenter />
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Opacity" Value="1" />
+                            </Trigger>
+                            <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                                <Setter Property="Opacity" Value="1" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Opacity" Value="0" />
+        </Style>
+    </UserControl.Resources>
     <Grid>
         <!--  当前页面  -->
         <Canvas
             x:Name="PageImageCanvas"
             Grid.RowSpan="3"
             Grid.ColumnSpan="3"
-            SizeChanged="PageImageCanvas_SizeChanged"
-            KeyboardNavigation.DirectionalNavigation="Contained">
+            KeyboardNavigation.DirectionalNavigation="Contained"
+            SizeChanged="PageImageCanvas_SizeChanged">
             <Grid x:Name="PageImageHost">
                 <Image x:Name="PageImage" />
                 <Thumb
                     x:Name="PageDragThumb"
                     Cursor="ScrollAll"
                     DragDelta="PageDragThumb_DragDelta"
+                    FocusVisualStyle="{StaticResource Focus-Empty}"
                     Focusable="True"
                     MouseWheel="PageDragThumb_MouseWheel">
                     <Thumb.Template>
@@ -36,70 +57,85 @@
             </Grid>
         </Canvas>
         <!--  左边栏  -->
-        <Grid Grid.Row="1" HorizontalAlignment="Left">
-            <!--  背景色  -->
-            <Rectangle Fill="{StaticResource Brush-Main}" Opacity="0.5" />
-            <Button
-                Width="80"
-                Height="60"
-                Margin="20,0,10,0"
-                Command="{Binding PrePageCommand}"
-                Content="&lt;上一页" />
-        </Grid>
-        <!--  右边栏  -->
-        <Grid Grid.Row="1" HorizontalAlignment="Right">
-            <!--  背景色  -->
-            <Rectangle Fill="{StaticResource Brush-Main}" Opacity="0.5" />
-            <Button
-                Width="80"
-                Height="60"
-                Margin="10,0,20,0"
-                Command="{Binding NextPageCommand}"
-                Content="下一页&gt;" />
-        </Grid>
-        <!--  上边栏  -->
-        <Grid Grid.Row="0" VerticalAlignment="Top">
-            <!--  背景色  -->
-            <Rectangle
-                Grid.ColumnSpan="2"
-                Fill="{StaticResource Brush-Main}"
-                Opacity="0.5" />
-            <Grid Margin="100,20,100,10">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
-                <TextBlock
-                    Margin="0,4,0,0"
-                    Style="{StaticResource TextBlock}"
-                    TextAlignment="Center"
-                    TextWrapping="Wrap">
-                    <Run Text="{Binding CurrentPage.Index}" />
-                    <Run Text="|" />
-                    <Run Text="{Binding CurrentPage.Artist}" />
-                    <Run Text="|" />
-                    <Run Text="{Binding CurrentPage.Characters, Converter={StaticResource Converter-Arrary-To-Text}}" />
-                    <Run Text="|" />
-                    <Run Text="{Binding CurrentPage.Tags, Converter={StaticResource Converter-Arrary-To-Text}}" />
-                </TextBlock>
-                <StackPanel
-                    Grid.Column="1"
-                    Margin="20,0,0,0"
-                    VerticalAlignment="Top"
-                    Orientation="Horizontal">
-                    <TextBlock
-                        VerticalAlignment="Center"
-                        Style="{StaticResource TextBlock}"
-                        Text="显示模式：" />
-                    <ComboBox
-                        Width="80"
-                        DisplayMemberPath="Text"
-                        ItemsSource="{Binding PageStretches}"
-                        SelectedValue="{Binding CurrentPageStretch}"
-                        SelectedValuePath="Value" />
-                </StackPanel>
+        <ContentControl
+            Grid.Row="1"
+            HorizontalAlignment="Left"
+            Style="{StaticResource ContentControl-MouseOverDisplay}">
+            <Grid>
+                <!--  背景色  -->
+                <Rectangle Fill="{StaticResource Brush-Main}" Opacity="0.5" />
+                <Button
+                    Width="80"
+                    Height="60"
+                    Margin="20,0,10,0"
+                    Command="{Binding PrePageCommand}"
+                    Content="&lt;上一页" />
             </Grid>
-        </Grid>
+        </ContentControl>
+        <!--  右边栏  -->
+        <ContentControl
+            Grid.Row="1"
+            HorizontalAlignment="Right"
+            Style="{StaticResource ContentControl-MouseOverDisplay}">
+            <Grid>
+                <!--  背景色  -->
+                <Rectangle Fill="{StaticResource Brush-Main}" Opacity="0.5" />
+                <Button
+                    Width="80"
+                    Height="60"
+                    Margin="10,0,20,0"
+                    Command="{Binding NextPageCommand}"
+                    Content="下一页&gt;" />
+            </Grid>
+        </ContentControl>
+        <!--  上边栏  -->
+        <ContentControl
+            Grid.Row="0"
+            VerticalAlignment="Top"
+            Style="{StaticResource ContentControl-MouseOverDisplay}">
+            <Grid>
+                <!--  背景色  -->
+                <Rectangle
+                    Grid.ColumnSpan="2"
+                    Fill="{StaticResource Brush-Main}"
+                    Opacity="0.5" />
+                <Grid Margin="100,20,100,20">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock
+                        Margin="0,4,0,0"
+                        Style="{StaticResource TextBlock}"
+                        TextAlignment="Center"
+                        TextWrapping="Wrap">
+                        <Run Text="{Binding CurrentPage.Index}" />
+                        <Run Text="|" />
+                        <Run Text="{Binding CurrentPage.Artist}" />
+                        <Run Text="|" />
+                        <Run Text="{Binding CurrentPage.Characters, Converter={StaticResource Converter-Arrary-To-Text}}" />
+                        <Run Text="|" />
+                        <Run Text="{Binding CurrentPage.Tags, Converter={StaticResource Converter-Arrary-To-Text}}" />
+                    </TextBlock>
+                    <StackPanel
+                        Grid.Column="1"
+                        Margin="20,0,0,0"
+                        VerticalAlignment="Top"
+                        Orientation="Horizontal">
+                        <TextBlock
+                            VerticalAlignment="Center"
+                            Style="{StaticResource TextBlock}"
+                            Text="显示模式：" />
+                        <ComboBox
+                            Width="80"
+                            DisplayMemberPath="Text"
+                            ItemsSource="{Binding PageStretches}"
+                            SelectedValue="{Binding CurrentPageStretch}"
+                            SelectedValuePath="Value" />
+                    </StackPanel>
+                </Grid>
+            </Grid>
+        </ContentControl>
         <!--  下边栏  -->
         <!--<Grid Grid.Row="2" Grid.ColumnSpan="3"></Grid>-->
     </Grid>

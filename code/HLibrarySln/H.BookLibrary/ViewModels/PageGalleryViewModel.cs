@@ -64,7 +64,7 @@ namespace H.BookLibrary.ViewModels
         /// Property name of <see cref="CurrentPageStretch"/>
         /// </summary>
         public const string CurrentPageStretchPropertyName = "CurrentPageStretch";
-        private Stretch _currentPageStretch = Stretch.None;
+        private Stretch _currentPageStretch = Stretch.Uniform;
         /// <summary>
         /// Get or set <see cref="CurrentPageStretch"/>
         /// </summary>

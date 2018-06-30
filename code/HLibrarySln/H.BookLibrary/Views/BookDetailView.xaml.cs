@@ -19,14 +19,30 @@ namespace H.BookLibrary.Views
     /// <summary>
     /// Interaction logic for BookDetailView.xaml
     /// </summary>
-    public partial class BookDetailView : UserControl
+    public partial class BookDetailView : UserControl, IView
     {
         public BookDetailView()
         {
             InitializeComponent();
             Loaded += BookDetailView_Loaded;
             Unloaded += BookDetailView_Unloaded;
+
+            Title = "书本概览";
         }
+
+        #region properties
+        #region Title
+        private string _title;
+        /// <summary>
+        /// Get or set <see cref="Title"/>
+        /// </summary>
+        public string Title
+        {
+            get { return _title; }
+            set { _title = value; }
+        }
+        #endregion
+        #endregion
 
         public void PagesScrollToTop()
         {

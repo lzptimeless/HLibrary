@@ -146,6 +146,15 @@
     <!--  用到的转换器  -->
     <BooleanToVisibilityConverter x:Key="Converter-Bool-To-Visibility" />
 
+    <!--  焦点样式  -->
+    <Style x:Key="Focus-Empty">
+        <Setter Property="Control.Template">
+            <Setter.Value>
+                <ControlTemplate />
+            </Setter.Value>
+        </Setter>
+    </Style>
+
     <!--  Text  -->
     <FontFamily x:Key="Font">Microsoft YaHei UI</FontFamily>
     <sys:Double x:Key="Font-Size">13</sys:Double>
@@ -174,6 +183,32 @@
         <Setter Property="FontFamily" Value="{StaticResource Font}" />
         <Setter Property="Foreground" Value="{StaticResource Brush-Text-Weak}" />
     </Style>
+
+    <!--  超链接  -->
+    <Style x:Key="Hyperlink" TargetType="Hyperlink">
+        <Setter Property="OverridesDefaultStyle" Value="True" />
+        <Setter Property="TextDecorations" Value="Underline" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Foreground" Value="{StaticResource Brush-Text-Highlight}"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+    <Style x:Key="Hyperlink-FG" TargetType="Hyperlink">
+        <Setter Property="OverridesDefaultStyle" Value="True" />
+        <Setter Property="TextDecorations" Value="Underline" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Foreground" Value="{StaticResource Brush-Text-Highlight-FG}"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+    <Style
+        x:Key="{x:Type Hyperlink}"
+        BasedOn="{StaticResource Hyperlink}"
+        TargetType="Hyperlink" />
 
     <!--  Button colors  -->
     <Style x:Key="Button" TargetType="Button">
@@ -651,7 +686,10 @@
         <Setter Property="BorderBrush" Value="{StaticResource Brush-Control-BD}" />
         <Setter Property="Background" Value="{StaticResource Brush-Control-BG}" />
     </Style>
-    <Style x:Key="{x:Type Thumb}" TargetType="Thumb" BasedOn="{StaticResource Thumb}"/>
+    <Style
+        x:Key="{x:Type Thumb}"
+        BasedOn="{StaticResource Thumb}"
+        TargetType="Thumb" />
 
     <!--  ToolTip  -->
     <Style x:Key="{x:Type ToolTip}" TargetType="ToolTip">
