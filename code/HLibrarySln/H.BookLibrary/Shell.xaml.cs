@@ -178,16 +178,5 @@ namespace H.BookLibrary
             var model = DataContext as ShellModel;
             model.ViewLoaded();
         }
-
-        private void DownloadButton_Click(object sender, RoutedEventArgs e)
-        {
-            //BookDownloadViewModel vm = new BookDownloadViewModel(BookIDTextBox.Text.Trim());
-            //vm.ViewManager = this;
-            //BookDownloadView view = new BookDownloadView();
-            //view.DataContext = vm;
-            //vm.Init(view);
-
-            //MainViewGo(view);
-        }
     }
 }

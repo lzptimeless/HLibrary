@@ -32,26 +32,6 @@
         </Grid>
     </Window.Tag>
     <Grid>
-        <!--<Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition />
-        </Grid.RowDefinitions>
-        <StackPanel Margin="20,20,20,0" Orientation="Horizontal">
-            <TextBlock
-                VerticalAlignment="Center"
-                Style="{StaticResource textblock}"
-                Text="ID:" />
-            <TextBox
-                x:Name="BookIDTextBox"
-                Width="100"
-                Margin="10,0,0,0"
-                Text="1201123" />
-            <Button
-                x:Name="DownloadButton"
-                Margin="10,0,0,0"
-                Click="DownloadButton_Click"
-                Content="下载" />
-        </StackPanel>-->
         <Grid x:Name="PageHost" ClipToBounds="True" />
     </Grid>
 </Window>

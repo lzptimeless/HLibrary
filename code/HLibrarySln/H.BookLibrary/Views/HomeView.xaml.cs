@@ -17,17 +17,17 @@ using System.Windows.Shapes;
 namespace H.BookLibrary.Views
 {
     /// <summary>
-    /// Interaction logic for BookDownloadView.xaml
+    /// Interaction logic for HomeView.xaml
     /// </summary>
-    public partial class BookDownloadView : UserControl,IView
+    public partial class HomeView : UserControl, IView
     {
-        public BookDownloadView()
+        public HomeView()
         {
             InitializeComponent();
-            Loaded += BookDownloadView_Loaded;
-            Unloaded += BookDownloadView_Unloaded;
+            Loaded += HomeView_Loaded;
+            Unloaded += HomeView_Unloaded;
 
-            Title = "下载";
+            Title = "首页";
         }
 
         #region properties
@@ -44,23 +44,18 @@ namespace H.BookLibrary.Views
         #endregion
         #endregion
 
-        private void BookDownloadView_Loaded(object sender, RoutedEventArgs e)
+        private void HomeView_Loaded(object sender, RoutedEventArgs e)
         {
             var vm = DataContext as ViewModelBase;
             if (vm != null) vm.ViewLoaded();
         }
 
-        private void BookDownloadView_Unloaded(object sender, RoutedEventArgs e)
+        private void HomeView_Unloaded(object sender, RoutedEventArgs e)
         {
             var vm = DataContext as ViewModelBase;
             DataContext = null;
 
             if (vm != null) vm.Release();
-        }
-
-        public void Print(string msg)
-        {
-            OutputTextBox.AppendText(msg + Environment.NewLine);
         }
     }
 }

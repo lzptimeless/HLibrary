@@ -70,7 +70,6 @@ namespace H.BookLibrary.Views
             DataContext = null;
 
             if (vm != null) vm.Release();
-            if (vm != null) vm.Release();
             if (_ownerWindow != null) _ownerWindow.MouseUp -= _ownerWindow_MouseUp;
         }
 

@@ -83,10 +83,9 @@ namespace H.BookLibrary
         #region public methods
         public void ViewLoaded()
         {
-            string bookFolderPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "books");
-            AllBookViewModel vm = new AllBookViewModel(bookFolderPath);
+            HomeViewModel vm = new HomeViewModel();
             vm.ViewManager = _viewManager;
-            AllBookView view = new AllBookView();
+            HomeView view = new HomeView();
             view.DataContext = vm;
             vm.Init(view);
 
