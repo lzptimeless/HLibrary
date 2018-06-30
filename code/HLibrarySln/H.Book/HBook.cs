@@ -769,7 +769,7 @@ namespace H.Book
         {
             if (!MakeDisposed()) return;
 
-            _stream.Dispose();
+            _stream?.Dispose();
             GC.SuppressFinalize(this);
         }
         #region private methods

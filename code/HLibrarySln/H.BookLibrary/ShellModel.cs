@@ -5,6 +5,7 @@ using Prism.Commands;
 using Prism.Mvvm;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -80,14 +81,12 @@ namespace H.BookLibrary
         #endregion
 
         #region public methods
-        public async void ViewLoaded()
+        public void ViewLoaded()
         {
-            HBook book = new HBook(@"books\hitomi-1201123-2018-06-27.hb", HBookMode.Open);
-            await book.InitAsync();
-
-            BookDetailViewModel vm = new BookDetailViewModel(book);
+            string bookFolderPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "books");
+            AllBookViewModel vm = new AllBookViewModel(bookFolderPath);
             vm.ViewManager = _viewManager;
-            BookDetailView view = new BookDetailView();
+            AllBookView view = new AllBookView();
             view.DataContext = vm;
             vm.Init(view);
 

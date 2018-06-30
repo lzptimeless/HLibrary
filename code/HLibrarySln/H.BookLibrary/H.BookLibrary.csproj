@@ -96,6 +96,9 @@
     <Compile Include="ViewModels\PageGalleryViewModel.cs" />
     <Compile Include="ViewModels\SelectionModel.cs" />
     <Compile Include="ViewModels\ViewModelBase.cs" />
+    <Compile Include="Views\AllBookView.xaml.cs">
+      <DependentUpon>AllBookView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\BookDetailView.xaml.cs">
       <DependentUpon>BookDetailView.xaml</DependentUpon>
     </Compile>
@@ -141,6 +144,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Shell.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\AllBookView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

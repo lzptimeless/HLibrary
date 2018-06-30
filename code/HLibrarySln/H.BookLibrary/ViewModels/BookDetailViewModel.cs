@@ -21,6 +21,7 @@ namespace H.BookLibrary.ViewModels
         #region fields
         private const int DefaultPageSize = 10;
 
+        private string _bookPath;
         private IHBook _book;
         private List<IHPageHeader> _pageHeaderInfos = new List<IHPageHeader>();
         /// <summary>
@@ -29,10 +30,9 @@ namespace H.BookLibrary.ViewModels
         private bool _isInnerChange;
         #endregion
 
-        public BookDetailViewModel(IHBook book)
+        public BookDetailViewModel(string bookPath)
         {
-            _book = book;
-
+            _bookPath = bookPath;
             _galleryPageSizes.AddRange(new[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 50, 60, 70, 80, 90, 100 });
         }
 
@@ -695,6 +695,7 @@ namespace H.BookLibrary.ViewModels
         {
             base.ViewLoaded();
 
+            await LoadBook();
             await UpdateBookHeader();
             await LoadCover();
             await GalleryUpdatePageInfo();
@@ -703,11 +704,19 @@ namespace H.BookLibrary.ViewModels
 
         public override void Release()
         {
+            _book?.Dispose();
+
             base.Release();
         }
         #endregion
 
         #region private methods
+        private async Task LoadBook()
+        {
+            _book = new HBook(_bookPath, HBookMode.Open);
+            await _book.InitAsync();
+        }
+
         private async Task LoadCover()
         {
             await _book.ReadCoverThumbnailAsync(async s =>

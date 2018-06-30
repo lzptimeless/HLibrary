@@ -117,6 +117,38 @@ namespace H.BookLibrary.Views
 
             _ownerWindow = Window.GetWindow(this);
             _ownerWindow.KeyUp += _ownerWindow_KeyUp;
+            _ownerWindow.MouseUp += _ownerWindow_MouseUp;
+        }
+
+        private void _ownerWindow_MouseUp(object sender, MouseButtonEventArgs e)
+        {
+            // 页面不可见则不用处理窗口按键
+            if (Visibility != Visibility.Visible) return;
+
+            if (e.ChangedButton == MouseButton.XButton1)
+            {
+                var vm = DataContext as PageGalleryViewModel;
+                if (vm != null && vm.PrePageCommand.CanExecute(null))
+                {
+                    e.Handled = true;
+                    vm.PrePageCommand.Execute(null);
+                }
+
+                // 防止焦点乱跑触发了别的控件事件
+                if (!PageDragThumb.IsFocused) PageDragThumb.Focus();
+            }
+            else if (e.ChangedButton == MouseButton.XButton2)
+            {
+                var vm = DataContext as PageGalleryViewModel;
+                if (vm != null && vm.NextPageCommand.CanExecute(null))
+                {
+                    e.Handled = true;
+                    vm.NextPageCommand.Execute(null);
+                }
+
+                // 防止焦点乱跑触发了别的控件事件
+                if (!PageDragThumb.IsFocused) PageDragThumb.Focus();
+            }
         }
 
         private void _ownerWindow_KeyUp(object sender, KeyEventArgs e)
@@ -179,7 +211,11 @@ namespace H.BookLibrary.Views
             DataContext = null;
 
             if (vm != null) vm.Release();
-            if (_ownerWindow != null) _ownerWindow.KeyUp -= _ownerWindow_KeyUp;
+            if (_ownerWindow != null)
+            {
+                _ownerWindow.KeyUp -= _ownerWindow_KeyUp;
+                _ownerWindow.MouseUp -= _ownerWindow_MouseUp;
+            }
         }
 
         private void PageDragThumb_DragDelta(object sender, System.Windows.Controls.Primitives.DragDeltaEventArgs e)

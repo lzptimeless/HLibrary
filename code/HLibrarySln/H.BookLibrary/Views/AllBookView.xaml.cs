@@ -17,21 +17,22 @@ using System.Windows.Shapes;
 namespace H.BookLibrary.Views
 {
     /// <summary>
-    /// Interaction logic for BookDetailView.xaml
+    /// Interaction logic for AllBookView.xaml
     /// </summary>
-    public partial class BookDetailView : UserControl, IView
+    public partial class AllBookView : UserControl, IView
     {
         #region fields
         private Window _ownerWindow;
         #endregion
 
-        public BookDetailView()
+        public AllBookView()
         {
             InitializeComponent();
-            Loaded += BookDetailView_Loaded;
-            Unloaded += BookDetailView_Unloaded;
 
-            Title = "书本详细";
+            Loaded += AllBookView_Loaded;
+            Unloaded += AllBookView_Unloaded;
+
+            Title = "书本浏览";
         }
 
         #region properties
@@ -50,11 +51,11 @@ namespace H.BookLibrary.Views
 
         public void PagesScrollToTop()
         {
-            var sv = UITree.FindDescendant<ScrollViewer>(PageListBox);
+            var sv = UITree.FindDescendant<ScrollViewer>(BookListBox);
             if (sv != null) sv.ScrollToTop();
         }
 
-        private void BookDetailView_Loaded(object sender, RoutedEventArgs e)
+        private void AllBookView_Loaded(object sender, RoutedEventArgs e)
         {
             var vm = DataContext as ViewModelBase;
             if (vm != null) vm.ViewLoaded();
@@ -63,11 +64,12 @@ namespace H.BookLibrary.Views
             _ownerWindow.MouseUp += _ownerWindow_MouseUp;
         }
 
-        private void BookDetailView_Unloaded(object sender, RoutedEventArgs e)
+        private void AllBookView_Unloaded(object sender, RoutedEventArgs e)
         {
             var vm = DataContext as ViewModelBase;
             DataContext = null;
 
+            if (vm != null) vm.Release();
             if (vm != null) vm.Release();
             if (_ownerWindow != null) _ownerWindow.MouseUp -= _ownerWindow_MouseUp;
         }
@@ -76,7 +78,7 @@ namespace H.BookLibrary.Views
         {
             // 页面不可见则不用处理窗口按键
             if (Visibility != Visibility.Visible) return;
-            var vm = DataContext as BookDetailViewModel;
+            var vm = DataContext as AllBookViewModel;
 
             if (vm == null)
             {

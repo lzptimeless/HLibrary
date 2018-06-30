@@ -298,7 +298,7 @@ namespace H.BookLibrary.ViewModels
             }
         }
 
-        private async void GoBookDetail(BookMiniModel e)
+        private void GoBookDetail(BookMiniModel e)
         {
             try
             {
@@ -307,10 +307,7 @@ namespace H.BookLibrary.ViewModels
                 else
                 {
                     // Do command
-                    HBook book = new HBook(e.Path, HBookMode.Open);
-                    await book.InitAsync();
-
-                    BookDetailViewModel vm = new BookDetailViewModel(book);
+                    BookDetailViewModel vm = new BookDetailViewModel(e.Path);
                     vm.ViewManager = ViewManager;
                     BookDetailView view = new BookDetailView();
                     view.DataContext = vm;
@@ -365,6 +362,8 @@ namespace H.BookLibrary.ViewModels
         private async Task LoadGalleryPages()
         {
             Books.Clear();
+            if (View is AllBookView) (View as AllBookView).PagesScrollToTop();
+
             if (GalleryPageIndexes.Count == 0)
             {
                 Output.Print("GalleryPageIndexes is empty");
@@ -401,7 +400,7 @@ namespace H.BookLibrary.ViewModels
                         else
                             Output.Print($"Page thumbnail is null, index={i}");
                     });
-                    BookMiniModel model = new BookMiniModel(bookHeader,cover,path);
+                    BookMiniModel model = new BookMiniModel(i, bookHeader, cover, path);
                     Books.Add(model);
                 }
             }

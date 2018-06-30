@@ -11,7 +11,7 @@ namespace H.BookLibrary.ViewModels
 {
     public class BookMiniModel : BindableBase
     {
-        public BookMiniModel(IHBookHeader bookHeader, ImageSource coverThumbnail, string path)
+        public BookMiniModel(int index, IHBookHeader bookHeader, ImageSource coverThumbnail, string path)
         {
             Names = bookHeader.Names;
             Artists = bookHeader.Artists;
@@ -26,6 +26,28 @@ namespace H.BookLibrary.ViewModels
         }
 
         #region properties
+        #region Index
+        /// <summary>
+        /// Property name of <see cref="Index"/>
+        /// </summary>
+        public const string IndexPropertyName = "Index";
+        private int _index;
+        /// <summary>
+        /// Get or set <see cref="Index"/>
+        /// </summary>
+        public int Index
+        {
+            get { return this._index; }
+            set
+            {
+                if (this._index == value) return;
+
+                this._index = value;
+                this.RaisePropertyChanged(IndexPropertyName);
+            }
+        }
+        #endregion
+
         #region Names
         /// <summary>
         /// Property name of <see cref="Names"/>

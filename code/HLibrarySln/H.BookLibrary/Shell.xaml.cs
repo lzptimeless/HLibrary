@@ -33,7 +33,6 @@ namespace H.BookLibrary
 
             Loaded += Shell_Loaded;
             KeyUp += Shell_KeyUp;
-            MouseUp += Shell_MouseUp;
         }
 
         #region properties
@@ -168,15 +167,6 @@ namespace H.BookLibrary
         private void Shell_KeyUp(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Back)
-            {
-                e.Handled = true;
-                MainViewBack();
-            }
-        }
-
-        private void Shell_MouseUp(object sender, MouseButtonEventArgs e)
-        {
-            if (e.ChangedButton == MouseButton.XButton1)
             {
                 e.Handled = true;
                 MainViewBack();
