@@ -164,6 +164,35 @@ namespace H.Book
         }
 
         /// <summary>
+        /// 向buffer中写入属性值
+        /// </summary>
+        /// <param name="propertyName">属性名</param>
+        /// <param name="value">属性值</param>
+        /// <param name="buffer">buffer</param>
+        /// <param name="startIndex">buffer写入起始位置</param>
+        /// <returns></returns>
+        public static int WritePropertyLong(string propertyName, long value, byte[] buffer, int startIndex)
+        {
+            const int len = 8;
+            try
+            {
+                ExceptionFactory.CheckArgNull("buffer", buffer);
+                ExceptionFactory.CheckArgRange("startIndex", startIndex, 0, buffer.Length - 1);
+                ExceptionFactory.CheckArgLengthRange("buffer", buffer, startIndex + len, int.MaxValue, $"startIndex={startIndex}, len={len}");
+
+                byte[] valueBuffer = BitConverter.GetBytes(value);
+                ExceptionFactory.CheckBufferLength("valueBuffer", valueBuffer, len);
+                Array.Copy(valueBuffer, 0, buffer, startIndex, valueBuffer.Length);
+            }
+            catch (Exception ex)
+            {
+                throw ExceptionFactory.CreateWritePropertyException(propertyName, null, ex);
+            }
+
+            return len;
+        }
+
+        /// <summary>
         /// 从buffer中读取属性值
         /// </summary>
         /// <param name="propertyName">属性名</param>
@@ -183,6 +212,35 @@ namespace H.Book
                 ExceptionFactory.CheckBufferLengthRange("buffer", buffer, startIndex + len, int.MaxValue, $"startIndex={startIndex}, len={len}");
 
                 value = BitConverter.ToInt32(buffer, startIndex);
+            }
+            catch (Exception ex)
+            {
+                throw ExceptionFactory.CreateReadPropertyException(propertyName, null, ex);
+            }
+
+            return len;
+        }
+
+        /// <summary>
+        /// 从buffer中读取属性值
+        /// </summary>
+        /// <param name="propertyName">属性名</param>
+        /// <param name="value">读取到的属性值</param>
+        /// <param name="buffer">存有属性值的buffer</param>
+        /// <param name="startIndex">读取起始位置</param>
+        /// <returns>读取字节数</returns>
+        public static int ReadPropertyLong(string propertyName, out long value, byte[] buffer, int startIndex)
+        {
+            const int len = 8;
+            value = 0;
+
+            try
+            {
+                ExceptionFactory.CheckArgNull("buffer", buffer);
+                ExceptionFactory.CheckArgRange("startIndex", startIndex, 0, buffer.Length - 1);
+                ExceptionFactory.CheckBufferLengthRange("buffer", buffer, startIndex + len, int.MaxValue, $"startIndex={startIndex}, len={len}");
+
+                value = BitConverter.ToInt64(buffer, startIndex);
             }
             catch (Exception ex)
             {

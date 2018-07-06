@@ -11,6 +11,8 @@ namespace H.Book
     {
         public override byte ControlCode { get { return HMetadataControlCodes.BookCover; } }
 
+        public override int FixedLength { get { return HMetadataConstant.BookCoverLength; } }
+
         public bool HasThumbnail { get; set; }
         public const string HasThumbnailPropertyName = "HasThumbnail";
 
@@ -38,7 +40,7 @@ namespace H.Book
 
             int readPos = 0;
             bool hasThumbnail;
-            readPos += HMetadataHelper.ReadPropertyBool(HasThumbnailPropertyName,out hasThumbnail,buffer,readPos);
+            readPos += HMetadataHelper.ReadPropertyBool(HasThumbnailPropertyName, out hasThumbnail, buffer, readPos);
             HasThumbnail = hasThumbnail;
 
             bool hasImg;

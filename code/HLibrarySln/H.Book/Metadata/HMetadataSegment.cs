@@ -22,6 +22,12 @@ namespace H.Book
         public const string ControlCodePropertyName = "ControlCode";
 
         /// <summary>
+        /// 元素数据固定长度，<see cref="HMetadataConstant.VariableLength"/>表示可变长度
+        /// </summary>
+        public abstract int FixedLength { get; }
+        public const string FixedLengthPropertyName = "FixedLength";
+
+        /// <summary>
         /// 在文件中的状态
         /// </summary>
         public HMetadataSegmentFileStatus FileStatus { get; private set; }
@@ -34,7 +40,7 @@ namespace H.Book
         /// </summary>
         /// <param name="stream">用以保存数据的<see cref="Stream"/></param>
         /// <param name="appendix">附加数据</param>
-        /// <param name="reserveLen">保留空间大小，会以<see cref="HMetadataConstant.CCFlag"/>填充</param>
+        /// <param name="reserveLen">保留空间大小，会以<see cref="HMetadataConstant.CCFlag"/>填充，如果<see cref="FixedLength"/>有有效值则忽略这个参数</param>
         public async Task SaveAsync(Stream stream, object[] appendixes, int reserveLen)
         {
             ExceptionFactory.CheckArgNull("stream", stream);
@@ -61,6 +67,19 @@ namespace H.Book
             byte[] fields = GetFields();
             ExceptionFactory.CheckBufferNull("fields", fields, "GetFields return null");
             ExceptionFactory.CheckBufferLengthRange("fields", fields, 0, int.MaxValue, "GetFields return null");
+
+            // 如果总长度固定则验证控件是否足够
+            int desiredSpace = 0;
+            if (FixedLength != HMetadataConstant.VariableLength)
+            {
+                if (FixedLength <= 0)
+                    throw new InvalidPropertyException(FixedLengthPropertyName, $"value not valid:value={FixedLength}, range={HMetadataConstant.VariableLength}|[1,{int.MaxValue}]", null);
+
+                desiredSpace = HMetadataSegmentFileStatus.CalculateSpace(fields.Length, appendixLens, 0);
+                if (FixedLength < desiredSpace)
+                    throw new ArgumentException($"Space not enough: {FixedLengthPropertyName}={FixedLength}, desiredSpace={desiredSpace}, fieldsLen={fields.Length}, appendixLens={string.Join(",", appendixLens)}");
+            }
+
             // 写入控制码
             await stream.WriteByteAsync(HMetadataConstant.CCFlag);
             await stream.WriteByteAsync(ControlCode);
@@ -102,6 +121,9 @@ namespace H.Book
             // 写入校验码
             await stream.WriteByteAsync(HMetadataConstant.CCode);
             // 写入保留区长度
+            if (FixedLength != HMetadataConstant.VariableLength)
+                reserveLen = FixedLength - desiredSpace;
+
             buffer = BitConverter.GetBytes(reserveLen);
             await stream.WriteAsync(buffer, 0, buffer.Length);
             // 填充保留区
