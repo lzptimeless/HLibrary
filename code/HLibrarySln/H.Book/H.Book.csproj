@@ -48,6 +48,7 @@
     <Compile Include="Exception\LoadHeaderOnlyException.cs" />
     <Compile Include="Exception\PageNotFoundException.cs" />
     <Compile Include="Exception\ReadPropertyException.cs" />
+    <Compile Include="Exception\ReserveSpaceNotEnoughException.cs" />
     <Compile Include="Exception\WritePropertyException.cs" />
     <Compile Include="HBook.cs" />
     <Compile Include="HBookHeader.cs" />
