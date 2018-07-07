@@ -99,7 +99,7 @@ namespace H.Book
                 if (IsInitialized()) throw new ApplicationException("This HBook already initialized");
 
                 int readedLen = 0;
-                int cacheLen = _access == HBookAccess.Header ? HMetadataConstant.BookCoverPosition : (_access == HBookAccess.HeaderAndCover ? HMetadataConstant.PageHeaderListPosition : HMetadataConstant.PageContentListPosition);
+                int cacheLen = !CanAccessCover() ? HMetadataConstant.BookCoverPosition : (!CanAccessPage() ? HMetadataConstant.PageHeaderListPosition : HMetadataConstant.PageContentListPosition);
                 using (var cacheStream = await CreateMemoryCache(_stream, cacheLen))
                 {
                     // 验证文件头
@@ -114,9 +114,9 @@ namespace H.Book
                     // 读取头
                     await _headerMetadata.LoadAsync(cacheStream);
                     // 读取封面
-                    if (_access != HBookAccess.Header) await _coverMetadata.LoadAsync(cacheStream);
+                    if (CanAccessCover()) await _coverMetadata.LoadAsync(cacheStream);
                     // 读取页面头
-                    if (_access == HBookAccess.All)
+                    if (CanAccessPage())
                     {
                         byte cc = 0;
                         while (0 != (cc = await ReadNextControlCodeAsync(cacheStream)))
@@ -583,7 +583,7 @@ namespace H.Book
 
                 // 准备写入页头的起始位置
                 if (_pages.Count == 0)
-                    _stream.Seek(HMetadataConstant.StartCode.Length + HMetadataConstant.BookHeaderLength + HMetadataConstant.BookCoverLength, SeekOrigin.Begin);
+                    _stream.Seek(HMetadataConstant.PageHeaderListPosition, SeekOrigin.Begin);
                 else
                 {
                     var lastPageHeaderFs = _pages[_pages.Count - 1].HeaderMetadata.FileStatus;
@@ -638,8 +638,9 @@ namespace H.Book
                 var headerMetadata = page.HeaderMetadata;
                 var headerFS = headerMetadata.FileStatus;
 
-                _stream.Seek(headerFS.Position, SeekOrigin.Begin);
                 headerMetadata.IsDeleted = true;
+
+                _stream.Seek(headerFS.Position, SeekOrigin.Begin);
                 await headerMetadata.SaveAsync(_stream, null, 0);
 
                 return true;
