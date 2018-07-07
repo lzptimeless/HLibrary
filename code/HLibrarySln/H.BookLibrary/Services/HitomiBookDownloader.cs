@@ -115,26 +115,56 @@ namespace H.BookLibrary
         public async Task DownloadPageAsync(string thumburl, string pageurl, int index)
         {
             Output.Print("Download page thumbnail:" + index);
-            using (var thumbS = await Retry(6, () => DownloadImage(thumburl)))
-            {
-                Output.Print("Download page:" + index);
-                using (var pageS = await Retry(6, () => DownloadImage(pageurl)))
-                {
-                    HPageHeaderSetting pageHeader = new HPageHeaderSetting();
-                    if (_headerSetting != null && _headerSetting.Artists != null && _headerSetting.Artists.Length == 1)
-                    {
-                        pageHeader.Artist = _headerSetting.Artists[0];
-                        pageHeader.Selected = pageHeader.Selected | HPageHeaderFieldSelections.Artist;
-                    }
+            Stream thumbS = null;
+            Stream pageS = null;
 
-                    using (var shrinkThumbS = CreateShrinkStream(thumbS, 400, 400))
+            try
+            {
+                thumbS = await Retry(6, async () =>
+                {
+                    var s = await DownloadImage(thumburl);
+                    try
                     {
-                        using (var shrinkPageS = CreateShrinkStream(pageS, 1920, 1920))
-                        {
-                            await _book.AddPageAsync(pageHeader, shrinkThumbS, shrinkPageS);
-                        }
+                        var ss = CreateShrinkStream(s, 400, 400);
+                        if (s != ss) s.Dispose();
+                        return ss;
                     }
+                    catch
+                    {
+                        s.Dispose();
+                        throw;
+                    }
+                });
+                Output.Print("Download page:" + index);
+                pageS = await Retry(6, async () =>
+                {
+
+                    var s = await DownloadImage(pageurl);
+                    try
+                    {
+                        var ss = CreateShrinkStream(s, 1920, 1920);
+                        if (s != ss) s.Dispose();
+                        return ss;
+                    }
+                    catch
+                    {
+                        s.Dispose();
+                        throw;
+                    }
+                });
+
+                HPageHeaderSetting pageHeader = new HPageHeaderSetting();
+                if (_headerSetting != null && _headerSetting.Artists != null && _headerSetting.Artists.Length == 1)
+                {
+                    pageHeader.Artist = _headerSetting.Artists[0];
+                    pageHeader.Selected = pageHeader.Selected | HPageHeaderFieldSelections.Artist;
                 }
+                await _book.AddPageAsync(pageHeader, thumbS, pageS);
+            }
+            finally
+            {
+                if (thumbS != null) thumbS.Dispose();
+                if (pageS != null) pageS.Dispose();
             }
         }
 
@@ -501,6 +531,8 @@ namespace H.BookLibrary
             if (width <= shrinkWidth && height <= shrinkHeight)
                 return imgStream;
 
+            Output.Print($"Shrink image from {width}x{height} to {shrinkWidth}x{shrinkHeight}");
+
             BitmapImage thumb = new BitmapImage();
             thumb.BeginInit();
             thumb.StreamSource = imgStream;
@@ -513,7 +545,15 @@ namespace H.BookLibrary
             JpegBitmapEncoder encoder = new JpegBitmapEncoder();
             encoder.Frames.Add(BitmapFrame.Create(thumb));
             MemoryStream ms = new MemoryStream();
-            encoder.Save(ms);
+            try
+            {
+                encoder.Save(ms);
+            }
+            catch
+            {
+                ms.Dispose();
+                throw;
+            }
 
             imgStream.Seek(0, SeekOrigin.Begin);
             ms.Seek(0, SeekOrigin.Begin);

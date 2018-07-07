@@ -61,7 +61,7 @@
                 Margin="20,10,20,0"
                 Style="{StaticResource TextBlock}">
                 <Run Text="保存路径:" />
-                <Run Text="{Binding FilePath}" />
+                <Run Text="{Binding CurrentFilePath}" />
             </TextBlock>
             <ProgressBar
                 Grid.Row="3"

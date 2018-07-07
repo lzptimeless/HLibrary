@@ -30,7 +30,7 @@
             <Rectangle.Fill>
                 <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
                     <GradientStop Offset="-0.2" Color="{StaticResource Color-Transparent}" />
-                    <GradientStop Offset="0.5" Color="{StaticResource Color-Main}" />
+                    <GradientStop Offset="0.7" Color="{StaticResource Color-Main}" />
                     <GradientStop Offset="1" Color="{StaticResource Color-Main}" />
                 </LinearGradientBrush>
             </Rectangle.Fill>
