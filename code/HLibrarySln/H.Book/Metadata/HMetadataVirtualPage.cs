@@ -10,6 +10,8 @@ namespace H.Book
     {
         public override byte ControlCode { get { return HMetadataControlCodes.VirtualPageHeader; } }
 
+        public override int FixedLength { get { return HMetadataConstant.VirtualPageLength; } }
+
         /// <summary>
         /// Length is 16B
         /// </summary>

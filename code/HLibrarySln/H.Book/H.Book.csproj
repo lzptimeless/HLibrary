@@ -48,6 +48,7 @@
     <Compile Include="Exception\LoadHeaderOnlyException.cs" />
     <Compile Include="Exception\PageNotFoundException.cs" />
     <Compile Include="Exception\ReadPropertyException.cs" />
+    <Compile Include="Exception\ReserveSpaceNotEnoughException.cs" />
     <Compile Include="Exception\WritePropertyException.cs" />
     <Compile Include="HBook.cs" />
     <Compile Include="HBookHeader.cs" />
@@ -66,7 +67,6 @@
     <Compile Include="Metadata\HMetadataBookHeader.cs" />
     <Compile Include="Metadata\HMetadataConstant.cs" />
     <Compile Include="Metadata\HMetadataControlCodes.cs" />
-    <Compile Include="Metadata\HMetadataIndex.cs" />
     <Compile Include="Metadata\HMetadataPageContent.cs" />
     <Compile Include="Metadata\HMetadataPageHeader.cs" />
     <Compile Include="Metadata\HMetadataSegmentFileStatus.cs" />

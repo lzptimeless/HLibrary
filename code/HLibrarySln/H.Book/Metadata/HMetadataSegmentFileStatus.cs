@@ -33,7 +33,7 @@ namespace H.Book
         public long Position { get; set; }
         public const string PositionPropertyName = "Position";
         /// <summary>
-        /// 数据大小 4B 包括除了控制码，本字段本身，保留区大小字段，保留区的所有数据的长度，用以快速定位下一个数据段
+        /// 字段数据大小
         /// </summary>
         public int FieldsLength { get; set; }
         public const string FieldsLengthPropertyName = "FieldsLength";
@@ -43,7 +43,7 @@ namespace H.Book
         public int[] AppendixLengths { get; set; }
         public const string AppendixLengthsPropertyName = "AppendixLengths";
         /// <summary>
-        /// 保留区大小 4B 保留区长度，用以快速定位下一个数据段
+        /// 保留区大小
         /// </summary>
         public int ReserveLength { get; set; }
         public const string ReserveLengthPropertyName = "ReserveLength";
@@ -56,23 +56,7 @@ namespace H.Book
         /// <returns></returns>
         public int GetSpace()
         {
-            checked
-            {
-                // control code add fields
-                int space = CCLen + CheckLen + LenLen + FieldsLength;
-                // appendix
-                if (AppendixLengths != null)
-                {
-                    foreach (int appendixLen in AppendixLengths)
-                    {
-                        space += CheckLen + LenLen + appendixLen;
-                    }
-                }
-                space += CheckLen + LenLen; // Add the end of appendix: 0xFE 0x00 0x00 0x00 0x00
-                // reserved
-                space += CheckLen + LenLen + ReserveLength;
-                return space;
-            }
+            return CalculateSpace(FieldsLength, AppendixLengths, ReserveLength);
         }
 
         /// <summary>
@@ -84,23 +68,53 @@ namespace H.Book
             if (index < 0 || AppendixLengths == null || AppendixLengths.Length <= index)
                 return null;
 
+            long position = 0;
             checked
             {
                 // control code add fields
-                long position = Position + CCLen + CheckLen + LenLen + FieldsLength;
+                position = Position + CCLen + CheckLen + LenLen + FieldsLength;
                 // the appendix before index
                 for (int i = 0; i < index; i++)
                 {
                     position += CheckLen + LenLen + AppendixLengths[i];
                 }
                 position += CheckLen + LenLen;// Add current appendix checkcode length and lenght of length
-                return new HMetadataAppendix(position, AppendixLengths[index]);
             }
+            return new HMetadataAppendix(position, AppendixLengths[index]);
         }
 
         public object Clone()
         {
             return MemberwiseClone();
+        }
+
+        /// <summary>
+        /// 计算元数据所需空间（字节）
+        /// </summary>
+        /// <param name="fieldsLen">字段数据长度</param>
+        /// <param name="appendixLens">附加数据长度集合，可为null</param>
+        /// <param name="reserveLen">保留区长度</param>
+        /// <returns></returns>
+        public static int CalculateSpace(int fieldsLen, int[] appendixLens, int reserveLen)
+        {
+            int space = 0;
+            checked
+            {
+                // control code add fields
+                space = CCLen + CheckLen + LenLen + fieldsLen;
+                // appendix
+                if (appendixLens != null)
+                {
+                    foreach (int appendixLen in appendixLens)
+                    {
+                        space += CheckLen + LenLen + appendixLen;
+                    }
+                }
+                space += CheckLen + LenLen; // Add the end of appendix: 0xFE 0x00 0x00 0x00 0x00
+                // reserved
+                space += CheckLen + LenLen + reserveLen;
+            }
+            return space;
         }
         #endregion
     }

@@ -24,26 +24,32 @@ namespace H.Book
         /// </summary>
         public const byte CCode = 0xFE;
         /// <summary>
-        /// 获取默认的保留区大小
+        /// 页头列表所占的空间
         /// </summary>
-        /// <param name="controlCode">来自<see cref="HMetadataControlCodes"/></param>
-        /// <returns></returns>
-        public static int GetDefaultReserveLength(int controlCode)
-        {
-            switch (controlCode)
-            {
-                case HMetadataControlCodes.BookHeader:
-                    return 10 * 1024;
-                case HMetadataControlCodes.BookIndex:
-                    return 10 * 1024;
-                case HMetadataControlCodes.BookCover:
-                    return 1024 * 1024;
-                case HMetadataControlCodes.PageHeader:
-                case HMetadataControlCodes.DeletedPageHeader:
-                    return 2 * 1024;
-                default:
-                    return 0;
-            }
-        }
+        public const int PageHeadersLength = 1024 * 1024;
+        /// <summary>
+        /// 可变长度元数据，用以设置<see cref="HMetadataSegment.FixedLength"/>
+        /// </summary>
+        public const int VariableLength = -1;
+        /// <summary>
+        /// 书头固定长度
+        /// </summary>
+        public const int BookHeaderLength = 4 * 1024;
+        /// <summary>
+        /// 封面固定长度
+        /// </summary>
+        public const int BookCoverLength = 1024 * 1024;
+        /// <summary>
+        /// 页头固定长度
+        /// </summary>
+        public const int PageHeaderLength = 1024;
+        /// <summary>
+        /// 虚页面固定长度
+        /// </summary>
+        public const int VirtualPageLength = 64;
+        /// <summary>
+        /// 页面内容固定长度
+        /// </summary>
+        public const int PageContentLength = VariableLength;
     }
 }

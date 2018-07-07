@@ -10,11 +10,18 @@ namespace H.Book
     {
         public override byte ControlCode { get { return HMetadataControlCodes.PageHeader; } }
 
+        public override int FixedLength { get { return HMetadataConstant.PageHeaderLength; } }
+
         /// <summary>
         /// Length is 16B
         /// </summary>
         public Guid ID { get; set; }
         public const string IDPropertyName = "ID";
+        /// <summary>
+        /// 页面内容的起始位置，大小8B
+        /// </summary>
+        public long ContentPosition { get; set; }
+        public const string ContentPositionPropertyName = "ContentPosition";
 
         public string Artist { get; set; }
         public const string ArtistPropertyName = "Artist";
@@ -28,7 +35,7 @@ namespace H.Book
         public override int GetFieldsLength()
         {
             // 页面ID+页内容位置+作者名+角色+标签
-            return 16 + HMetadataHelper.GetByteLen(Artist) +
+            return 16 + 8 + HMetadataHelper.GetByteLen(Artist) +
                 HMetadataHelper.GetByteLen(Characters) +
                 HMetadataHelper.GetByteLen(Tags);
         }
@@ -44,6 +51,8 @@ namespace H.Book
             int writePos = 0;
             // 写入ID
             writePos += HMetadataHelper.WritePropertyGuid(IDPropertyName, ID, data, writePos);
+            // 写入内容起始位置
+            writePos += HMetadataHelper.WritePropertyLong(ContentPositionPropertyName, ContentPosition, data, writePos);
             // 写入作者名
             writePos += HMetadataHelper.WritePropertyString(ArtistPropertyName, Artist, data, writePos);
             // 写入角色
@@ -70,6 +79,10 @@ namespace H.Book
             Guid id;
             readPos += HMetadataHelper.ReadPropertyGuid(IDPropertyName, out id, buffer, readPos);
             ID = id;
+            // 读取内容位置
+            long contentPos;
+            readPos += HMetadataHelper.ReadPropertyLong(ContentPositionPropertyName, out contentPos, buffer, readPos);
+            ContentPosition = contentPos;
             // 读取作者
             string artist;
             readPos += HMetadataHelper.ReadPropertyString(ArtistPropertyName, out artist, buffer, readPos);

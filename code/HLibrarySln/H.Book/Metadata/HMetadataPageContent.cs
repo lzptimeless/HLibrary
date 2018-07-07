@@ -10,6 +10,8 @@ namespace H.Book
     {
         public override byte ControlCode { get { return HMetadataControlCodes.PageContent; } }
 
+        public override int FixedLength { get { return HMetadataConstant.PageContentLength; } }
+
         public bool HasThumbnail { get; set; }
         public const string HasThumbnailPropertyName = "HasThumbnail";
 

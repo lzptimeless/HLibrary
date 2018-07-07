@@ -16,7 +16,6 @@ namespace H.Book
         private HBookMode _mode;
         private Stream _stream;
         private HMetadataBookHeader _headerMetadata = new HMetadataBookHeader();
-        private HMetadataIndex _indexMetadata = new HMetadataIndex();
         private HMetadataBookCover _coverMetadata = new HMetadataBookCover();
         private HMetadataPageCollection _pages = new HMetadataPageCollection();
 
@@ -94,59 +93,53 @@ namespace H.Book
                 if (IsInitialized()) throw new ApplicationException("This HBook already initialized");
 
                 int readedLen = 0;
-                // 验证文件头
-                byte[] startCode = new byte[HMetadataConstant.StartCode.Length];
-                readedLen = await _stream.ReadAsync(startCode, 0, startCode.Length);
-                if (!startCode.SequenceEqual(HMetadataConstant.StartCode))
+                int cacheLen = HMetadataConstant.StartCode.Length + HMetadataConstant.BookHeaderLength + HMetadataConstant.BookCoverLength + HMetadataConstant.PageHeadersLength;
+                using (var cacheStream = await CreateMemoryCache(_stream, cacheLen))
                 {
-                    _stream.Dispose();
-                    _stream = null;
-                    throw new InvalidDataException("StartCode error, this is not a HBook");
-                }
-                // 读取头
-                await _headerMetadata.LoadAsync(_stream);
-                // 读取索引
-                await _indexMetadata.LoadAsync(_stream);
-                // 读取封面
-                await _coverMetadata.LoadAsync(_stream);
-                // 读取页面
-                byte cc = 0;
-                while (0 != (cc = await ReadNextControlCodeAsync(_stream)))
-                {
-                    // 移动读取位置到数据对起始位置
-                    _stream.Seek(-2, SeekOrigin.Current);
-                    // 读取数据段
-                    if (cc == HMetadataControlCodes.PageHeader)
+                    // 验证文件头
+                    byte[] startCode = new byte[HMetadataConstant.StartCode.Length];
+                    readedLen = await cacheStream.ReadAsync(startCode, 0, startCode.Length);
+                    if (!startCode.SequenceEqual(HMetadataConstant.StartCode))
                     {
-                        HMetadataPage page = new HMetadataPage();
-                        await page.HeaderMetadata.LoadAsync(_stream);
-                        // 读取页面内容
-                        await page.ContentMetadata.LoadAsync(_stream);
-                        // 添加到集合
-                        if (!_pages.Add(page))
-                            throw new InvalidDataException("Found duplicate id page");
+                        _stream.Dispose();
+                        _stream = null;
+                        throw new InvalidDataException("StartCode error, this is not a HBook");
                     }
-                    else if (cc == HMetadataControlCodes.VirtualPageHeader)
+                    // 读取头
+                    await _headerMetadata.LoadAsync(cacheStream);
+                    // 读取封面
+                    await _coverMetadata.LoadAsync(cacheStream);
+                    // 读取页面头
+                    byte cc = 0;
+                    while (0 != (cc = await ReadNextControlCodeAsync(cacheStream)))
                     {
-                        // 忽略虚拟页面
-                        HMetadataVirtualPage virtualPage = new HMetadataVirtualPage();
-                        await virtualPage.LoadAsync(_stream);
-                    }
-                    else if (cc == HMetadataControlCodes.DeletedPageHeader)
-                    {
-                        // 忽略被删除的页面头
-                        HMetadataDeletedPageHeader deletedPage = new HMetadataDeletedPageHeader();
-                        await deletedPage.LoadAsync(_stream);
-                    }
-                    else if (cc == HMetadataControlCodes.PageContent)
-                    {
-                        // 忽略被删除的页面内容或没有页头的内容
-                        HMetadataPageContent pageContent = new HMetadataPageContent();
-                        await pageContent.LoadAsync(_stream);
-                    }
-                    else
-                        throw new InvalidDataException($"Not support control code: {cc}");
-                }// while (0 != (cc = ReadNextControlCode(_stream)))
+                        // 移动读取位置到数据对起始位置
+                        cacheStream.Seek(-2, SeekOrigin.Current);
+                        // 读取数据段
+                        if (cc == HMetadataControlCodes.PageHeader)
+                        {
+                            HMetadataPage page = new HMetadataPage();
+                            await page.HeaderMetadata.LoadAsync(cacheStream);
+                            // 添加到集合
+                            if (!_pages.Add(page))
+                                throw new InvalidDataException("Found duplicate id page");
+                        }
+                        else if (cc == HMetadataControlCodes.VirtualPageHeader)
+                        {
+                            // 忽略虚拟页面
+                            HMetadataVirtualPage virtualPage = new HMetadataVirtualPage();
+                            await virtualPage.LoadAsync(cacheStream);
+                        }
+                        else if (cc == HMetadataControlCodes.DeletedPageHeader)
+                        {
+                            // 忽略被删除的页面头
+                            HMetadataDeletedPageHeader deletedPage = new HMetadataDeletedPageHeader();
+                            await deletedPage.LoadAsync(cacheStream);
+                        }
+                        else
+                            throw new InvalidDataException($"Not support page header control code: {cc}");
+                    }// while (0 != (cc = ReadNextControlCode(cacheStream)))
+                }// using cacheStream
 
                 MakeInitialized();
             }
@@ -172,21 +165,23 @@ namespace H.Book
                 if (IsInitialized()) throw new ApplicationException("This HBook already initialized");
 
                 int readedLen = 0;
-                // 验证文件头
-                byte[] startCode = new byte[HMetadataConstant.StartCode.Length];
-                readedLen = await _stream.ReadAsync(startCode, 0, startCode.Length);
-                if (!startCode.SequenceEqual(HMetadataConstant.StartCode))
+                int cacheLen = HMetadataConstant.StartCode.Length + HMetadataConstant.BookHeaderLength + HMetadataConstant.BookCoverLength;
+                using (var cacheStream = await CreateMemoryCache(_stream, cacheLen))
                 {
-                    _stream.Dispose();
-                    _stream = null;
-                    throw new InvalidDataException("StartCode error, this is not a HBook");
+                    // 验证文件头
+                    byte[] startCode = new byte[HMetadataConstant.StartCode.Length];
+                    readedLen = await cacheStream.ReadAsync(startCode, 0, startCode.Length);
+                    if (!startCode.SequenceEqual(HMetadataConstant.StartCode))
+                    {
+                        _stream.Dispose();
+                        _stream = null;
+                        throw new InvalidDataException("StartCode error, this is not a HBook");
+                    }
+                    // 读取头
+                    await _headerMetadata.LoadAsync(cacheStream);
+                    // 读取封面
+                    await _coverMetadata.LoadAsync(cacheStream);
                 }
-                // 读取头
-                await _headerMetadata.LoadAsync(_stream);
-                // 读取索引
-                await _indexMetadata.LoadAsync(_stream);
-                // 读取封面
-                await _coverMetadata.LoadAsync(_stream);
 
                 MakeLoadHeaderOnly();
                 MakeInitialized();
@@ -212,22 +207,17 @@ namespace H.Book
                 if (IsInitFailed()) throw CreateInitFailedEx();
                 if (IsInitialized()) throw new ApplicationException("This HBook already initialized");
 
-                int reserveLen = 0;
-
                 // 初始化
                 _headerMetadata.ID = Guid.NewGuid();
                 _headerMetadata.Version = 1;
                 // 写入起始码
                 await _stream.WriteAsync(HMetadataConstant.StartCode, 0, HMetadataConstant.StartCode.Length);
                 // 存储头
-                reserveLen = HMetadataConstant.GetDefaultReserveLength(HMetadataControlCodes.BookHeader);
-                await _headerMetadata.SaveAsync(_stream, null, reserveLen);
-                // 写入索引
-                reserveLen = HMetadataConstant.GetDefaultReserveLength(HMetadataControlCodes.BookIndex);
-                await _indexMetadata.SaveAsync(_stream, null, reserveLen);
+                await _headerMetadata.SaveAsync(_stream, null, 0);
                 // 存储封面
-                reserveLen = HMetadataConstant.GetDefaultReserveLength(HMetadataControlCodes.BookCover);
-                await _coverMetadata.SaveAsync(_stream, null, reserveLen);
+                await _coverMetadata.SaveAsync(_stream, null, 0);
+                // 在页头列表区域填充空数据
+                await _stream.FillAsync(HMetadataConstant.CCFlag, HMetadataConstant.PageHeadersLength);
 
                 MakeInitialized();
             }
@@ -294,14 +284,8 @@ namespace H.Book
                 if (selected.HasFlag(HBookHeaderFieldSelections.Tags)) metadata.Tags = header.Tags;
 
                 // 保存
-                int space = fs.GetSpace();
-                int desiredLen = metadata.GetDesiredLength(null);
-                int reserveLen = checked(space - desiredLen);
-                if (reserveLen < 0)
-                    throw new ArgumentException($"header is too big: space={space}, desiredLen={desiredLen}", "header");
-
                 _stream.Seek(fs.Position, SeekOrigin.Begin);
-                await metadata.SaveAsync(_stream, null, reserveLen);
+                await metadata.SaveAsync(_stream, null, 0);
 
                 return true;
             }
@@ -389,17 +373,11 @@ namespace H.Book
                 if (thumb != null) appendixes.Add(thumb);
                 if (cover != null) appendixes.Add(cover);
 
-                int space = _coverMetadata.FileStatus.GetSpace();
-                int desiredLen = _coverMetadata.GetDesiredLength(appendixes.ToArray());
-                int reserveLen = checked(space - desiredLen);
-                if (reserveLen < 0)
-                    throw new ArgumentException($"thumb and cover is too big: space={space}, desiredLen={desiredLen}");
-
                 _coverMetadata.HasThumbnail = thumb != null;
                 _coverMetadata.HasImage = cover != null;
 
                 _stream.Seek(_coverMetadata.FileStatus.Position, SeekOrigin.Begin);
-                await _coverMetadata.SaveAsync(_stream, appendixes.ToArray(), reserveLen);
+                await _coverMetadata.SaveAsync(_stream, appendixes.ToArray(), 0);
             }
             finally
             {
@@ -631,19 +609,9 @@ namespace H.Book
                 if (IsInitError()) throw CreateInitErrorEx();
                 if (IsIOWriteFailed()) throw CreateIOWriteFailedEx();
                 if (IsLoadHeaderOnly()) throw CreateLoadHeaderOnlyEx();
-
-                _stream.Seek(0, SeekOrigin.End);
-                // 写入页头
-                HMetadataPageHeader headerMetadata = new HMetadataPageHeader();
-                headerMetadata.ID = Guid.NewGuid();
-
-                if (header.Selected.HasFlag(HPageHeaderFieldSelections.Artist)) headerMetadata.Artist = header.Artist;
-                if (header.Selected.HasFlag(HPageHeaderFieldSelections.Characters)) headerMetadata.Characters = header.Characters;
-                if (header.Selected.HasFlag(HPageHeaderFieldSelections.Tags)) headerMetadata.Tags = header.Tags;
-
-                int reserveLen = HMetadataConstant.GetDefaultReserveLength(HMetadataControlCodes.PageHeader);
-                await headerMetadata.SaveAsync(_stream, null, reserveLen);
                 // 写入页图像
+                _stream.Seek(0, SeekOrigin.End);// 页面内容直接增加到文件末尾
+
                 HMetadataPageContent contentMetadata = new HMetadataPageContent();
                 contentMetadata.HasThumbnail = thumbnail != null;
                 contentMetadata.HasImage = content != null;
@@ -652,22 +620,38 @@ namespace H.Book
                 if (thumbnail != null) appendixes.Add(thumbnail);
                 if (content != null) appendixes.Add(content);
 
-                reserveLen = HMetadataConstant.GetDefaultReserveLength(HMetadataControlCodes.PageContent);
-                await contentMetadata.SaveAsync(_stream, appendixes.ToArray(), reserveLen);
+                await contentMetadata.SaveAsync(_stream, appendixes.ToArray(), 0);
 
+                // 准备写入页头的起始位置
+                int availablePageHeaderSpace = 0;
+                if (_pages.Count == 0)
+                {
+                    availablePageHeaderSpace = HMetadataConstant.PageHeadersLength;
+                    _stream.Seek(HMetadataConstant.StartCode.Length + HMetadataConstant.BookHeaderLength + HMetadataConstant.BookCoverLength, SeekOrigin.Begin);
+                }
+                else
+                {
+                    var lastPageHeaderFs = _pages[_pages.Count - 1].HeaderMetadata.FileStatus;
+                    availablePageHeaderSpace = (int)(HMetadataConstant.StartCode.Length + HMetadataConstant.BookHeaderLength + HMetadataConstant.BookCoverLength + HMetadataConstant.PageHeadersLength - (lastPageHeaderFs.Position + lastPageHeaderFs.GetSpace()));
+                    if (availablePageHeaderSpace < HMetadataConstant.PageHeaderLength)
+                        throw new ReserveSpaceNotEnoughException("PageHeader space not enough");
+
+                    _stream.Seek(lastPageHeaderFs.Position + lastPageHeaderFs.GetSpace(), SeekOrigin.Begin);
+                }
+                // 写入页头
+                HMetadataPageHeader headerMetadata = new HMetadataPageHeader();
+                headerMetadata.ID = Guid.NewGuid();
+                headerMetadata.ContentPosition = contentMetadata.FileStatus.Position;
+
+                if (header.Selected.HasFlag(HPageHeaderFieldSelections.Artist)) headerMetadata.Artist = header.Artist;
+                if (header.Selected.HasFlag(HPageHeaderFieldSelections.Characters)) headerMetadata.Characters = header.Characters;
+                if (header.Selected.HasFlag(HPageHeaderFieldSelections.Tags)) headerMetadata.Tags = header.Tags;
+
+                await headerMetadata.SaveAsync(_stream, null, 0);
+                // 添加页面信息到集合
                 HMetadataPage pageMetadata = new HMetadataPage(headerMetadata, contentMetadata);
                 if (!_pages.Add(pageMetadata))
                     throw new ApplicationException($"Unkown error, add page failed: id={headerMetadata.ID}");
-                // 写入索引
-                _indexMetadata.AddPageID(headerMetadata.ID);
-                int space = _indexMetadata.FileStatus.GetSpace();
-                int desiredLen = _indexMetadata.GetDesiredLength(null);
-                reserveLen = space - desiredLen;
-                if (reserveLen < 0)
-                    throw new ApplicationException($"Index space not enough: space={space}, desiredLen={desiredLen}");
-
-                _stream.Seek(_indexMetadata.FileStatus.Position, SeekOrigin.Begin);
-                await _indexMetadata.SaveAsync(_stream, null, reserveLen);
 
                 return headerMetadata.ID;
             }
@@ -743,14 +727,8 @@ namespace H.Book
                 if (selected.HasFlag(HPageHeaderFieldSelections.Tags)) metadata.Tags = header.Tags;
 
                 // 保存
-                int space = fs.GetSpace();
-                int desiredLen = metadata.GetDesiredLength(null);
-                int reserveLen = checked(space - desiredLen);
-                if (reserveLen < 0)
-                    throw new ArgumentException($"header is too big: space={space}, desiredLen={desiredLen}", "header");
-
                 _stream.Seek(fs.Position, SeekOrigin.Begin);
-                await metadata.SaveAsync(_stream, null, reserveLen);
+                await metadata.SaveAsync(_stream, null, 0);
 
                 return true;
             }
@@ -818,7 +796,7 @@ namespace H.Book
                     if (buffer[i] != HMetadataConstant.CCFlag)
                     {
                         // 调整Position到控制码后的数据起始位
-                        stream.Seek(readLen - i - 1, SeekOrigin.Current);
+                        stream.Seek(-(readLen - 1 - i), SeekOrigin.Current);
                         return buffer[i];
                     }
                 }
@@ -845,6 +823,20 @@ namespace H.Book
             stream.Position = partPosition;
             PartReadStream partStream = new PartReadStream(stream, partPosition, partLength);
             return partStream;
+        }
+
+        /// <summary>
+        /// 创建内存缓存，减少外部IO操作，只读，<see cref="MemoryStream"/>内部重载了<see cref="Stream.ReadAsync(byte[], int, int)"/>，内部同步执行读取操作，不会异步操作
+        /// </summary>
+        /// <param name="stream">外部数据流</param>
+        /// <param name="len">缓存大小</param>
+        /// <returns></returns>
+        private static async Task<MemoryStream> CreateMemoryCache(Stream stream, int len)
+        {
+            byte[] buffer = new byte[len];
+            int readLen = await stream.ReadAsync(buffer, 0, len);
+            // 直接用buffer创建MemoryStream，MemoryStream内部会直接使用buffer而不会自己再创建新的内存空间
+            return new MemoryStream(buffer, 0, readLen, false);
         }
 
         /// <summary>
