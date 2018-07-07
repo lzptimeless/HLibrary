@@ -388,9 +388,9 @@ namespace H.BookLibrary.ViewModels
             for (int i = pageSize * pageIndex; i < pageSize * (pageIndex + 1) && i < bookPaths.Count; i++)
             {
                 string path = bookPaths[i];
-                using (var book = new HBook(path, HBookMode.Open))
+                using (var book = new HBook(path, HBookMode.Open, HBookAccess.HeaderAndCover))
                 {
-                    await book.InitAsync(true);
+                    await book.InitAsync();
                     var bookHeader = await book.GetHeaderAsync();
                     ImageSource cover = null;
                     await book.ReadCoverThumbnailAsync(async s =>

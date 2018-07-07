@@ -14,6 +14,10 @@ namespace H.Book
         /// </summary>
         public static byte[] StartCode = new byte[] { 0x48, 0x42, 0x4F, 0x4F, 0x4B };
         /// <summary>
+        /// HBOOK标识码的长度
+        /// </summary>
+        public const int StartCodeLength = 5;
+        /// <summary>
         /// 控制码起始标志
         /// The flag of control code
         /// </summary>
@@ -23,10 +27,6 @@ namespace H.Book
         /// The check code of data
         /// </summary>
         public const byte CCode = 0xFE;
-        /// <summary>
-        /// 页头列表所占的空间
-        /// </summary>
-        public const int PageHeadersLength = 1024 * 1024;
         /// <summary>
         /// 可变长度元数据，用以设置<see cref="HMetadataSegment.FixedLength"/>
         /// </summary>
@@ -40,16 +40,28 @@ namespace H.Book
         /// </summary>
         public const int BookCoverLength = 1024 * 1024;
         /// <summary>
+        /// 封面起始位置
+        /// </summary>
+        public const int BookCoverPosition = StartCodeLength + BookHeaderLength;
+        /// <summary>
         /// 页头固定长度
         /// </summary>
         public const int PageHeaderLength = 1024;
         /// <summary>
-        /// 虚页面固定长度
+        /// 页头列表所占的空间
         /// </summary>
-        public const int VirtualPageLength = 64;
+        public const int PageHeaderListLength = 1024 * 1024;
         /// <summary>
         /// 页面内容固定长度
         /// </summary>
         public const int PageContentLength = VariableLength;
+        /// <summary>
+        /// 页头列表起始位置
+        /// </summary>
+        public const int PageHeaderListPosition = StartCodeLength + BookHeaderLength + BookCoverLength;
+        /// <summary>
+        /// 页面内容列表起始位置
+        /// </summary>
+        public const int PageContentListPosition = PageHeaderListPosition + PageHeaderListLength;
     }
 }

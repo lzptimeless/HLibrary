@@ -77,7 +77,7 @@ namespace H.Book
 
                 desiredSpace = HMetadataSegmentFileStatus.CalculateSpace(fields.Length, appendixLens, 0);
                 if (FixedLength < desiredSpace)
-                    throw new ArgumentException($"Space not enough: {FixedLengthPropertyName}={FixedLength}, desiredSpace={desiredSpace}, fieldsLen={fields.Length}, appendixLens={string.Join(",", appendixLens)}");
+                    throw new ReserveSpaceNotEnoughException($"Space not enough: {FixedLengthPropertyName}={FixedLength}, desiredSpace={desiredSpace}, fieldsLen={fields.Length}, appendixLens={string.Join(",", appendixLens)}");
             }
 
             // 写入控制码

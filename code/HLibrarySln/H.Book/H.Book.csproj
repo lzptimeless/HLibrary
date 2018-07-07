@@ -42,15 +42,16 @@
   <ItemGroup>
     <Compile Include="ExceptionFactory.cs" />
     <Compile Include="Exception\InitException.cs" />
+    <Compile Include="Exception\InvalidAccessException.cs" />
     <Compile Include="Exception\InvalidBufferException.cs" />
     <Compile Include="Exception\InvalidPropertyException.cs" />
     <Compile Include="Exception\IOWriteFailedException.cs" />
-    <Compile Include="Exception\LoadHeaderOnlyException.cs" />
     <Compile Include="Exception\PageNotFoundException.cs" />
     <Compile Include="Exception\ReadPropertyException.cs" />
     <Compile Include="Exception\ReserveSpaceNotEnoughException.cs" />
     <Compile Include="Exception\WritePropertyException.cs" />
     <Compile Include="HBook.cs" />
+    <Compile Include="HBookAccess.cs" />
     <Compile Include="HBookHeader.cs" />
     <Compile Include="HBookHeaderSetting.cs" />
     <Compile Include="HBookMode.cs" />
@@ -60,7 +61,6 @@
     <Compile Include="Metadata\HMetadataPage.cs" />
     <Compile Include="HMetadataPageCollection.cs" />
     <Compile Include="HPageHeader.cs" />
-    <Compile Include="Metadata\HMetadataDeletedPageHeader.cs" />
     <Compile Include="Metadata\HMetadataHelper.cs" />
     <Compile Include="Metadata\HMetadataSegment.cs" />
     <Compile Include="Metadata\HMetadataBookCover.cs" />
@@ -70,7 +70,6 @@
     <Compile Include="Metadata\HMetadataPageContent.cs" />
     <Compile Include="Metadata\HMetadataPageHeader.cs" />
     <Compile Include="Metadata\HMetadataSegmentFileStatus.cs" />
-    <Compile Include="Metadata\HMetadataVirtualPage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

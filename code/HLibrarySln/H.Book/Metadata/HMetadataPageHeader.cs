@@ -22,6 +22,11 @@ namespace H.Book
         /// </summary>
         public long ContentPosition { get; set; }
         public const string ContentPositionPropertyName = "ContentPosition";
+        /// <summary>
+        /// 这个页面是否已经删除了
+        /// </summary>
+        public bool IsDeleted { get; set; }
+        public const string IsDeletedPropertyName = "IsDeleted";
 
         public string Artist { get; set; }
         public const string ArtistPropertyName = "Artist";
@@ -35,7 +40,7 @@ namespace H.Book
         public override int GetFieldsLength()
         {
             // 页面ID+页内容位置+作者名+角色+标签
-            return 16 + 8 + HMetadataHelper.GetByteLen(Artist) +
+            return 16 + 8 + 1 + HMetadataHelper.GetByteLen(Artist) +
                 HMetadataHelper.GetByteLen(Characters) +
                 HMetadataHelper.GetByteLen(Tags);
         }
@@ -53,6 +58,8 @@ namespace H.Book
             writePos += HMetadataHelper.WritePropertyGuid(IDPropertyName, ID, data, writePos);
             // 写入内容起始位置
             writePos += HMetadataHelper.WritePropertyLong(ContentPositionPropertyName, ContentPosition, data, writePos);
+            // 写入删除标记
+            writePos += HMetadataHelper.WritePropertyBool(IsDeletedPropertyName, IsDeleted, data, writePos);
             // 写入作者名
             writePos += HMetadataHelper.WritePropertyString(ArtistPropertyName, Artist, data, writePos);
             // 写入角色
@@ -83,6 +90,10 @@ namespace H.Book
             long contentPos;
             readPos += HMetadataHelper.ReadPropertyLong(ContentPositionPropertyName, out contentPos, buffer, readPos);
             ContentPosition = contentPos;
+            // 读取删除标记
+            bool isDeleted;
+            readPos += HMetadataHelper.ReadPropertyBool(IsDeletedPropertyName, out isDeleted, buffer, readPos);
+            IsDeleted = isDeleted;
             // 读取作者
             string artist;
             readPos += HMetadataHelper.ReadPropertyString(ArtistPropertyName, out artist, buffer, readPos);

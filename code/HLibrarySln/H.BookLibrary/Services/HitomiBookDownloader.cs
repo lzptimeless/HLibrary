@@ -42,7 +42,7 @@ namespace H.BookLibrary
             string dir = Path.GetDirectoryName(savePath);
             if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
 
-            _book = new HBook(savePath, HBookMode.Create);
+            _book = new HBook(savePath, HBookMode.Create, HBookAccess.All);
             await _book.InitAsync();
             await _book.SetHeaderAsync(_headerSetting);
 

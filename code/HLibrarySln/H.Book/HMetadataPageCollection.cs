@@ -66,7 +66,6 @@ namespace H.Book
         {
             if (item == null) throw new ArgumentNullException("item");
             if (item.HeaderMetadata == null) throw new ArgumentException("The property HeaderMetadata can not be null", "item");
-            if (item.ContentMetadata == null) throw new ArgumentException("The property ContentMetadata can not be null", "item");
 
             bool res = false;
             if (!_items.Any(i => i.HeaderMetadata.ID == item.HeaderMetadata.ID))
@@ -167,10 +166,25 @@ namespace H.Book
             return clone.GetEnumerator();
         }
 
+        /// <summary>
+        /// 获取所有的页头
+        /// </summary>
+        /// <returns></returns>
         public IHPageHeader[] GetPageHeaders()
         {
             IHPageHeader[] headers = null;
             headers = _items.Select(i => new HPageHeader(i.HeaderMetadata)).ToArray();
+            return headers;
+        }
+
+        /// <summary>
+        /// 获取可见的页头
+        /// </summary>
+        /// <returns></returns>
+        public IHPageHeader[] GetAvailablePageHeaders()
+        {
+            IHPageHeader[] headers = null;
+            headers = _items.Where(i => !i.HeaderMetadata.IsDeleted).Select(i => new HPageHeader(i.HeaderMetadata)).ToArray();
             return headers;
         }
         #endregion

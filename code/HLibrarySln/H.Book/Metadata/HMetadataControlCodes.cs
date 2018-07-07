@@ -16,8 +16,6 @@ namespace H.Book
         public const byte BookHeader = 0x01;
         public const byte BookCover = 0x02;
         public const byte PageHeader = 0x11;
-        public const byte VirtualPageHeader = 0x12;
-        public const byte DeletedPageHeader = 0x13;
-        public const byte PageContent = 0x21;
+        public const byte PageContent = 0x12;
     }
 }

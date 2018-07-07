@@ -8,12 +8,6 @@ namespace H.Book
 {
     public class HMetadataPage
     {
-        public HMetadataPage()
-        {
-            HeaderMetadata = new HMetadataPageHeader();
-            ContentMetadata = new HMetadataPageContent();
-        }
-
         public HMetadataPage(HMetadataPageHeader headerMetadata, HMetadataPageContent contentMetadata)
         {
             HeaderMetadata = headerMetadata;
@@ -21,6 +15,6 @@ namespace H.Book
         }
 
         public HMetadataPageHeader HeaderMetadata { get; private set; }
-        public HMetadataPageContent ContentMetadata { get; private set; }
+        public HMetadataPageContent ContentMetadata { get; set; }
     }
 }
