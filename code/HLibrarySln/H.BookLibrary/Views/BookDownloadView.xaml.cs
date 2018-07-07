@@ -61,6 +61,7 @@ namespace H.BookLibrary.Views
         public void Print(string msg)
         {
             OutputTextBox.AppendText(msg + Environment.NewLine);
+            OutputTextBox.ScrollToEnd();
         }
     }
 }

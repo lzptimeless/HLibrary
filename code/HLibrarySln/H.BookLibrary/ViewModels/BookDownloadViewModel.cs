@@ -21,7 +21,7 @@ namespace H.BookLibrary.ViewModels
 
         public BookDownloadViewModel()
         {
-            _bookID = "955625";
+            _bookID = "1057991";
         }
 
         #region properties
