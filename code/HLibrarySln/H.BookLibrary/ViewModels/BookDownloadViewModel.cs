@@ -47,24 +47,68 @@ namespace H.BookLibrary.ViewModels
         }
         #endregion
 
-        #region FilePath
+        #region CurrentFilePath
         /// <summary>
-        /// Property name of <see cref="FilePath"/>
+        /// Property name of <see cref="CurrentFilePath"/>
         /// </summary>
-        public const string FilePathPropertyName = "FilePath";
-        private string _filePath;
+        public const string CurrentFilePathPropertyName = "CurrentFilePath";
+        private string _currentFilePath;
         /// <summary>
-        /// Get or set <see cref="FilePath"/>
+        /// Get or set <see cref="CurrentFilePath"/>
         /// </summary>
-        public string FilePath
+        public string CurrentFilePath
         {
-            get { return this._filePath; }
+            get { return this._currentFilePath; }
             set
             {
-                if (this._filePath == value) return;
+                if (this._currentFilePath == value) return;
 
-                this._filePath = value;
-                this.RaisePropertyChanged(FilePathPropertyName);
+                this._currentFilePath = value;
+                this.RaisePropertyChanged(CurrentFilePathPropertyName);
+            }
+        }
+        #endregion
+
+        #region CurrentProgressMax
+        /// <summary>
+        /// Property name of <see cref="CurrentProgressMax"/>
+        /// </summary>
+        public const string CurrentProgressMaxPropertyName = "CurrentProgressMax";
+        private int _currentProgressMax;
+        /// <summary>
+        /// Get or set <see cref="CurrentProgressMax"/>
+        /// </summary>
+        public int CurrentProgressMax
+        {
+            get { return this._currentProgressMax; }
+            set
+            {
+                if (this._currentProgressMax == value) return;
+
+                this._currentProgressMax = value;
+                this.RaisePropertyChanged(CurrentProgressMaxPropertyName);
+            }
+        }
+        #endregion
+
+        #region CurrentProgressValue
+        /// <summary>
+        /// Property name of <see cref="CurrentProgressValue"/>
+        /// </summary>
+        public const string CurrentProgressValuePropertyName = "CurrentProgressValue";
+        private int _currentProgressValue;
+        /// <summary>
+        /// Get or set <see cref="CurrentProgressValue"/>
+        /// </summary>
+        public int CurrentProgressValue
+        {
+            get { return this._currentProgressValue; }
+            set
+            {
+                if (this._currentProgressValue == value) return;
+
+                this._currentProgressValue = value;
+                this.RaisePropertyChanged(CurrentProgressValuePropertyName);
             }
         }
         #endregion
@@ -83,11 +127,13 @@ namespace H.BookLibrary.ViewModels
             var view = View as BookDownloadView;
             try
             {
-                FilePath = $"books/hitomi-{_bookID}-{DateTime.Now.ToString("yyyy-MM-dd")}.hb";
+                CurrentFilePath = $"books/hitomi-{_bookID}-{DateTime.Now.ToString("yyyy-MM-dd")}.hb";
 
                 Output.Write += Output_Write;
                 _downloader = new HitomiBookDownloader();
-                _book = await _downloader.DownloadAsync(_bookID, FilePath);
+                _downloader.ProgressChanged += _downloader_ProgressChanged;
+                _book = await _downloader.DownloadAsync(_bookID, CurrentFilePath);
+                _downloader.ProgressChanged -= _downloader_ProgressChanged;
             }
             catch (Exception ex)
             {
@@ -109,6 +155,17 @@ namespace H.BookLibrary.ViewModels
         #endregion
 
         #region private methods
+        private void _downloader_ProgressChanged(object sender, DownloadProgressEventArgs e)
+        {
+            Action action = () => {
+                CurrentProgressMax = e.ProgressMax;
+                CurrentProgressValue = e.ProgressValue;
+            };
+
+            if (View.Dispatcher.CheckAccess()) action.Invoke();
+            else View.Dispatcher.InvokeAsync(action);
+        }
+
         private async void Output_Write(object sender, WriteEventArgs e)
         {
             var view = View as BookDownloadView;

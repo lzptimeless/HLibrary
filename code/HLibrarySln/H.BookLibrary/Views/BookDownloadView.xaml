@@ -31,6 +31,7 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
                 <RowDefinition />
             </Grid.RowDefinitions>
             <TextBlock
@@ -45,9 +46,14 @@
                 <Run Text="保存路径:" />
                 <Run Text="{Binding FilePath}" />
             </TextBlock>
+            <ProgressBar
+                Grid.Row="2"
+                Margin="20,10,20,0"
+                Maximum="{Binding CurrentProgressMax}"
+                Value="{Binding CurrentProgressValue}" />
             <TextBox
                 x:Name="OutputTextBox"
-                Grid.Row="2"
+                Grid.Row="3"
                 Height="Auto"
                 Margin="20,20,20,20"
                 VerticalContentAlignment="Stretch"

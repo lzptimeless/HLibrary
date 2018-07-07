@@ -76,6 +76,8 @@
     <Compile Include="Converters\ArrayToTextConverter.cs" />
     <Compile Include="Html\HtmlReader.cs" />
     <Compile Include="Html\HtmlWriter.cs" />
+    <Compile Include="Services\BookInfoEventArgs.cs" />
+    <Compile Include="Services\DownloadProgressEventArgs.cs" />
     <Compile Include="Services\HitomiBookDownloader.cs" />
     <Compile Include="Services\BookEventArgs.cs" />
     <Compile Include="Services\BooksResult.cs" />

@@ -6,7 +6,9 @@ using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Media.Imaging;
 using System.Xml.Linq;
 
 namespace H.BookLibrary
@@ -21,6 +23,32 @@ namespace H.BookLibrary
         private string _coverUrl;
         private string[] _thumbnailUrls;
         private string[] _pageUrls;
+        #endregion
+
+        #region events
+        #region BookInfoDownloaded
+        /// <summary>
+        /// 书信息下载成功
+        /// </summary>
+        public event EventHandler<BookInfoEventArgs> BookInfoDownloaded;
+
+        private void OnBookInfoDownloaded(BookInfoEventArgs e)
+        {
+            Volatile.Read(ref BookInfoDownloaded)?.Invoke(this, e);
+        }
+        #endregion
+
+        #region ProgressChanged
+        /// <summary>
+        /// 下载进度改变
+        /// </summary>
+        public event EventHandler<DownloadProgressEventArgs> ProgressChanged;
+
+        private void OnProgressChanged(DownloadProgressEventArgs e)
+        {
+            Volatile.Read(ref ProgressChanged)?.Invoke(this, e);
+        }
+        #endregion
         #endregion
 
         public async Task<IHBook> DownloadAsync(string id, string savePath)
@@ -46,15 +74,26 @@ namespace H.BookLibrary
             await _book.InitAsync();
             await _book.SetHeaderAsync(_headerSetting);
 
+            int progressMax = 1 + 1 + _thumbnailUrls.Length;// 头 + 封面 + 页面
+            int progressValue = 1;
+            OnBookInfoDownloaded(new BookInfoEventArgs(_headerSetting.Names[0], _thumbnailUrls.Length));
+            OnProgressChanged(new DownloadProgressEventArgs(progressMax, progressValue));
+
             if (!string.IsNullOrEmpty(_coverUrl))
             {
                 Output.Print("Download cover...");
-                using (var s = await Retry(3, () => DownloadImage(_coverUrl)))
+                using (var s = await Retry(6, () => DownloadImage(_coverUrl)))
                 {
-                    if (s != null) await _book.SetCoverAsync(s, s);
+                    if (s != null)
+                    {
+                        using (var coverThumbStream = CreateThumbnailStream(s))
+                            await _book.SetCoverAsync(coverThumbStream, s);
+                    }
                 }
             }
             else Output.Print("Cover url is empty.");
+
+            OnProgressChanged(new DownloadProgressEventArgs(progressMax, ++progressValue));
 
             if (_thumbnailUrls != null)
             {
@@ -63,13 +102,13 @@ namespace H.BookLibrary
                     string thumburl = _thumbnailUrls[i];
                     string pageurl = _pageUrls[i];
                     Output.Print("Download page thumbnail:" + i);
-                    using (var thumbS = await Retry(3, () => DownloadImage(thumburl)))
+                    using (var thumbS = await Retry(6, () => DownloadImage(thumburl)))
                     {
                         Stream pageS = null;
                         if (!string.IsNullOrEmpty(pageurl))
                         {
                             Output.Print("Download page:" + i);
-                            pageS = await Retry(3, () => DownloadImage(pageurl));
+                            pageS = await Retry(6, () => DownloadImage(pageurl));
                         }
                         else Output.Print($"Page url is null: {i}");
 
@@ -87,11 +126,15 @@ namespace H.BookLibrary
                         {
                             if (pageS != null) pageS.Dispose();
                         }
+
+                        OnProgressChanged(new DownloadProgressEventArgs(progressMax, ++progressValue));
                     }
                 }
             }
             else Output.Print("Page url is empty.");
 
+            if (progressMax != progressValue)
+                OnProgressChanged(new DownloadProgressEventArgs(progressMax, progressMax));
             Output.Print("Download complete.");
             return _book;
         }
@@ -121,6 +164,8 @@ namespace H.BookLibrary
                         {
                             await s.CopyToAsync(ms);
                         }
+
+                        ms.Seek(0, SeekOrigin.Begin);
                         return ms;
                     }
                     catch (Exception ex)
@@ -347,12 +392,14 @@ namespace H.BookLibrary
                 {
                     result = await action();
                 }
-                catch
+                catch (Exception ex)
                 {
                     if (retryCount <= 0) throw;
 
                     --retryCount;
                     isRetry = true;
+
+                    Output.Print($"Retry for (remain count:{retryCount}):" + Environment.NewLine + ex.ToString());
                 }
             }
             while (isRetry);
@@ -406,6 +453,52 @@ namespace H.BookLibrary
             }
 
             return sb.ToString();
+        }
+
+        private static Stream CreateThumbnailStream(Stream imgStream)
+        {
+            BitmapImage bitmap = new BitmapImage();
+            bitmap.BeginInit();
+            bitmap.StreamSource = imgStream;
+            bitmap.CacheOption = BitmapCacheOption.Default;
+            bitmap.EndInit();
+            bitmap.Freeze();
+
+            int width = bitmap.PixelWidth;
+            int height = bitmap.PixelHeight;
+
+            // 缩略图限制在400x400
+            int thumbWidth = 0;
+            int thumbHeight = 0;
+            if (width > height)
+            {
+                thumbWidth = Math.Min(400, width);
+                thumbHeight = (int)Math.Round((double)height / width * thumbWidth);
+            }
+            else
+            {
+                thumbHeight = Math.Min(400, height);
+                thumbWidth = (int)Math.Round((double)width / height * thumbHeight);
+            }
+
+            imgStream.Seek(0, SeekOrigin.Begin);
+            BitmapImage thumb = new BitmapImage();
+            thumb.BeginInit();
+            thumb.StreamSource = imgStream;
+            thumb.CacheOption = BitmapCacheOption.Default;
+            thumb.DecodePixelWidth = thumbWidth;
+            thumb.DecodePixelHeight = thumbHeight;
+            thumb.EndInit();
+            thumb.Freeze();
+
+            JpegBitmapEncoder encoder = new JpegBitmapEncoder();
+            encoder.Frames.Add(BitmapFrame.Create(thumb));
+            MemoryStream ms = new MemoryStream();
+            encoder.Save(ms);
+
+            imgStream.Seek(0, SeekOrigin.Begin);
+            ms.Seek(0, SeekOrigin.Begin);
+            return ms;
         }
     }
 }
