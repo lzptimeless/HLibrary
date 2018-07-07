@@ -73,6 +73,12 @@
                             <RowDefinition Height="Auto" />
                             <RowDefinition />
                         </Grid.RowDefinitions>
+                        <Grid.Effect>
+                            <DropShadowEffect
+                                RenderingBias="Performance"
+                                ShadowDepth="0"
+                                Color="{StaticResource Color-Main}" />
+                        </Grid.Effect>
                         <!--  书名  -->
                         <TextBlock
                             Grid.ColumnSpan="2"

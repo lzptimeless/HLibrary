@@ -173,13 +173,34 @@ namespace H.BookLibrary
             if (!string.IsNullOrEmpty(_coverUrl))
             {
                 Output.Print("Download cover...");
-                using (var s = await Retry(6, () => DownloadImage(_coverUrl)))
+                Stream thumbS = null;
+                Stream coverS = null;
+                try
                 {
-                    if (s != null)
+                    coverS = await Retry(6, async () =>
                     {
-                        using (var coverThumbStream = CreateShrinkStream(s, 400, 400))
-                            await _book.SetCoverAsync(coverThumbStream, s);
-                    }
+                        var s = await DownloadImage(_coverUrl);
+                        try
+                        {
+                            var ss = CreateShrinkStream(s, 1920, 1920);
+                            thumbS = CreateShrinkStream(s, 400, 400);
+
+                            if (s != ss && s != thumbS) s.Dispose();
+                            return ss;
+                        }
+                        catch
+                        {
+                            s.Dispose();
+                            throw;
+                        }
+                    });
+
+                    await _book.SetCoverAsync(thumbS, coverS);
+                }
+                finally
+                {
+                    if (thumbS != null) thumbS.Dispose();
+                    if (coverS != null) coverS.Dispose();
                 }
             }
             else Output.Print("Cover url is empty.");
