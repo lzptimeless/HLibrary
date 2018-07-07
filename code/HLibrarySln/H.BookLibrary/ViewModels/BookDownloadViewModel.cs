@@ -1,5 +1,6 @@
 ﻿using H.Book;
 using H.BookLibrary.Views;
+using Prism.Commands;
 using Prism.Mvvm;
 using System;
 using System.Collections.Generic;
@@ -8,20 +9,19 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Input;
 
 namespace H.BookLibrary.ViewModels
 {
     public class BookDownloadViewModel : ViewModelBase
     {
         #region fields
-        private string _bookID;
         private IHBook _book;
         private HitomiBookDownloader _downloader;
         #endregion
 
         public BookDownloadViewModel()
         {
-            _bookID = "1057991";
         }
 
         #region properties
@@ -43,6 +43,50 @@ namespace H.BookLibrary.ViewModels
 
                 this._description = value;
                 this.RaisePropertyChanged(DescriptionPropertyName);
+            }
+        }
+        #endregion
+
+        #region BookID
+        /// <summary>
+        /// Property name of <see cref="BookID"/>
+        /// </summary>
+        public const string BookIDPropertyName = "BookID";
+        private string _bookID;
+        /// <summary>
+        /// Get or set <see cref="BookID"/>
+        /// </summary>
+        public string BookID
+        {
+            get { return this._bookID; }
+            set
+            {
+                if (this._bookID == value) return;
+
+                this._bookID = value;
+                this.RaisePropertyChanged(BookIDPropertyName);
+            }
+        }
+        #endregion
+
+        #region IsDownloading
+        /// <summary>
+        /// Property name of <see cref="IsDownloading"/>
+        /// </summary>
+        public const string IsDownloadingPropertyName = "IsDownloading";
+        private bool _isDownloading;
+        /// <summary>
+        /// Get or set <see cref="IsDownloading"/>
+        /// </summary>
+        public bool IsDownloading
+        {
+            get { return this._isDownloading; }
+            set
+            {
+                if (this._isDownloading == value) return;
+
+                this._isDownloading = value;
+                this.RaisePropertyChanged(IsDownloadingPropertyName);
             }
         }
         #endregion
@@ -114,37 +158,73 @@ namespace H.BookLibrary.ViewModels
         #endregion
         #endregion
 
+        #region commands
+        #region DownloadCommand
+        /// <summary>
+        /// Download command
+        /// </summary>
+        private DelegateCommand _downloadCommand;
+        /// <summary>
+        /// Get <see cref="DownloadCommand"/>
+        /// </summary>
+        public ICommand DownloadCommand
+        {
+            get
+            {
+                if (this._downloadCommand == null)
+                {
+                    this._downloadCommand = new DelegateCommand(this.Download, this.CanDownload);
+                }
+
+                return this._downloadCommand;
+            }
+        }
+
+        private async void Download()
+        {
+            try
+            {
+                IsDownloading = true;
+                RaiseDownloadCanExecuteChanged();
+                // Do command
+                await DownloadInnerAsync();
+            }
+            catch (Exception ex)
+            {
+                // Do exception work, print log.
+                Output.Print("Download failed." + Environment.NewLine + ex.ToString());
+            }
+            finally
+            {
+                IsDownloading = false;
+                RaiseDownloadCanExecuteChanged();
+            }
+        }
+
+        private bool CanDownload()
+        {
+            return !IsDownloading;
+        }
+
+        private void RaiseDownloadCanExecuteChanged()
+        {
+            if (this._downloadCommand != null)
+            {
+                this._downloadCommand.RaiseCanExecuteChanged();
+            }
+        }
+        #endregion
+        #endregion
+
         #region public methods
         public override void Init(FrameworkElement view)
         {
             base.Init(view);
         }
 
-        public async override void ViewLoaded()
+        public override void ViewLoaded()
         {
             base.ViewLoaded();
-            Description = $"开始下载：{_bookID}";
-            var view = View as BookDownloadView;
-            try
-            {
-                CurrentFilePath = $"books/hitomi-{_bookID}-{DateTime.Now.ToString("yyyy-MM-dd")}.hb";
-
-                Output.Write += Output_Write;
-                _downloader = new HitomiBookDownloader();
-                _downloader.ProgressChanged += _downloader_ProgressChanged;
-                _book = await _downloader.DownloadAsync(_bookID, CurrentFilePath);
-                _downloader.ProgressChanged -= _downloader_ProgressChanged;
-            }
-            catch (Exception ex)
-            {
-                Description = "下载失败";
-
-                if (view != null) view.Print("下载失败." + Environment.NewLine + ex.ToString());
-                return;
-            }
-
-            Description = "下载成功";
-            if (view != null) view.Print("下载成功.");
         }
 
         public override void Release()
@@ -155,9 +235,48 @@ namespace H.BookLibrary.ViewModels
         #endregion
 
         #region private methods
+        private async Task DownloadInnerAsync()
+        {
+            Description = $"开始下载：{_bookID}";
+            var view = View as BookDownloadView;
+            try
+            {
+                CurrentFilePath = $"books/hitomi-{_bookID}-{DateTime.Now.ToString("yyyy-MM-dd")}.hb";
+                view.ClearPrint();
+                Output.Write += Output_Write;
+                _downloader = new HitomiBookDownloader();
+                _downloader.ProgressChanged += _downloader_ProgressChanged;
+                _book = await _downloader.DownloadAsync(_bookID, CurrentFilePath);
+
+                Description = "下载成功";
+                if (view != null) view.Print("下载成功.");
+            }
+            catch (Exception ex)
+            {
+                Description = "下载失败";
+                if (view != null) view.Print("下载失败." + Environment.NewLine + ex.ToString());
+            }
+            finally
+            {
+                if (_downloader != null)
+                {
+                    _downloader.ProgressChanged -= _downloader_ProgressChanged;
+                    _downloader = null;
+                }
+
+                if (_book != null)
+                {
+                    _book.Dispose();
+                    _book = null;
+                }
+                Output.Write -= Output_Write;
+            }
+        }
+
         private void _downloader_ProgressChanged(object sender, DownloadProgressEventArgs e)
         {
-            Action action = () => {
+            Action action = () =>
+            {
                 CurrentProgressMax = e.ProgressMax;
                 CurrentProgressValue = e.ProgressValue;
             };

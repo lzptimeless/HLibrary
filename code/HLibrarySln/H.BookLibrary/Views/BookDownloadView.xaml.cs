@@ -58,6 +58,11 @@ namespace H.BookLibrary.Views
             if (vm != null) vm.Release();
         }
 
+        public void ClearPrint()
+        {
+            OutputTextBox.Clear();
+        }
+
         public void Print(string msg)
         {
             OutputTextBox.AppendText(msg + Environment.NewLine);
