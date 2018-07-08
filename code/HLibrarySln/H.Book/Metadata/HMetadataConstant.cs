@@ -56,12 +56,16 @@ namespace H.Book
         /// </summary>
         public const int PageContentLength = VariableLength;
         /// <summary>
-        /// 页头列表起始位置
+        /// 页面列表数量位置
         /// </summary>
-        public const int PageHeaderListPosition = StartCodeLength + BookHeaderLength + BookCoverLength;
+        public const int PageHeaderListCountPosition = StartCodeLength + BookHeaderLength + BookCoverLength;
         /// <summary>
-        /// 页面内容列表起始位置
+        /// 第一页头列表起始位置
         /// </summary>
-        public const int PageContentListPosition = PageHeaderListPosition + PageHeaderListLength;
+        public const int FirstPageHeaderListPosition = PageHeaderListCountPosition + 1;
+        /// <summary>
+        /// 第一页头列表结束位置
+        /// </summary>
+        public const int FirstPageHeaderListEndPosition = FirstPageHeaderListPosition + PageHeaderListLength - 1;
     }
 }

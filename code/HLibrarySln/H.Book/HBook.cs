@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -15,6 +16,7 @@ namespace H.Book
         private AsyncOneManyLockEx _lock = new AsyncOneManyLockEx(10);
         private HBookMode _mode;
         private Stream _stream;
+        private int _pageHeaderListCount;
         private HMetadataBookHeader _headerMetadata = new HMetadataBookHeader();
         private HMetadataBookCover _coverMetadata = new HMetadataBookCover();
         private HMetadataPageCollection _pages = new HMetadataPageCollection();
@@ -50,7 +52,8 @@ namespace H.Book
         /// <param name="path">文件路径</param>
         /// <param name="mode">打开或创建</param>
         /// <param name="access">访问内容，如果是创建文件则忽略这个参数，如果是打开文件则影响可操作的内容和初始化速度，可操作内容越少初始化速度越快</param>
-        public HBook(string path, HBookMode mode, HBookAccess access)
+        /// <param name="pageHeaderListCount">创建书时设置的页头列表数量，一个页头列表数包含1024个页头，如果是打开文件则忽略这个参数</param>
+        public HBook(string path, HBookMode mode, HBookAccess access, byte pageHeaderListCount)
         {
             if (mode != HBookMode.OpenOrCreate)
                 _mode = mode;
@@ -59,13 +62,17 @@ namespace H.Book
 
             if (_mode == HBookMode.Create)
             {
+                if (pageHeaderListCount < 1) throw new ArgumentOutOfRangeException("pageHeaderListCount", $"value={pageHeaderListCount}, range=[1,255]");
+
                 _stream = new FileStream(path, FileMode.CreateNew, FileAccess.ReadWrite, FileShare.None, 2048, true);
                 _access = HBookAccess.All;// 创建文件忽略access参数，直接用All
+                _pageHeaderListCount = pageHeaderListCount;
             }
             else if (_mode == HBookMode.Open)
             {
                 _stream = new FileStream(path, FileMode.Open, FileAccess.ReadWrite, FileShare.None, 2048, true);
                 _access = access;
+                _pageHeaderListCount = 0;// 打开文件忽略pageHeaderListCount参数
             }
             else
                 throw new ArgumentOutOfRangeException("mode", $"Not supported mode:{_mode}");
@@ -99,7 +106,7 @@ namespace H.Book
                 if (IsInitialized()) throw new ApplicationException("This HBook already initialized");
 
                 int readedLen = 0;
-                int cacheLen = !CanAccessCover() ? HMetadataConstant.BookCoverPosition : (!CanAccessPage() ? HMetadataConstant.PageHeaderListPosition : HMetadataConstant.PageContentListPosition);
+                int cacheLen = !CanAccessCover() ? HMetadataConstant.BookCoverPosition : (!CanAccessPage() ? HMetadataConstant.PageHeaderListCountPosition : (HMetadataConstant.FirstPageHeaderListEndPosition + 1));
                 using (var cacheStream = await CreateMemoryCache(_stream, cacheLen))
                 {
                     // 验证文件头
@@ -118,23 +125,23 @@ namespace H.Book
                     // 读取页面头
                     if (CanAccessPage())
                     {
-                        byte cc = 0;
-                        while (0 != (cc = await ReadNextControlCodeAsync(cacheStream)))
+                        // 验证当前读取位置是否符合预期
+                        if (cacheStream.Position != HMetadataConstant.PageHeaderListCountPosition)
+                            throw new InvalidDataException("Cover metadata not readed expect length");
+                        // 读取页头列表数量
+                        _pageHeaderListCount = cacheStream.ReadByte();
+                        if (_pageHeaderListCount < 1) throw new InvalidDataException($"Page header list count error:value={_pageHeaderListCount}, range=[1,255]");
+                        // 读取第一页头列表
+                        await ReadPageHeadersAsync(cacheStream);
+                        if (_pageHeaderListCount > 1)
                         {
-                            // 移动读取位置到数据对起始位置
-                            cacheStream.Seek(-2, SeekOrigin.Current);
-                            // 读取数据段
-                            if (cc == HMetadataControlCodes.PageHeader)
+                            // 读取后续页头列表
+                            int otherHeadersLen = HMetadataConstant.PageHeaderListLength * (_pageHeaderListCount - 1);
+                            using (var otherHeadersCacheS = await CreateMemoryCache(_stream, otherHeadersLen))
                             {
-                                HMetadataPageHeader pageHeaderMetadata = new HMetadataPageHeader();
-                                await pageHeaderMetadata.LoadAsync(cacheStream);
-                                // 添加到集合
-                                if (!_pages.Add(new HMetadataPage(pageHeaderMetadata, null)))
-                                    throw new InvalidDataException("Found duplicate id page");
+                                await ReadPageHeadersAsync(otherHeadersCacheS);
                             }
-                            else
-                                throw new InvalidDataException($"Not support page header control code: {cc}");
-                        }// while (0 != (cc = ReadNextControlCode(cacheStream)))
+                        }
                     }// if (access == HBookAccess.All)
                 }// using cacheStream
 
@@ -170,8 +177,14 @@ namespace H.Book
                 await _headerMetadata.SaveAsync(_stream, null, 0);
                 // 存储封面
                 await _coverMetadata.SaveAsync(_stream, null, 0);
+                // 写入页头列表数
+                if (_pageHeaderListCount < 1 || _pageHeaderListCount > byte.MaxValue)
+                    throw new ApplicationException($"Page header list count error:value={_pageHeaderListCount}, range=[1,255]");
+
+                await _stream.WriteByteAsync((byte)_pageHeaderListCount);
                 // 在页头列表区域填充空数据
-                await _stream.FillAsync(HMetadataConstant.CCFlag, HMetadataConstant.PageHeaderListLength);
+                int totalPageHeaderListLen = _pageHeaderListCount * HMetadataConstant.PageHeaderListLength;
+                await _stream.FillAsync(HMetadataConstant.CCFlag, totalPageHeaderListLen);
 
                 MakeInitialized();
             }
@@ -583,12 +596,13 @@ namespace H.Book
 
                 // 准备写入页头的起始位置
                 if (_pages.Count == 0)
-                    _stream.Seek(HMetadataConstant.PageHeaderListPosition, SeekOrigin.Begin);
+                    _stream.Seek(HMetadataConstant.FirstPageHeaderListPosition, SeekOrigin.Begin);
                 else
                 {
                     var lastPageHeaderFs = _pages[_pages.Count - 1].HeaderMetadata.FileStatus;
                     long newPagePosition = lastPageHeaderFs.Position + lastPageHeaderFs.GetSpace();
-                    if (HMetadataConstant.PageContentListPosition - newPagePosition < HMetadataConstant.PageHeaderLength)
+                    long pageContentListPosition = HMetadataConstant.FirstPageHeaderListPosition + _pageHeaderListCount * HMetadataConstant.PageHeaderListLength;
+                    if (pageContentListPosition - newPagePosition < HMetadataConstant.PageHeaderLength)
                         throw new ReserveSpaceNotEnoughException("PageHeader space not enough");
 
                     _stream.Seek(newPagePosition, SeekOrigin.Begin);
@@ -708,6 +722,27 @@ namespace H.Book
             GC.SuppressFinalize(this);
         }
         #region private methods
+        private async Task ReadPageHeadersAsync(Stream stream)
+        {
+            byte cc = 0;
+            while (0 != (cc = await ReadNextControlCodeAsync(stream)))
+            {
+                // 移动读取位置到数据对起始位置
+                stream.Seek(-2, SeekOrigin.Current);
+                // 读取数据段
+                if (cc == HMetadataControlCodes.PageHeader)
+                {
+                    HMetadataPageHeader pageHeaderMetadata = new HMetadataPageHeader();
+                    await pageHeaderMetadata.LoadAsync(stream);
+                    // 添加到集合
+                    if (!_pages.Add(new HMetadataPage(pageHeaderMetadata, null)))
+                        throw new InvalidDataException("Found duplicate id page");
+                }
+                else
+                    throw new InvalidDataException($"Not support page header control code: {cc}");
+            }// while (0 != (cc = ReadNextControlCode(cacheStream)))
+        }
+
         private static string CreateReceiver(string filePath, string caller)
         {
             return $"{Path.GetFileName(filePath)}:{caller}";

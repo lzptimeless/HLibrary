@@ -713,7 +713,7 @@ namespace H.BookLibrary.ViewModels
         #region private methods
         private async Task LoadBook()
         {
-            _book = new HBook(_bookPath, HBookMode.Open, HBookAccess.All);
+            _book = new HBook(_bookPath, HBookMode.Open, HBookAccess.All, 0);
             await _book.InitAsync();
         }
 

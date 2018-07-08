@@ -897,8 +897,8 @@ namespace Demo
         private IHBook CreateHBook()
         {
             string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "testbook.hb");
-            //string path = @"..\..\..\H.BookLibrary\bin\Debug\books\hitomi-1201123-2018-06-27";
-            return new HBook(path, HBookMode.OpenOrCreate, HBookAccess.All);
+            //string path = @"..\..\..\H.BookLibrary\bin\Debug\books\hitomi-955625-2018-07-07-new.hb";
+            return new HBook(path, HBookMode.OpenOrCreate, HBookAccess.All,1);
         }
 
         private static Task<BitmapImage> CreateImage(Task<Stream> taskStream)

@@ -267,9 +267,9 @@
                 <ListBox.ItemTemplate>
                     <DataTemplate DataType="{x:Type vm:PageMinModel}">
                         <!--  图像宽高比0.69  -->
-                        <Grid Width="200" Height="326">
+                        <Grid Width="184" Height="302.8">
                             <Grid.RowDefinitions>
-                                <RowDefinition Height="290" />
+                                <RowDefinition Height="266.8" />
                                 <RowDefinition />
                             </Grid.RowDefinitions>
                             <Image Source="{Binding Thumb}" Stretch="Uniform" />

@@ -17,7 +17,7 @@ namespace H.BookLibrary.ViewModels
     public class AllBookViewModel : ViewModelBase
     {
         #region fields
-        private const int DefaultPageSize = 10;
+        private const int DefaultPageSize = 12;
 
         /// <summary>
         /// 这个改变来自ViewModel代码
@@ -388,7 +388,7 @@ namespace H.BookLibrary.ViewModels
             for (int i = pageSize * pageIndex; i < pageSize * (pageIndex + 1) && i < bookPaths.Count; i++)
             {
                 string path = bookPaths[i];
-                using (var book = new HBook(path, HBookMode.Open, HBookAccess.HeaderAndCover))
+                using (var book = new HBook(path, HBookMode.Open, HBookAccess.HeaderAndCover, 0))
                 {
                     await book.InitAsync();
                     var bookHeader = await book.GetHeaderAsync();

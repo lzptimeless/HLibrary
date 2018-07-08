@@ -7,8 +7,8 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:view="clr-namespace:H.BookLibrary.Views"
     Title="Shell"
-    Width="1082"
-    Height="700"
+    Width="1002"
+    Height="702"
     d:DataContext="{d:DesignInstance Type=local:ShellModel,
                                      IsDesignTimeCreatable=False}"
     Style="{StaticResource Window-Shell}"

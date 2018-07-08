@@ -70,7 +70,11 @@ namespace H.BookLibrary
             string dir = Path.GetDirectoryName(savePath);
             if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
 
-            _book = new HBook(savePath, HBookMode.Create, HBookAccess.All);
+            int maxPageCount = 1024 * 255;
+            if (_thumbnailUrls.Length > maxPageCount) throw new ApplicationException($"Page is to many:value={_thumbnailUrls.Length}, range=[0,{maxPageCount}]");
+
+            byte pageHeaderListCount = (byte)Math.Ceiling((double)_thumbnailUrls.Length / 1024);
+            _book = new HBook(savePath, HBookMode.Create, HBookAccess.All, pageHeaderListCount);
             try
             {
                 await _book.InitAsync();
