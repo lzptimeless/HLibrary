@@ -19,11 +19,6 @@ namespace H.BookLibrary
         public event EventHandler<BookEventArgs> DownloadBookResume;
         public event EventHandler<BookEventArgs> DownloadBookCompleted;
         public event EventHandler<PageEventArgs> DownloadPageCompleted;
-        public event EventHandler<BookEventArgs> DownloadPreviewBookStart;
-        public event EventHandler<BookEventArgs> DownloadPreviewBookStop;
-        public event EventHandler<BookEventArgs> DownloadPreviewBookResume;
-        public event EventHandler<BookEventArgs> DownloadPreviewBookCompleted;
-        public event EventHandler<BookEventArgs> DownloadPreviewPageCompleted;
 
         public Task<IHBookHeader> GetDownloadingBook()
         {

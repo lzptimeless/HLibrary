@@ -714,28 +714,20 @@ namespace Demo
 
         private async void SaveCover()
         {
+            FileStream coverFs = null, thumbFs = null;
             try
             {
                 // Do command
                 string thumbPath = InputCoverThumb;
                 string coverPath = InputCover;
-                if (string.IsNullOrEmpty(thumbPath) || string.IsNullOrEmpty(coverPath))
-                {
-                    MessageBox.Show("缩略图和封面不能为空");
-                    return;
-                }
-                if (!File.Exists(thumbPath) || !File.Exists(coverPath))
-                {
-                    MessageBox.Show("缩略图或封面不存在");
-                    return;
-                }
+                if (!string.IsNullOrWhiteSpace(thumbPath) && File.Exists(thumbPath))
+                    thumbFs = new FileStream(thumbPath, FileMode.Open, FileAccess.Read, FileShare.Read, 2048, true);
+
+                if (!string.IsNullOrWhiteSpace(coverPath) && File.Exists(coverPath))
+                    coverFs = new FileStream(thumbPath, FileMode.Open, FileAccess.Read, FileShare.Read, 2048, true);
 
                 IsBusy = true;
-                using (FileStream coverFs = new FileStream(coverPath, FileMode.Open, FileAccess.Read))
-                using (FileStream thumbFs = new FileStream(thumbPath, FileMode.Open, FileAccess.Read))
-                {
-                    await _book.SetCoverAsync(thumbFs, coverFs);
-                }
+                await _book.SetCoverAsync(thumbFs, coverFs);
             }
             catch (Exception ex)
             {
@@ -745,6 +737,8 @@ namespace Demo
             finally
             {
                 IsBusy = false;
+                coverFs?.Dispose();
+                thumbFs?.Dispose();
             }
 
             Reload();
@@ -788,21 +782,17 @@ namespace Demo
 
         private async void AddPage()
         {
+            FileStream pageFs = null, thumbFs = null;
             try
             {
                 // Do command
                 string thumbPath = InputPageThumb;
                 string pagePath = InputPageContent;
-                if (string.IsNullOrEmpty(thumbPath) || string.IsNullOrEmpty(pagePath))
-                {
-                    MessageBox.Show("缩略图和页面不能为空");
-                    return;
-                }
-                if (!File.Exists(thumbPath) || !File.Exists(pagePath))
-                {
-                    MessageBox.Show("缩略图或页面不存在");
-                    return;
-                }
+                if (!string.IsNullOrWhiteSpace(thumbPath) && File.Exists(thumbPath))
+                    thumbFs = new FileStream(thumbPath, FileMode.Open, FileAccess.Read, FileShare.Read, 2048, true);
+
+                if (!string.IsNullOrWhiteSpace(pagePath) && File.Exists(pagePath))
+                    pageFs = new FileStream(pagePath, FileMode.Open, FileAccess.Read, FileShare.Read, 2048, true);
 
                 HPageHeaderSetting setting = new HPageHeaderSetting();
                 setting.Artist = InputPageArtist;
@@ -810,11 +800,7 @@ namespace Demo
                 setting.Tags = CreateArrayValue(InputPageTag);
                 setting.Selected = HPageHeaderFieldSelections.All;
                 IsBusy = true;
-                using (FileStream pageFs = new FileStream(pagePath, FileMode.Open, FileAccess.Read, FileShare.Read, 2048, true))
-                using (FileStream thumbFs = new FileStream(thumbPath, FileMode.Open, FileAccess.Read, FileShare.Read, 2048, true))
-                {
-                    await _book.AddPageAsync(setting, thumbFs, pageFs);
-                }
+                await _book.AddPageAsync(setting, thumbFs, pageFs);
             }
             catch (Exception ex)
             {
@@ -824,6 +810,8 @@ namespace Demo
             finally
             {
                 IsBusy = false;
+                pageFs?.Dispose();
+                thumbFs?.Dispose();
             }
 
             Reload();
@@ -898,7 +886,7 @@ namespace Demo
         {
             string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "testbook.hb");
             //string path = @"..\..\..\H.BookLibrary\bin\Debug\books\hitomi-955625-2018-07-07-new.hb";
-            return new HBook(path, HBookMode.OpenOrCreate, HBookAccess.All,1);
+            return new HBook(path, HBookMode.OpenOrCreate, HBookAccess.All, 1);
         }
 
         private static Task<BitmapImage> CreateImage(Task<Stream> taskStream)
