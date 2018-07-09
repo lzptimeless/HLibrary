@@ -81,7 +81,7 @@ namespace H.BookLibrary
             text = text.Replace("<", "&lt;");
             text = text.Replace(">", "&gt;");
             text = text.Replace("'", "&apos;");
-            text = text.Replace("\"", "&quote;");
+            text = text.Replace("\"", "&quot;");
 
             if (this.FilterOutput)
             {
