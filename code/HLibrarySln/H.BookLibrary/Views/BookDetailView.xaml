@@ -41,7 +41,7 @@
             Margin="0,20,0,0"
             HorizontalContentAlignment="Center"
             Header="展开或关闭属性面板"
-            IsExpanded="True">
+            IsExpanded="False">
             <Grid Height="180">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="4*" />
