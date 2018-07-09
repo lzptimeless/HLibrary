@@ -565,9 +565,7 @@ namespace H.Book
 
         public async Task<Guid> AddPageAsync(HPageHeaderSetting header, Stream thumbnail, Stream content, [CallerFilePath] string callerFilePath = "", [CallerMemberName] string callerName = "")
         {
-            ExceptionFactory.CheckArgNull("content", content);
-
-            if (content.Length > int.MaxValue)
+            if (content != null && content.Length > int.MaxValue)
                 throw new ArgumentException($"content is too big:max={int.MaxValue}, value={content.Length}", "content");
 
             if (thumbnail != null && thumbnail.Length > int.MaxValue)

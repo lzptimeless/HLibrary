@@ -116,7 +116,13 @@ namespace H.BookLibrary
             return _book;
         }
 
-        public async Task DownloadPageAsync(string thumburl, string pageurl, int index)
+        public async Task Stop()
+        { }
+
+        public async Task Resume()
+        { }
+
+        private async Task DownloadPageAsync(string thumburl, string pageurl, int index)
         {
             Output.Print("Download page thumbnail:" + index);
             Stream thumbS = null;
@@ -172,7 +178,7 @@ namespace H.BookLibrary
             }
         }
 
-        public async Task DownloadCoverAsync()
+        private async Task DownloadCoverAsync()
         {
             if (!string.IsNullOrEmpty(_coverUrl))
             {
