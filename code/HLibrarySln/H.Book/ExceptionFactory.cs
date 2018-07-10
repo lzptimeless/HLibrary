@@ -160,5 +160,10 @@ namespace H.Book
         {
             return new PageNotFoundException($"Page not exist: id={id}");
         }
+
+        public static Exception CreateStaleStatusEx(string msg)
+        {
+            return new StaleStatusException(msg);
+        }
     }
 }

@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace H.BookLibrary
 {
-    public class DownloadProgressEventArgs : EventArgs
+    public class ProgressEventArgs : EventArgs
     {
-        public DownloadProgressEventArgs(int progressMax, int progressValue)
+        public ProgressEventArgs(int progressMax, int progressValue)
         {
             ProgressMax = progressMax;
             ProgressValue = progressValue;

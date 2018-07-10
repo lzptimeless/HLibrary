@@ -8,6 +8,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Xml.Linq;
 
@@ -16,7 +17,10 @@ namespace H.BookLibrary
     public class HitomiBookDownloader
     {
         #region fields
+        private AsyncOneManyLock _lock;
+        private CancellationTokenSource _cts;
         private string _id;
+        private string _savePath;
         private IHBook _book;
         private HttpClient _httpClient;
         private HBookHeaderSetting _headerSetting;
@@ -25,68 +29,128 @@ namespace H.BookLibrary
         private string[] _pageUrls;
         #endregion
 
-        #region events
-        #region BookInfoDownloaded
-        /// <summary>
-        /// 书信息下载成功
-        /// </summary>
-        public event EventHandler<BookInfoEventArgs> BookInfoDownloaded;
-
-        private void OnBookInfoDownloaded(BookInfoEventArgs e)
+        public HitomiBookDownloader(string id, string savePath)
         {
-            Volatile.Read(ref BookInfoDownloaded)?.Invoke(this, e);
+            _id = id;
+            _savePath = savePath;
+            _lock = new AsyncOneManyLock();
         }
-        #endregion
 
+        #region events
         #region ProgressChanged
         /// <summary>
         /// 下载进度改变
         /// </summary>
-        public event EventHandler<DownloadProgressEventArgs> ProgressChanged;
+        public event EventHandler<ProgressEventArgs> ProgressChanged;
 
-        private void OnProgressChanged(DownloadProgressEventArgs e)
+        private void OnProgressChanged(ProgressEventArgs e)
         {
             Volatile.Read(ref ProgressChanged)?.Invoke(this, e);
         }
         #endregion
+
+        #region BookCreated
+        /// <summary>
+        /// 已经创建下载文件
+        /// </summary>
+        public event EventHandler<BookEventArgs> BookCreated;
+
+        private void OnBookCreated(BookEventArgs e)
+        {
+            Volatile.Read(ref BookCreated)?.Invoke(this, e);
+        }
         #endregion
 
-        public async Task<IHBook> DownloadAsync(string id, string savePath)
+        #region CoverDownloaded
+        /// <summary>
+        /// 封面下载完成
+        /// </summary>
+        public event EventHandler<CoverEventArgs> CoverDownloaded;
+
+        private void OnCoverDownloaded(CoverEventArgs e)
         {
-            if (_httpClient != null)
-                throw new ApplicationException("One book is processing");
+            Volatile.Read(ref CoverDownloaded)?.Invoke(this, e);
+        }
+        #endregion
 
-            _id = id;
-            _httpClient = new HttpClient();
+        #region PageDownload
+        /// <summary>
+        /// 一个页面下载完成
+        /// </summary>
+        public event EventHandler<PageEventArgs> PageDownload;
 
-            Output.Print($"Download book gallery: {id}");
-            string galleryHtml = await Retry(3, () => DownloadHtml($"galleries/{id}.html", null));
-            await Task.Run(() => ParseGallery(galleryHtml));
+        private void OnPageDownload(PageEventArgs e)
+        {
+            Volatile.Read(ref PageDownload)?.Invoke(this, e);
+        }
+        #endregion
 
-            Output.Print($"Download book page html: {id}");
-            string pageHtml = await Retry(3, () => DownloadHtml($"reader/{_id}.html", "1"));
-            await Task.Run(() => ParsePage(pageHtml));
+        #region Completed
+        /// <summary>
+        /// 下载完成
+        /// </summary>
+        public event EventHandler<BookEventArgs> Completed;
 
-            string dir = Path.GetDirectoryName(savePath);
-            if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
+        private void OnCompleted(BookEventArgs e)
+        {
+            Volatile.Read(ref Completed)?.Invoke(this, e);
+        }
+        #endregion
 
-            int maxPageCount = 1024 * 255;
-            if (_thumbnailUrls.Length > maxPageCount) throw new ApplicationException($"Page is to many:value={_thumbnailUrls.Length}, range=[0,{maxPageCount}]");
+        #region Failed
+        /// <summary>
+        /// 下载失败
+        /// </summary>
+        public event EventHandler<FailedEventArgs> Failed;
 
-            byte pageHeaderListCount = (byte)Math.Ceiling((double)_thumbnailUrls.Length / 1024);
-            _book = new HBook(savePath, HBookMode.Create, HBookAccess.All, pageHeaderListCount);
+        private void OnFailed(FailedEventArgs e)
+        {
+            Volatile.Read(ref Failed)?.Invoke(this, e);
+        }
+        #endregion
+        #endregion
+
+        public async Task<IHBook> DownloadAsync()
+        {
+            await _lock.WaitAsync(true);
             try
             {
+                if (_httpClient != null)
+                    throw new ApplicationException("One book is processing");
+
+                _httpClient = new HttpClient();
+                _cts = new CancellationTokenSource();
+
+                Output.Print($"Download book gallery: {_id}");
+                string galleryHtml = await Retry(3, _cts.Token, () => DownloadHtml($"galleries/{_id}.html", null, _cts.Token));
+                await Task.Run(() => ParseGallery(galleryHtml));
+                _cts.Token.ThrowIfCancellationRequested();
+
+                Output.Print($"Download book page html: {_id}");
+                string pageHtml = await Retry(3, _cts.Token, () => DownloadHtml($"reader/{_id}.html", "1", _cts.Token));
+                await Task.Run(() => ParsePage(pageHtml));
+                _cts.Token.ThrowIfCancellationRequested();
+
+                string dir = Path.GetDirectoryName(_savePath);
+                if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
+
+                int maxPageCount = 1024 * 255;
+                if (_thumbnailUrls.Length > maxPageCount) throw new ApplicationException($"Page is to many:value={_thumbnailUrls.Length}, range=[0,{maxPageCount}]");
+
+                byte pageHeaderListCount = (byte)Math.Ceiling((double)_thumbnailUrls.Length / 1024);
+                _book = new HBook(_savePath, HBookMode.Create, HBookAccess.All, pageHeaderListCount);
                 await _book.InitAsync();
-                await _book.SetHeaderAsync(_headerSetting);
+                _cts.Token.ThrowIfCancellationRequested();
+                var bookHeader = await _book.SetHeaderAsync(_headerSetting);
+                _cts.Token.ThrowIfCancellationRequested();
 
                 int progressMax = 1 + 1 + _thumbnailUrls.Length;// 头 + 封面 + 页面
                 int progressValue = 1;
-                OnBookInfoDownloaded(new BookInfoEventArgs(_headerSetting.Names[0], _thumbnailUrls.Length));
-                OnProgressChanged(new DownloadProgressEventArgs(progressMax, progressValue));
+                OnProgressChanged(new ProgressEventArgs(progressMax, progressValue));
+                OnBookCreated(new BookEventArgs(_book, bookHeader));
 
-                await DownloadCoverAsync();
-                OnProgressChanged(new DownloadProgressEventArgs(progressMax, ++progressValue));
+                await DownloadCoverAsync(_cts.Token);
+                OnProgressChanged(new ProgressEventArgs(progressMax, ++progressValue));
 
                 if (_thumbnailUrls != null)
                 {
@@ -95,70 +159,90 @@ namespace H.BookLibrary
                         string thumburl = _thumbnailUrls[i];
                         string pageurl = _pageUrls[i];
                         if (!string.IsNullOrEmpty(pageurl))
-                            await DownloadPageAsync(thumburl, pageurl, i);
+                        {
+                            _cts.Token.ThrowIfCancellationRequested();
+                            await DownloadPageAsync(thumburl, pageurl, i, _cts.Token);
+                        }
                         else
                             Output.Print($"Page url is null, skip this page: index={i}");
 
-                        OnProgressChanged(new DownloadProgressEventArgs(progressMax, ++progressValue));
+                        OnProgressChanged(new ProgressEventArgs(progressMax, ++progressValue));
                     }
                 }
                 else Output.Print("Page url is empty.");
 
                 if (progressMax != progressValue)
-                    OnProgressChanged(new DownloadProgressEventArgs(progressMax, progressMax));
+                    OnProgressChanged(new ProgressEventArgs(progressMax, progressMax));
+
                 Output.Print("Download complete.");
+                OnCompleted(new BookEventArgs(_book, bookHeader));
+                return _book;
             }
-            catch
+            catch(Exception ex)
             {
-                _book.Dispose();
+                _book?.Dispose();
+                OnFailed(new FailedEventArgs(ex));
                 throw;
             }
-            return _book;
+            finally
+            {
+                _lock.Release();
+                _cts?.Dispose();
+                _httpClient?.Dispose();
+            }
         }
 
-        public async Task Stop()
-        { }
+        public async Task CancelAsync()
+        {
+            await _lock.WaitAsync(true);
+            try
+            {
+                if (_cts != null && !_cts.IsCancellationRequested) _cts.Cancel();
+            }
+            finally
+            {
+                _lock.Release();
+            }
+        }
 
-        public async Task Resume()
-        { }
-
-        private async Task DownloadPageAsync(string thumburl, string pageurl, int index)
+        private async Task DownloadPageAsync(string thumburl, string pageurl, int index, CancellationToken ct)
         {
             Output.Print("Download page thumbnail:" + index);
-            Stream thumbS = null;
-            Stream pageS = null;
+            BookImageShrinkResult thumbRes = null, contentRes = null;
 
             try
             {
-                thumbS = await Retry(6, async () =>
+                await Retry(6, _cts.Token, async () =>
                 {
-                    var s = await DownloadImage(thumburl);
+                    var s = await DownloadImage(thumburl, ct);
                     try
                     {
-                        var ss = CreateShrinkStream(s, 400, 400);
-                        if (s != ss) s.Dispose();
-                        return ss;
+                        ct.ThrowIfCancellationRequested();
+                        thumbRes = BookImageHelper.Shrink(s, 400, 400);
+                        if (s != thumbRes.Stream) s.Dispose();
                     }
                     catch
                     {
                         s.Dispose();
+                        if (thumbRes != null) thumbRes.Stream?.Dispose();
                         throw;
                     }
                 });
                 Output.Print("Download page:" + index);
-                pageS = await Retry(6, async () =>
+                await Retry(6, _cts.Token, async () =>
                 {
 
-                    var s = await DownloadImage(pageurl);
+                    var s = await DownloadImage(pageurl, ct);
                     try
                     {
-                        var ss = CreateShrinkStream(s, 1920, 1920);
-                        if (s != ss) s.Dispose();
-                        return ss;
+                        ct.ThrowIfCancellationRequested();
+                        contentRes = BookImageHelper.Shrink(s, 1920, 1920);
+                        if (s != contentRes.Stream) s.Dispose();
                     }
                     catch
                     {
                         s.Dispose();
+                        if (contentRes != null) contentRes.Stream?.Dispose();
                         throw;
                     }
                 });
@@ -169,58 +253,61 @@ namespace H.BookLibrary
                     pageHeader.Artist = _headerSetting.Artists[0];
                     pageHeader.Selected = pageHeader.Selected | HPageHeaderFieldSelections.Artist;
                 }
-                await _book.AddPageAsync(pageHeader, thumbS, pageS);
+                var pageHeaderRes = await _book.AddPageAsync(pageHeader, thumbRes.Stream, contentRes.Stream);
+                OnPageDownload(new PageEventArgs(_book, pageHeaderRes, thumbRes.ImageSource, contentRes.ImageSource));
             }
             finally
             {
-                if (thumbS != null) thumbS.Dispose();
-                if (pageS != null) pageS.Dispose();
+                if (thumbRes != null) thumbRes.Stream?.Dispose();
+                if (contentRes != null) contentRes.Stream?.Dispose();
             }
         }
 
-        private async Task DownloadCoverAsync()
+        private async Task DownloadCoverAsync(CancellationToken ct)
         {
             if (!string.IsNullOrEmpty(_coverUrl))
             {
                 Output.Print("Download cover...");
-                Stream thumbS = null;
-                Stream coverS = null;
+                BookImageShrinkResult thumbRes = null, coverRes = null;
                 try
                 {
-                    coverS = await Retry(6, async () =>
+                    await Retry(6, ct, async () =>
                     {
-                        var s = await DownloadImage(_coverUrl);
+                        var s = await DownloadImage(_coverUrl, ct);
                         try
                         {
-                            var ss = CreateShrinkStream(s, 1920, 1920);
-                            thumbS = CreateShrinkStream(s, 400, 400);
+                            ct.ThrowIfCancellationRequested();
+                            coverRes = BookImageHelper.Shrink(s, 1920, 1920);
+                            thumbRes = BookImageHelper.Shrink(s, 400, 400);
 
-                            if (s != ss && s != thumbS) s.Dispose();
-                            return ss;
+                            if (s != coverRes.Stream && s != thumbRes.Stream) s.Dispose();
                         }
                         catch
                         {
                             s.Dispose();
+                            if (coverRes != null) coverRes.Stream?.Dispose();
+                            if (thumbRes != null) thumbRes.Stream?.Dispose();
                             throw;
                         }
                     });
 
-                    await _book.SetCoverAsync(thumbS, coverS);
+                    await _book.SetCoverAsync(thumbRes.Stream, coverRes.Stream);
+                    OnCoverDownloaded(new CoverEventArgs(thumbRes.ImageSource, coverRes.ImageSource));
                 }
                 finally
                 {
-                    if (thumbS != null) thumbS.Dispose();
-                    if (coverS != null) coverS.Dispose();
+                    if (thumbRes != null) thumbRes.Stream?.Dispose();
+                    if (coverRes != null) coverRes.Stream?.Dispose();
                 }
             }
             else Output.Print("Cover url is empty.");
         }
 
-        private async Task<string> DownloadHtml(string url, string fragment)
+        private async Task<string> DownloadHtml(string url, string fragment, CancellationToken ct)
         {
             using (var req = CreateRequest(url, fragment, HttpMethod.Get, null, null))
             {
-                using (var res = await _httpClient.SendAsync(req))
+                using (var res = await _httpClient.SendAsync(req, ct))
                 {
                     string html = await res.Content.ReadAsStringAsync();
                     return html;
@@ -228,18 +315,18 @@ namespace H.BookLibrary
             }
         }
 
-        private async Task<Stream> DownloadImage(string url)
+        private async Task<Stream> DownloadImage(string url, CancellationToken ct)
         {
             using (var req = CreateRequest(url, null, HttpMethod.Get, null, null))
             {
-                using (var res = await _httpClient.SendAsync(req))
+                using (var res = await _httpClient.SendAsync(req, ct))
                 {
                     MemoryStream ms = new MemoryStream();
                     try
                     {
                         using (var s = await res.Content.ReadAsStreamAsync())
                         {
-                            await s.CopyToAsync(ms);
+                            await s.CopyToAsync(ms, 2048, ct);
                         }
 
                         ms.Seek(0, SeekOrigin.Begin);
@@ -458,7 +545,7 @@ namespace H.BookLibrary
             return request;
         }
 
-        private static async Task<T> Retry<T>(int retryCount, Func<Task<T>> action)
+        private static async Task<T> Retry<T>(int retryCount, CancellationToken ct, Func<Task<T>> action)
         {
             bool isRetry = false;
             T result = default(T);
@@ -471,7 +558,7 @@ namespace H.BookLibrary
                 }
                 catch (Exception ex)
                 {
-                    if (retryCount <= 0) throw;
+                    if (retryCount <= 0 || ct.IsCancellationRequested) throw;
 
                     --retryCount;
                     isRetry = true;
@@ -482,6 +569,29 @@ namespace H.BookLibrary
             while (isRetry);
 
             return result;
+        }
+
+        private static async Task Retry(int retryCount, CancellationToken ct, Func<Task> action)
+        {
+            bool isRetry = false;
+            do
+            {
+                isRetry = false;
+                try
+                {
+                    await action();
+                }
+                catch (Exception ex)
+                {
+                    if (retryCount <= 0 || ct.IsCancellationRequested) throw;
+
+                    --retryCount;
+                    isRetry = true;
+
+                    Output.Print($"Retry for (remain count:{retryCount}):" + Environment.NewLine + ex.ToString());
+                }
+            }
+            while (isRetry);
         }
 
         private static string CreateHttpParameters(IEnumerable<KeyValuePair<string, object>> parameters, bool isEnableUrlEncode)
@@ -530,65 +640,6 @@ namespace H.BookLibrary
             }
 
             return sb.ToString();
-        }
-
-        private static Stream CreateShrinkStream(Stream imgStream, int maxPixelWidth, int maxPixelHeight)
-        {
-            BitmapImage bitmap = new BitmapImage();
-            bitmap.BeginInit();
-            bitmap.StreamSource = imgStream;
-            bitmap.CacheOption = BitmapCacheOption.Default;
-            bitmap.EndInit();
-            bitmap.Freeze();
-
-            int width = bitmap.PixelWidth;
-            int height = bitmap.PixelHeight;
-
-            int shrinkWidth = 0;
-            int shrinkHeight = 0;
-            if (width >= height)
-            {
-                shrinkWidth = Math.Min(maxPixelWidth, width);
-                shrinkHeight = (int)Math.Round((double)height / width * shrinkWidth);
-            }
-            else
-            {
-                shrinkHeight = Math.Min(maxPixelHeight, height);
-                shrinkWidth = (int)Math.Round((double)width / height * shrinkHeight);
-            }
-
-            imgStream.Seek(0, SeekOrigin.Begin);
-            // 原始图像大小小于限制值，直接返回原始图像数据
-            if (width <= shrinkWidth && height <= shrinkHeight)
-                return imgStream;
-
-            Output.Print($"Shrink image from {width}x{height} to {shrinkWidth}x{shrinkHeight}");
-
-            BitmapImage thumb = new BitmapImage();
-            thumb.BeginInit();
-            thumb.StreamSource = imgStream;
-            thumb.CacheOption = BitmapCacheOption.Default;
-            thumb.DecodePixelWidth = shrinkWidth;
-            thumb.DecodePixelHeight = shrinkHeight;
-            thumb.EndInit();
-            thumb.Freeze();
-
-            JpegBitmapEncoder encoder = new JpegBitmapEncoder();
-            encoder.Frames.Add(BitmapFrame.Create(thumb));
-            MemoryStream ms = new MemoryStream();
-            try
-            {
-                encoder.Save(ms);
-            }
-            catch
-            {
-                ms.Dispose();
-                throw;
-            }
-
-            imgStream.Seek(0, SeekOrigin.Begin);
-            ms.Seek(0, SeekOrigin.Begin);
-            return ms;
         }
     }
 }

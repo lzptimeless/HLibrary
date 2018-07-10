@@ -217,7 +217,7 @@ namespace H.Book
             }
         }
 
-        public async Task<bool> SetHeaderAsync(HBookHeaderSetting header, [CallerFilePath] string callerFilePath = "", [CallerMemberName] string callerName = "")
+        public async Task<IHBookHeader> SetHeaderAsync(HBookHeaderSetting header, [CallerFilePath] string callerFilePath = "", [CallerMemberName] string callerName = "")
         {
             var wt = _lock.WaitAsync(true, Timeout.InfiniteTimeSpan, CancellationToken.None, CreateReceiver(callerFilePath, callerName));
             await wt;
@@ -231,14 +231,15 @@ namespace H.Book
                 var fs = metadata.FileStatus;
                 var selected = header.Selected;
                 // 检测当前属性是否符合预期
-                if (selected.HasFlag(HBookHeaderFieldSelections.IetfLanguageTag) && !FieldEqual(header.PreIetfLanguageTag, metadata.IetfLanguageTag)) return false;
-                if (selected.HasFlag(HBookHeaderFieldSelections.Names) && !FieldEqual(header.PreNames, metadata.Names)) return false;
-                if (selected.HasFlag(HBookHeaderFieldSelections.Artists) && !FieldEqual(header.PreArtists, metadata.Artists)) return false;
-                if (selected.HasFlag(HBookHeaderFieldSelections.Groups) && !FieldEqual(header.PreGroups, metadata.Groups)) return false;
-                if (selected.HasFlag(HBookHeaderFieldSelections.Series) && !FieldEqual(header.PreSeries, metadata.Series)) return false;
-                if (selected.HasFlag(HBookHeaderFieldSelections.Categories) && !FieldEqual(header.PreCategories, metadata.Categories)) return false;
-                if (selected.HasFlag(HBookHeaderFieldSelections.Characters) && !FieldEqual(header.PreCharacters, metadata.Characters)) return false;
-                if (selected.HasFlag(HBookHeaderFieldSelections.Tags) && !FieldEqual(header.PreTags, metadata.Tags)) return false;
+                var staleStatusEx = ExceptionFactory.CreateStaleStatusEx("Book header has changed");
+                if (selected.HasFlag(HBookHeaderFieldSelections.IetfLanguageTag) && !FieldEqual(header.PreIetfLanguageTag, metadata.IetfLanguageTag)) throw staleStatusEx;
+                if (selected.HasFlag(HBookHeaderFieldSelections.Names) && !FieldEqual(header.PreNames, metadata.Names)) throw staleStatusEx;
+                if (selected.HasFlag(HBookHeaderFieldSelections.Artists) && !FieldEqual(header.PreArtists, metadata.Artists)) throw staleStatusEx;
+                if (selected.HasFlag(HBookHeaderFieldSelections.Groups) && !FieldEqual(header.PreGroups, metadata.Groups)) throw staleStatusEx;
+                if (selected.HasFlag(HBookHeaderFieldSelections.Series) && !FieldEqual(header.PreSeries, metadata.Series)) throw staleStatusEx;
+                if (selected.HasFlag(HBookHeaderFieldSelections.Categories) && !FieldEqual(header.PreCategories, metadata.Categories)) throw staleStatusEx;
+                if (selected.HasFlag(HBookHeaderFieldSelections.Characters) && !FieldEqual(header.PreCharacters, metadata.Characters)) throw staleStatusEx;
+                if (selected.HasFlag(HBookHeaderFieldSelections.Tags) && !FieldEqual(header.PreTags, metadata.Tags)) throw staleStatusEx;
 
                 // 更新
                 if (selected.HasFlag(HBookHeaderFieldSelections.IetfLanguageTag)) metadata.IetfLanguageTag = header.IetfLanguageTag;
@@ -254,7 +255,7 @@ namespace H.Book
                 _stream.Seek(fs.Position, SeekOrigin.Begin);
                 await metadata.SaveAsync(_stream, null, 0);
 
-                return true;
+                return new HBookHeader(_headerMetadata);
             }
             catch (IOException ioEx)
             {
@@ -563,7 +564,7 @@ namespace H.Book
             }
         }
 
-        public async Task<Guid> AddPageAsync(HPageHeaderSetting header, Stream thumbnail, Stream content, [CallerFilePath] string callerFilePath = "", [CallerMemberName] string callerName = "")
+        public async Task<IHPageHeader> AddPageAsync(HPageHeaderSetting header, Stream thumbnail, Stream content, [CallerFilePath] string callerFilePath = "", [CallerMemberName] string callerName = "")
         {
             if (content != null && content.Length > int.MaxValue)
                 throw new ArgumentException($"content is too big:max={int.MaxValue}, value={content.Length}", "content");
@@ -620,7 +621,7 @@ namespace H.Book
                 if (!_pages.Add(pageMetadata))
                     throw new ApplicationException($"Unkown error, add page failed: id={headerMetadata.ID}");
 
-                return headerMetadata.ID;
+                return new HPageHeader(headerMetadata);
             }
             catch (IOException ioEx)
             {
@@ -668,7 +669,7 @@ namespace H.Book
             }
         }
 
-        public async Task<bool> SetPageHeaderAsync(Guid id, HPageHeaderSetting header, [CallerFilePath] string callerFilePath = "", [CallerMemberName] string callerName = "")
+        public async Task<IHPageHeader> SetPageHeaderAsync(Guid id, HPageHeaderSetting header, [CallerFilePath] string callerFilePath = "", [CallerMemberName] string callerName = "")
         {
             var wt = _lock.WaitAsync(true, Timeout.InfiniteTimeSpan, CancellationToken.None, CreateReceiver(callerFilePath, callerName));
             await wt;
@@ -686,9 +687,10 @@ namespace H.Book
                 var fs = metadata.FileStatus;
                 var selected = header.Selected;
                 // 检测属性是否符合预期
-                if (selected.HasFlag(HPageHeaderFieldSelections.Artist) && !FieldEqual(header.PreArtist, metadata.Artist)) return false;
-                if (selected.HasFlag(HPageHeaderFieldSelections.Characters) && !FieldEqual(header.PreCharacters, metadata.Characters)) return false;
-                if (selected.HasFlag(HPageHeaderFieldSelections.Tags) && !FieldEqual(header.PreTags, metadata.Tags)) return false;
+                var staleStatusEx = ExceptionFactory.CreateStaleStatusEx($"Page header has changed: pageID={id}");
+                if (selected.HasFlag(HPageHeaderFieldSelections.Artist) && !FieldEqual(header.PreArtist, metadata.Artist)) throw staleStatusEx;
+                if (selected.HasFlag(HPageHeaderFieldSelections.Characters) && !FieldEqual(header.PreCharacters, metadata.Characters)) throw staleStatusEx;
+                if (selected.HasFlag(HPageHeaderFieldSelections.Tags) && !FieldEqual(header.PreTags, metadata.Tags)) throw staleStatusEx;
 
                 // 更新属性
                 if (selected.HasFlag(HPageHeaderFieldSelections.Artist)) metadata.Artist = header.Artist;
@@ -699,7 +701,7 @@ namespace H.Book
                 _stream.Seek(fs.Position, SeekOrigin.Begin);
                 await metadata.SaveAsync(_stream, null, 0);
 
-                return true;
+                return new HPageHeader(metadata);
             }
             catch (IOException ioEx)
             {
@@ -910,11 +912,12 @@ namespace H.Book
         /// <param name="header">头信息</param>
         /// <param name="callerFilePath">不需要设置</param>
         /// <param name="callerName">不需要设置</param>
-        /// <returns>true：成功，false：属性在修改前已经发生了改变</returns>
+        /// <returns>修改后的头信息</returns>
         /// <exception cref="InitException">没有加载数据或，创建数据</exception>
         /// <exception cref="IOWriteFailedException">数据在之前的写入操作中可能已经损坏</exception>
         /// <exception cref="ReserveSpaceNotEnoughException">空间不足</exception> 
-        Task<bool> SetHeaderAsync(HBookHeaderSetting header, [CallerFilePath] string callerFilePath = "", [CallerMemberName] string callerName = "");
+        /// <exception cref="StaleStatusException">书头在此之前已经发生了改变</exception>
+        Task<IHBookHeader> SetHeaderAsync(HBookHeaderSetting header, [CallerFilePath] string callerFilePath = "", [CallerMemberName] string callerName = "");
         /// <summary>
         /// 读取封面
         /// </summary>
@@ -1033,7 +1036,7 @@ namespace H.Book
         /// <param name="content">页面图像</param>
         /// <param name="callerFilePath">不需要设置</param>
         /// <param name="callerName">不需要设置</param>
-        /// <returns>新的页面的ID</returns>
+        /// <returns>新的页面的头信息</returns>
         /// <exception cref="ArgumentNullException">content为null</exception>
         /// <exception cref="ArgumentException">content太大了，超出定义</exception>
         /// <exception cref="ArgumentException">thumbnail太大了，超出定义</exception>
@@ -1042,7 +1045,7 @@ namespace H.Book
         /// <exception cref="IOWriteFailedException">数据在之前的写入操作中可能已经损坏</exception>
         /// <exception cref="InvalidAccessException">没有操作页面的权限</exception>
         /// <exception cref="ReserveSpaceNotEnoughException">空间不足</exception> 
-        Task<Guid> AddPageAsync(HPageHeaderSetting header, Stream thumbnail, Stream content, [CallerFilePath] string callerFilePath = "", [CallerMemberName] string callerName = "");
+        Task<IHPageHeader> AddPageAsync(HPageHeaderSetting header, Stream thumbnail, Stream content, [CallerFilePath] string callerFilePath = "", [CallerMemberName] string callerName = "");
         /// <summary>
         /// 删除页面
         /// </summary>
@@ -1061,12 +1064,13 @@ namespace H.Book
         /// <param name="header">头信息</param>
         /// <param name="callerFilePath">不需要设置</param>
         /// <param name="callerName">不需要设置</param>
-        /// <returns>true：成功，false：属性在修改前已经发生了改变</returns>
+        /// <returns>修改后的页头</returns>
         /// <exception cref="PageNotFoundException">找不到这个页面</exception>
         /// <exception cref="InitException">没有加载数据或，创建数据</exception>
         /// <exception cref="IOWriteFailedException">数据在之前的写入操作中可能已经损坏</exception>
         /// <exception cref="InvalidAccessException">没有操作页面的权限</exception>
         /// <exception cref="ReserveSpaceNotEnoughException">空间不足</exception> 
-        Task<bool> SetPageHeaderAsync(Guid id, HPageHeaderSetting header, [CallerFilePath] string callerFilePath = "", [CallerMemberName] string callerName = "");
+        /// <exception cref="StaleStatusException">页头在此之前已经发生了改变</exception>
+        Task<IHPageHeader> SetPageHeaderAsync(Guid id, HPageHeaderSetting header, [CallerFilePath] string callerFilePath = "", [CallerMemberName] string callerName = "");
     }
 }

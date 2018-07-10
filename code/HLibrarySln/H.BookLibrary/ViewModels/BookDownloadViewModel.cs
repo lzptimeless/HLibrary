@@ -244,9 +244,9 @@ namespace H.BookLibrary.ViewModels
                 CurrentFilePath = $"books/hitomi-{_bookID}-{DateTime.Now.ToString("yyyy-MM-dd")}.hb";
                 view.ClearPrint();
                 Output.Write += Output_Write;
-                _downloader = new HitomiBookDownloader();
+                _downloader = new HitomiBookDownloader(_bookID, CurrentFilePath);
                 _downloader.ProgressChanged += _downloader_ProgressChanged;
-                _book = await _downloader.DownloadAsync(_bookID, CurrentFilePath);
+                _book = await _downloader.DownloadAsync();
 
                 Description = "下载成功";
                 if (view != null) view.Print("下载成功.");
@@ -273,7 +273,7 @@ namespace H.BookLibrary.ViewModels
             }
         }
 
-        private void _downloader_ProgressChanged(object sender, DownloadProgressEventArgs e)
+        private void _downloader_ProgressChanged(object sender, ProgressEventArgs e)
         {
             Action action = () =>
             {

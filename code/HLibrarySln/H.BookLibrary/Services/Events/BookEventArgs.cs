@@ -9,11 +9,13 @@ namespace H.BookLibrary
 {
     public class BookEventArgs : EventArgs
     {
-        public BookEventArgs(IHBookHeader book)
+        public BookEventArgs(IHBook book,IHBookHeader header)
         {
             Book = book;
+            Header = header;
         }
 
-        public IHBookHeader Book { get; private set; }
+        public IHBook Book { get; private set; }
+        public IHBookHeader Header { get; private set; }
     }
 }

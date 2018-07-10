@@ -34,6 +34,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>HBIcon.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.Expression.Interactions, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="Prism, Version=7.0.0.396, Culture=neutral, PublicKeyToken=40ee6c3a2184dc59, processorArchitecture=MSIL">
@@ -76,15 +79,16 @@
     <Compile Include="Converters\ArrayToTextConverter.cs" />
     <Compile Include="Html\HtmlReader.cs" />
     <Compile Include="Html\HtmlWriter.cs" />
-    <Compile Include="Services\BookInfoEventArgs.cs" />
-    <Compile Include="Services\DownloadProgressEventArgs.cs" />
+    <Compile Include="Services\Events\CoverEventArgs.cs" />
+    <Compile Include="Services\Events\FailedEventArgs.cs" />
+    <Compile Include="Services\Events\ProgressEventArgs.cs" />
     <Compile Include="Services\HitomiBookDownloader.cs" />
-    <Compile Include="Services\BookEventArgs.cs" />
-    <Compile Include="Services\BooksResult.cs" />
+    <Compile Include="Services\Events\BookEventArgs.cs" />
+    <Compile Include="Services\Models\BooksResult.cs" />
     <Compile Include="Services\DownloadService.cs" />
     <Compile Include="Services\LibraryService.cs" />
-    <Compile Include="Services\PageEventArgs.cs" />
-    <Compile Include="Services\PagesResult.cs" />
+    <Compile Include="Services\Events\PageEventArgs.cs" />
+    <Compile Include="Services\Models\PagesResult.cs" />
     <Compile Include="Shell.xaml.cs">
       <DependentUpon>Shell.xaml</DependentUpon>
     </Compile>
@@ -174,7 +178,9 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="HBIcon.ico" />
+  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CLRTools\CLRTools.csproj">
       <Project>{4f653fe5-95a5-4019-be70-25c6f2b48c02}</Project>
