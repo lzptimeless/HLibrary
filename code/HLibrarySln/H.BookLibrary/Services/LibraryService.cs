@@ -10,6 +10,15 @@ namespace H.BookLibrary
 {
     public class LibraryService
     {
+        #region fields
+
+        #endregion
+
+        #region event handles
+        
+        #endregion
+
+        #region public methods
         public Task<BooksResult> GetBooksAsync(Func<IHBookHeader, bool> filter, int offset, int count)
         {
             throw new NotImplementedException();
@@ -39,5 +48,6 @@ namespace H.BookLibrary
         {
             throw new NotImplementedException();
         }
+        #endregion
     }
 }
