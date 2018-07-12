@@ -84,6 +84,7 @@
     <Compile Include="Services\Events\ProgressEventArgs.cs" />
     <Compile Include="Services\HitomiBookDownloader.cs" />
     <Compile Include="Services\Events\BookEventArgs.cs" />
+    <Compile Include="Services\Models\BookHandle.cs" />
     <Compile Include="Services\Models\BooksResult.cs" />
     <Compile Include="Services\DownloadService.cs" />
     <Compile Include="Services\LibraryService.cs" />

@@ -25,12 +25,12 @@ namespace H.BookLibrary
 
     public class PageResult
     {
-        public PageResult(IHBookHeader book, IHPageHeader[] pages)
+        public PageResult(IHBookHeader book, IHPageHeader page)
         {
             Book = book;
-            Pages = pages;
+            Page = page;
         }
         public IHBookHeader Book { get; private set; }
-        public IHPageHeader[] Pages { get; private set; }
+        public IHPageHeader Page { get; private set; }
     }
 }
