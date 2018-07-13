@@ -79,6 +79,7 @@
     <Compile Include="Converters\ArrayToTextConverter.cs" />
     <Compile Include="Html\HtmlReader.cs" />
     <Compile Include="Html\HtmlWriter.cs" />
+    <Compile Include="Services\CoverCacheService.cs" />
     <Compile Include="Services\Events\CoverEventArgs.cs" />
     <Compile Include="Services\Events\FailedEventArgs.cs" />
     <Compile Include="Services\Events\ProgressEventArgs.cs" />
