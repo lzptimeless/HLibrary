@@ -83,6 +83,7 @@
     <Compile Include="Services\Events\CoverEventArgs.cs" />
     <Compile Include="Services\Events\FailedEventArgs.cs" />
     <Compile Include="Services\Events\ProgressEventArgs.cs" />
+    <Compile Include="Services\Exceptions\BookNotFoundException.cs" />
     <Compile Include="Services\HitomiBookDownloader.cs" />
     <Compile Include="Services\Events\BookEventArgs.cs" />
     <Compile Include="Services\Models\BookHandle.cs" />
@@ -101,6 +102,7 @@
     <Compile Include="Common\BookImageHelper.cs" />
     <Compile Include="ViewModels\BookMiniModel.cs" />
     <Compile Include="ViewModels\HomeViewModel.cs" />
+    <Compile Include="ViewModels\InitViewModel.cs" />
     <Compile Include="ViewModels\PageMinModel.cs" />
     <Compile Include="ViewModels\PageGalleryViewModel.cs" />
     <Compile Include="ViewModels\SelectionModel.cs" />
@@ -116,6 +118,9 @@
     </Compile>
     <Compile Include="Views\HomeView.xaml.cs">
       <DependentUpon>HomeView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\InitView.xaml.cs">
+      <DependentUpon>InitView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\PageGalleryView.xaml.cs">
       <DependentUpon>PageGalleryView.xaml</DependentUpon>
@@ -172,6 +177,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\HomeView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\InitView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

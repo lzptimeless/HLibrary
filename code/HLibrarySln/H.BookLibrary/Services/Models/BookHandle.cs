@@ -9,6 +9,6 @@ namespace H.BookLibrary
     /// <summary>
     /// 访问指定书的凭据
     /// </summary>
-    public class BookHandle
+    public class HBookHandle
     { }
 }

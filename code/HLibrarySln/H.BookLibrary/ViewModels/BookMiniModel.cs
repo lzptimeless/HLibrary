@@ -11,7 +11,7 @@ namespace H.BookLibrary.ViewModels
 {
     public class BookMiniModel : BindableBase
     {
-        public BookMiniModel(int index, IHBookHeader bookHeader, ImageSource coverThumbnail, string path)
+        public BookMiniModel(int index, IHBookHeader bookHeader, ImageSource coverThumbnail, HBookHandle handle)
         {
             Names = bookHeader.Names;
             Artists = bookHeader.Artists;
@@ -22,7 +22,7 @@ namespace H.BookLibrary.ViewModels
             Characters = bookHeader.Characters;
             Tags = bookHeader.Tags;
             CoverThumbnail = coverThumbnail;
-            Path = path;
+            Handle = handle;
         }
 
         #region properties
@@ -246,24 +246,24 @@ namespace H.BookLibrary.ViewModels
         }
         #endregion
 
-        #region Path
+        #region Handle
         /// <summary>
-        /// Property name of <see cref="Path"/>
+        /// Property name of <see cref="Handle"/>
         /// </summary>
-        public const string PathPropertyName = "Path";
-        private string _path;
+        public const string HandlePropertyName = "Handle";
+        private HBookHandle _handle;
         /// <summary>
-        /// Get or set <see cref="Path"/>
+        /// Get or set <see cref="Handle"/>
         /// </summary>
-        public string Path
+        public HBookHandle Handle
         {
-            get { return _path; }
+            get { return _handle; }
             set
             {
-                if (_path == value) return;
+                if (_handle == value) return;
 
-                _path = value;
-                RaisePropertyChanged(PathPropertyName);
+                _handle = value;
+                RaisePropertyChanged(HandlePropertyName);
             }
         }
         #endregion

@@ -83,9 +83,9 @@ namespace H.BookLibrary
         #region public methods
         public void ViewLoaded()
         {
-            HomeViewModel vm = new HomeViewModel();
+            InitViewModel vm = new InitViewModel();
             vm.ViewManager = _viewManager;
-            HomeView view = new HomeView();
+            InitView view = new InitView();
             view.DataContext = vm;
             vm.Init(view);
 

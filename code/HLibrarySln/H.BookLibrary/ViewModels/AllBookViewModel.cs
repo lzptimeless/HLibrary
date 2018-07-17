@@ -19,38 +19,39 @@ namespace H.BookLibrary.ViewModels
         #region fields
         private const int DefaultPageSize = 12;
 
+        private ILibraryService _lib;
         /// <summary>
         /// 这个改变来自ViewModel代码
         /// </summary>
         private bool _isInnerChange;
-        private List<string> _bookPaths = new List<string>();
         #endregion
 
         public AllBookViewModel(string bookDirectory)
         {
-            _bookDirectory = bookDirectory;
+            _lib = LibraryService.Instance;
             _galleryPageSizes.AddRange(new[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 50, 60, 70, 80, 90, 100 });
+            _galleryPageIndexes.Add(0);
         }
 
         #region properties
-        #region BookDirectory
+        #region SearchString
         /// <summary>
-        /// Property name of <see cref="BookDirectory"/>
+        /// Property name of <see cref="SearchString"/>
         /// </summary>
-        public const string BookDirectoryPropertyName = "BookDirectory";
-        private string _bookDirectory;
+        public const string SearchStringPropertyName = "SearchString";
+        private string _SearchString;
         /// <summary>
-        /// Get or set <see cref="BookDirectory"/>
+        /// Get or set <see cref="SearchString"/>
         /// </summary>
-        public string BookDirectory
+        public string SearchString
         {
-            get { return _bookDirectory; }
+            get { return _SearchString; }
             set
             {
-                if (_bookDirectory == value) return;
+                if (_SearchString == value) return;
 
-                _bookDirectory = value;
-                RaisePropertyChanged(BookDirectoryPropertyName);
+                _SearchString = value;
+                RaisePropertyChanged(SearchStringPropertyName);
             }
         }
         #endregion
@@ -128,11 +129,20 @@ namespace H.BookLibrary.ViewModels
             {
                 if (_currentGalleryPageSize == value) return;
 
+                int oldValue = _currentGalleryPageSize;
                 _currentGalleryPageSize = value;
                 RaisePropertyChanged(CurrentGalleryPageSizePropertyName);
 
                 if (!_isInnerChange)
-                    GalleryUpdatePageInfo().ContinueWith(t => LoadGalleryPages().NoAwait(), TaskContinuationOptions.ExecuteSynchronously).NoAwait();
+                {
+                    // 自动设置页号
+                    _isInnerChange = true;
+                    int currentOffset = CurrentGalleryPageIndex * oldValue;
+                    CurrentGalleryPageIndex = currentOffset / value;
+                    _isInnerChange = false;
+                    // 刷新内容
+                    LoadGalleryPages().NoAwait();
+                }
             }
         }
         #endregion
@@ -348,7 +358,6 @@ namespace H.BookLibrary.ViewModels
         {
             base.ViewLoaded();
 
-            await GalleryUpdatePageInfo();
             await LoadGalleryPages();
         }
 
@@ -378,42 +387,28 @@ namespace H.BookLibrary.ViewModels
             if (pageIndex != CurrentGalleryPageIndex)
                 Output.Print("CurrentGalleryPageIndex not in the valid range: " + CurrentGalleryPageIndex);
 
-            var bookPaths = _bookPaths;
-            if (bookPaths.Count <= pageIndex * pageSize)
+            var booksRes = await _lib.GetBooksAsync(null, pageIndex * pageSize, pageSize);
+            if (booksRes == null || booksRes.Books == null)
+                Output.Print("GetBooksAsync result is null.");
+            else
             {
-                Output.Print("Cached book path count not match with page index");
-                return;
-            }
-
-            for (int i = pageSize * pageIndex; i < pageSize * (pageIndex + 1) && i < bookPaths.Count; i++)
-            {
-                string path = bookPaths[i];
-                using (var book = new HBook(path, HBookMode.Open, HBookAccess.HeaderAndCover, 0))
+                for (int i = 0; i < booksRes.Books.Length; i++)
                 {
-                    await book.InitAsync();
-                    var bookHeader = await book.GetHeaderAsync();
-                    ImageSource cover = null;
-                    await book.ReadCoverThumbnailAsync(async s =>
-                    {
-                        if (s != null)
-                            cover = await BookImageHelper.CreateImageAsync(s);
-                        else
-                            Output.Print($"Page thumbnail is null, index={i}");
-                    });
-                    BookMiniModel model = new BookMiniModel(i, bookHeader, cover, path);
+                    var bookHeader = booksRes.Books[1];
+                    var coverThumbnail = await _lib.GetCoverThumbnailAsync(bookHeader.ID);
+                    BookMiniModel model = new BookMiniModel(i, bookHeader, coverThumbnail, null);
                     Books.Add(model);
+
+                    if (coverThumbnail == null)
+                        Output.Print($"Page thumbnail is null, index={i}");
                 }
             }
+
+            GalleryUpdatePageInfo(booksRes);
         }
 
-        private async Task GalleryUpdatePageInfo()
+        private void GalleryUpdatePageInfo(BooksResult booksRes)
         {
-            if (string.IsNullOrEmpty(BookDirectory)) throw new ApplicationException("BookDirectory is null");
-
-            string[] files = await Task.Run(() => Directory.GetFiles(BookDirectory, "*.hb", SearchOption.AllDirectories));
-            _bookPaths.Clear();
-            _bookPaths.AddRange(files);
-
             _isInnerChange = true;
             int pageSize = CurrentGalleryPageSize;
             if (pageSize <= 0)
@@ -422,7 +417,7 @@ namespace H.BookLibrary.ViewModels
                 Output.Print($"CurrentGalleryPageSize={pageSize} is invlaid, reset to {DefaultPageSize}");
             }
 
-            int pageCount = (int)Math.Ceiling((double)files.Length / pageSize);
+            int pageCount = (int)Math.Ceiling((double)booksRes.Total / pageSize);
             if (pageCount < GalleryPageIndexes.Count)
             {
                 if (CurrentGalleryPageIndex >= pageCount)

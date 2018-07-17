@@ -11,9 +11,12 @@ using System.IO;
 
 namespace H.BookLibrary
 {
-    public class LibraryService
+    public class LibraryService : ILibraryService
     {
         #region fields
+        /// <summary>
+        /// 过滤文件类型
+        /// </summary>
         private const string FileFilter = "*.hb";
         /// <summary>
         /// 书库文件夹路径
@@ -27,11 +30,16 @@ namespace H.BookLibrary
         /// 书集合
         /// </summary>
         private BookCollection _books = new BookCollection();
+        /// <summary>
+        /// 封面缓存
+        /// </summary>
+        private CoverCacheService _coverCache;
         #endregion
 
         private LibraryService()
         {
             _dir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "books");
+            _coverCache = CoverCacheService.Instance;
         }
 
         #region properties
@@ -40,7 +48,7 @@ namespace H.BookLibrary
         /// <summary>
         /// Get or set <see cref="Instance"/>
         /// </summary>
-        public static LibraryService Instance
+        public static ILibraryService Instance
         {
             get
             {
@@ -89,24 +97,65 @@ namespace H.BookLibrary
             return Task.FromResult(result);
         }
 
-        public Task<BitmapImage> GetCoverThumbnailAsync(Guid bookID)
+        public async Task<BitmapImage> GetCoverThumbnailAsync(Guid bookID)
         {
-            throw new NotImplementedException();
+            BitmapImage thumbnail = null;
+            // 由于创建BitmapImage没法用异步IO，所以useAsyncStream设置为false
+            await _coverCache.ReadThumbnailAsync(bookID, false, async s =>
+            {
+                if (s != null) thumbnail = await BookImageHelper.CreateImageAsync(s);
+            });
+            return thumbnail;
         }
 
-        public Task<BitmapImage> GetCoverAsync(Guid bookID)
+        public async Task<BitmapImage> GetCoverAsync(Guid bookID)
         {
-            throw new NotImplementedException();
+            BitmapImage cover = null;
+            // 由于创建BitmapImage没法用异步IO，所以useAsyncStream设置为false
+            await _coverCache.ReadCoverAsync(bookID, false, async s =>
+            {
+                if (s != null) cover = await BookImageHelper.CreateImageAsync(s);
+            });
+            return cover;
         }
 
-        public Task<BitmapImage> GetPageThumbnailAsync(Guid bookID, Guid pageID)
+        public Task<HBookHandle> CreateBookAccess(Guid bookID)
         {
-            throw new NotImplementedException();
+            IHBook book;
+            var handle = _books.CreateAccess(bookID, out book);
+            return Task.FromResult(handle);
         }
 
-        public Task<BitmapImage> GetPageAsync(Guid bookID, Guid pageID)
+        public Task<bool> ReleaseBookAccess(HBookHandle handle)
         {
-            throw new NotImplementedException();
+            bool result = _books.ReleaseAccess(handle);
+            return Task.FromResult(result);
+        }
+
+        public async Task<BitmapImage> GetPageThumbnailAsync(HBookHandle handle, Guid pageID)
+        {
+            var book = _books.GetAccess(handle);
+            if (book == null) throw new BookNotFoundException($"Not found book: handle={handle}");
+
+            BitmapImage thumbnail = null;
+            await book.ReadThumbnailAsync(pageID, async s =>
+            {
+                if (s != null) thumbnail = await BookImageHelper.CreateImageAsync(s);
+            });
+            return thumbnail;
+        }
+
+        public async Task<BitmapImage> GetPageAsync(HBookHandle handle, Guid pageID)
+        {
+            var book = _books.GetAccess(handle);
+            if (book == null) throw new BookNotFoundException($"Not found book: handle={handle}");
+
+            BitmapImage page = null;
+            await book.ReadPageAsync(pageID, async s =>
+            {
+                if (s != null) page = await BookImageHelper.CreateImageAsync(s);
+            });
+            return page;
         }
         #endregion
 
@@ -237,6 +286,15 @@ namespace H.BookLibrary
                 var pageHeaders = await book.GetPageHeadersAsync();
 
                 cacheItem = new BookCacheItem(header.ID, path, header, pageHeaders);
+
+                // 缓存封面
+                bool coverExist = await _coverCache.ContainsCoverAsync(header.ID);
+                if (!coverExist)
+                    await book.ReadCoverAsync(s => _coverCache.SetCoverAsync(header.ID, s));
+
+                bool coverThumbnailExist = await _coverCache.ContainsThumbnailAsync(header.ID);
+                if (!coverThumbnailExist)
+                    await book.ReadCoverThumbnailAsync(s => _coverCache.SetThumbnailAsync(header.ID, s));
             }
 
             return cacheItem;
@@ -279,14 +337,14 @@ namespace H.BookLibrary
             {
                 ID = id;
                 Book = book;
-                Handles = new List<BookHandle>();
+                Handles = new List<HBookHandle>();
             }
 
             public Guid ID { get; private set; }
             /// <summary>
             /// 请求访问凭据
             /// </summary>
-            public List<BookHandle> Handles { get; private set; }
+            public List<HBookHandle> Handles { get; private set; }
             public IHBook Book { get; private set; }
         }
 
@@ -363,15 +421,72 @@ namespace H.BookLibrary
                 return new PagesResult(offset, count, total, pages.ToArray());
             }
 
-            public IHBook GetAccessItem(Guid id)
+            public IHBook GetAccess(HBookHandle handle)
             {
                 IHBook book = null;
                 _lock.Enter(false);
-                var item = GetAccessItemInner(id);
+                var item = GetAccessItemInner(handle);
                 if (item != null)
                     book = item.Book;
                 _lock.Leave();
                 return book;
+            }
+
+            public HBookHandle CreateAccess(Guid id, out IHBook book)
+            {
+                HBookHandle handle = new HBookHandle();
+                book = null;
+                _lock.Enter(true);
+                try
+                {
+                    var item = GetAccessItemInner(id);
+                    if (item != null)
+                    {
+                        item.Handles.Add(handle);
+                        book = item.Book;
+                    }
+                    else
+                    {
+                        var cacheItem = GetCacheItemInner(id);
+                        if (cacheItem == null)
+                            throw new BookNotFoundException($"Book not found: id={id}");
+
+                        book = new HBook(cacheItem.Path.LocalPath, HBookMode.Open, HBookAccess.All, 0);
+                        BookAccessItem accessItem = new BookAccessItem(id, book);
+                        accessItem.Handles.Add(handle);
+                        _access.Add(accessItem);
+                    }
+                }
+                finally
+                {
+                    _lock.Leave();
+                }
+                return handle;
+            }
+
+            public bool ReleaseAccess(HBookHandle handle)
+            {
+                bool result = false;
+                _lock.Enter(true);
+                try
+                {
+                    var accessItem = GetAccessItemInner(handle);
+                    if (accessItem != null)
+                    {
+                        result = accessItem.Handles.Remove(handle);
+                        if (accessItem.Handles.Count == 0)
+                        {
+                            accessItem.Book.Dispose();
+                            _access.Remove(accessItem);
+                        }
+                    }
+                }
+                finally
+                {
+                    _lock.Leave();
+                }
+
+                return result;
             }
 
             public void AddCacheItem(BookCacheItem item)
@@ -537,7 +652,41 @@ namespace H.BookLibrary
 
                 return null;
             }
+
+            private BookAccessItem GetAccessItemInner(HBookHandle handle)
+            {
+                for (int i = 0; i < _access.Count; i++)
+                {
+                    var item = _access[i];
+                    if (item.Handles.Contains(handle)) return item;
+                }
+
+                return null;
+            }
         }
         #endregion
+    }
+
+    public interface ILibraryService
+    {
+        event EventHandler<ProgressEventArgs> InitProgressChanged;
+
+        Task InitializeAsync();
+
+        Task<BooksResult> GetBooksAsync(Func<IHBookHeader, bool> filter, int offset, int count);
+
+        Task<PagesResult> GetPagesAsync(Func<IHPageHeader, bool> filter, int offset, int count);
+
+        Task<BitmapImage> GetCoverThumbnailAsync(Guid bookID);
+
+        Task<BitmapImage> GetCoverAsync(Guid bookID);
+
+        Task<HBookHandle> CreateBookAccess(Guid bookID);
+
+        Task<bool> ReleaseBookAccess(HBookHandle handle);
+
+        Task<BitmapImage> GetPageThumbnailAsync(HBookHandle handle, Guid pageID);
+
+        Task<BitmapImage> GetPageAsync(HBookHandle handle, Guid pageID);
     }
 }
