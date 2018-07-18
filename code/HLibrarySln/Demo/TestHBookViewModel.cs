@@ -843,7 +843,6 @@ namespace Demo
         public async Task Init()
         {
             IsBusy = true;
-            await _book.InitAsync();
             var header = await _book.GetHeaderAsync();
             Lang = header.IetfLanguageTag;
             Names = header.Names;

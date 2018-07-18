@@ -97,6 +97,18 @@ namespace H.BookLibrary
             return Task.FromResult(result);
         }
 
+        public Task<PagesResult> GetPagesAsync(Guid bookID, int offset, int count)
+        {
+            var result = _books.GetPages(bookID, offset, count);
+            return Task.FromResult(result);
+        }
+
+        public Task<IHBookHeader> GetBookAsync(Guid id)
+        {
+            var book = _books.GetBook(id);
+            return Task.FromResult(book);
+        }
+
         public async Task<BitmapImage> GetCoverThumbnailAsync(Guid bookID)
         {
             BitmapImage thumbnail = null;
@@ -119,20 +131,21 @@ namespace H.BookLibrary
             return cover;
         }
 
-        public Task<HBookHandle> CreateBookAccess(Guid bookID)
+        public Task<HBookHandle> CreateAccessAsync(Guid bookID)
         {
             IHBook book;
             var handle = _books.CreateAccess(bookID, out book);
+
             return Task.FromResult(handle);
         }
 
-        public Task<bool> ReleaseBookAccess(HBookHandle handle)
+        public Task<bool> ReleaseAccessAsync(HBookHandle handle)
         {
             bool result = _books.ReleaseAccess(handle);
             return Task.FromResult(result);
         }
 
-        public async Task<BitmapImage> GetPageThumbnailAsync(HBookHandle handle, Guid pageID)
+        public async Task<BitmapImage> GetThumbnailAsync(HBookHandle handle, Guid pageID)
         {
             var book = _books.GetAccess(handle);
             if (book == null) throw new BookNotFoundException($"Not found book: handle={handle}");
@@ -281,7 +294,6 @@ namespace H.BookLibrary
             BookCacheItem cacheItem = null;
             using (var book = new HBook(path.LocalPath, HBookMode.Open, HBookAccess.All, 0))
             {
-                await book.InitAsync();
                 var header = await book.GetHeaderAsync();
                 var pageHeaders = await book.GetPageHeadersAsync();
 
@@ -368,11 +380,9 @@ namespace H.BookLibrary
                 _lock.Enter(false);
                 try
                 {
-                    for (int i = 0; i < _cache.Count; i++)
+                    foreach (var item in _cache)
                     {
-                        var item = _cache[i];
-                        if (filter != null && !filter.Invoke(item.Header))
-                            continue;
+                        if (filter != null && !filter.Invoke(item.Header)) continue;
 
                         ++total;
                         if (index >= offset && bookHeaders.Count < count)
@@ -397,12 +407,10 @@ namespace H.BookLibrary
                 _lock.Enter(false);
                 try
                 {
-                    for (int i = 0; i < _cache.Count; i++)
+                    foreach (var item in _cache)
                     {
-                        var item = _cache[i];
-                        for (int pi = 0; pi < item.PageHeaders.Count; pi++)
+                        foreach (var ph in item.PageHeaders)
                         {
-                            var ph = item.PageHeaders[pi];
                             if (filter != null && !filter.Invoke(ph)) continue;
 
                             ++total;
@@ -419,6 +427,52 @@ namespace H.BookLibrary
                 }
 
                 return new PagesResult(offset, count, total, pages.ToArray());
+            }
+
+            public PagesResult GetPages(Guid bookID, int offset, int count)
+            {
+                List<PageResult> pages = new List<PageResult>();
+                int index = 0, total = 0;
+
+                _lock.Enter(false);
+                try
+                {
+                    var cacheItem = GetCacheItemInner(bookID);
+                    if (cacheItem == null) throw new BookNotFoundException($"Not found book: id={bookID}");
+
+                    foreach (var ph in cacheItem.PageHeaders)
+                    {
+                        ++total;
+                        if (index >= offset && pages.Count < count)
+                            pages.Add(new PageResult(cacheItem.Header, ph));
+
+                        ++index;
+                    }
+                }
+                finally
+                {
+                    _lock.Leave();
+                }
+
+                return new PagesResult(offset, count, total, pages.ToArray());
+            }
+
+            public IHBookHeader GetBook(Guid id)
+            {
+                IHBookHeader header = null;
+                _lock.Enter(false);
+                try
+                {
+                    var cacheItem = GetCacheItemInner(id);
+                    if (cacheItem != null) header = cacheItem.Header;
+                    else throw new BookNotFoundException($"Book not found: id={id}");
+                }
+                finally
+                {
+                    _lock.Leave();
+                }
+
+                return header;
             }
 
             public IHBook GetAccess(HBookHandle handle)
@@ -677,15 +731,19 @@ namespace H.BookLibrary
 
         Task<PagesResult> GetPagesAsync(Func<IHPageHeader, bool> filter, int offset, int count);
 
+        Task<PagesResult> GetPagesAsync(Guid bookID, int offset, int count);
+
+        Task<IHBookHeader> GetBookAsync(Guid id);
+
         Task<BitmapImage> GetCoverThumbnailAsync(Guid bookID);
 
         Task<BitmapImage> GetCoverAsync(Guid bookID);
 
-        Task<HBookHandle> CreateBookAccess(Guid bookID);
+        Task<HBookHandle> CreateAccessAsync(Guid bookID);
 
-        Task<bool> ReleaseBookAccess(HBookHandle handle);
+        Task<bool> ReleaseAccessAsync(HBookHandle handle);
 
-        Task<BitmapImage> GetPageThumbnailAsync(HBookHandle handle, Guid pageID);
+        Task<BitmapImage> GetThumbnailAsync(HBookHandle handle, Guid pageID);
 
         Task<BitmapImage> GetPageAsync(HBookHandle handle, Guid pageID);
     }

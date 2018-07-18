@@ -139,7 +139,6 @@ namespace H.BookLibrary
 
                 byte pageHeaderListCount = (byte)Math.Ceiling((double)_thumbnailUrls.Length / 1024);
                 _book = new HBook(_savePath, HBookMode.Create, HBookAccess.All, pageHeaderListCount);
-                await _book.InitAsync();
                 _cts.Token.ThrowIfCancellationRequested();
                 var bookHeader = await _book.SetHeaderAsync(_headerSetting);
                 _cts.Token.ThrowIfCancellationRequested();

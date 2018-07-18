@@ -21,19 +21,21 @@ namespace H.BookLibrary.ViewModels
         #region fields
         private const int DefaultPageSize = 10;
 
-        private string _bookPath;
-        private IHBook _book;
-        private List<IHPageHeader> _pageHeaderInfos = new List<IHPageHeader>();
+        private ILibraryService _lib;
+        private Guid _id;
+        private HBookHandle _handle;
         /// <summary>
         /// 这个改变来自ViewModel代码
         /// </summary>
         private bool _isInnerChange;
         #endregion
 
-        public BookDetailViewModel(string bookPath)
+        public BookDetailViewModel(Guid id)
         {
-            _bookPath = bookPath;
+            _lib = LibraryService.Instance;
+            _id = id;
             _galleryPageSizes.AddRange(new[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 50, 60, 70, 80, 90, 100 });
+            _galleryPageIndexes.Add(0);
         }
 
         #region properties
@@ -330,11 +332,20 @@ namespace H.BookLibrary.ViewModels
             {
                 if (_currentGalleryPageSize == value) return;
 
+                int oldValue = _currentGalleryPageSize;
                 _currentGalleryPageSize = value;
                 RaisePropertyChanged(CurrentGalleryPageSizePropertyName);
 
                 if (!_isInnerChange)
-                    GalleryUpdatePageInfo().ContinueWith(t => LoadGalleryPages().NoAwait(), TaskContinuationOptions.ExecuteSynchronously).NoAwait();
+                {
+                    // 自动设置页号
+                    _isInnerChange = true;
+                    int currentOffset = CurrentGalleryPageIndex * oldValue;
+                    CurrentGalleryPageIndex = currentOffset / value;
+                    _isInnerChange = false;
+                    // 刷新内容
+                    LoadGalleryPages().NoAwait();
+                }
             }
         }
         #endregion
@@ -655,7 +666,7 @@ namespace H.BookLibrary.ViewModels
             try
             {
                 // Do command
-                PageGalleryViewModel vm = new PageGalleryViewModel(_book, e.Index);
+                PageGalleryViewModel vm = new PageGalleryViewModel(_id, e.Index);
                 vm.ViewManager = ViewManager;
                 PageGalleryView view = new PageGalleryView();
                 view.DataContext = vm;
@@ -698,13 +709,16 @@ namespace H.BookLibrary.ViewModels
             await LoadBook();
             await UpdateBookHeader();
             await LoadCover();
-            await GalleryUpdatePageInfo();
             await LoadGalleryPages();
         }
 
         public override void Release()
         {
-            _book?.Dispose();
+            if (_handle != null)
+            {
+                _lib.ReleaseAccessAsync(_handle);
+                _handle = null;
+            }
 
             base.Release();
         }
@@ -713,26 +727,13 @@ namespace H.BookLibrary.ViewModels
         #region private methods
         private async Task LoadBook()
         {
-            _book = new HBook(_bookPath, HBookMode.Open, HBookAccess.All, 0);
-            await _book.InitAsync();
+            _handle = await _lib.CreateAccessAsync(_id);
         }
 
         private async Task LoadCover()
         {
-            await _book.ReadCoverThumbnailAsync(async s =>
-            {
-                if (s != null)
-                    CoverThumb = await BookImageHelper.CreateImageAsync(s);
-                else
-                    Output.Print("Cover thumbnial is null.");
-            });
-            await _book.ReadCoverAsync(async s =>
-            {
-                if (s != null)
-                    Cover = await BookImageHelper.CreateImageAsync(s);
-                else
-                    Output.Print("Cover is null.");
-            });
+            CoverThumb = await _lib.GetCoverThumbnailAsync(_id);
+            Cover = await _lib.GetCoverAsync(_id);
         }
 
         private async Task LoadGalleryPages()
@@ -754,53 +755,41 @@ namespace H.BookLibrary.ViewModels
             if (pageIndex != CurrentGalleryPageIndex)
                 Output.Print("CurrentGalleryPageIndex not in the valid range: " + CurrentGalleryPageIndex);
 
-            var phs = _pageHeaderInfos;
-            if (phs.Count <= pageSize * pageIndex)
-            {
-                Output.Print("Cached page header count not match with page index");
-                return;
-            }
+            int offset = pageSize * pageIndex;
+            var pagesRes = await _lib.GetPagesAsync(_id, offset, pageSize);
+            GalleryUpdatePageInfo(pagesRes);
 
-            for (int i = pageSize * pageIndex; i < pageSize * (pageIndex + 1) && i < _pageHeaderInfos.Count; i++)
+            int index = offset;
+            foreach (var p in pagesRes.Pages)
             {
-                var ph = _pageHeaderInfos[i];
-                var thumbImg = await _book.GetThumbnailCopyAsync(ph.ID);
+                var thumbImg = await _lib.GetThumbnailAsync(_handle, p.Page.ID);
                 PageMinModel pvm = new PageMinModel();
-                pvm.Index = i;
-                pvm.Artist = ph.Artist;
-                pvm.Characters = ph.Charachters;
-                pvm.Tags = ph.Tags;
-                bool res = await _book.ReadThumbnailAsync(ph.ID, async s =>
-                {
-                    if (s != null)
-                        pvm.Thumb = await BookImageHelper.CreateImageAsync(s);
-                    else
-                        Output.Print($"Page thumbnail is null, index={i}");
-                });
-                if (!res) Output.Print($"Read page thumbnail failed, index={i}");
+                pvm.Index = index;
+                pvm.Artist = p.Page.Artist;
+                pvm.Characters = p.Page.Charachters;
+                pvm.Tags = p.Page.Tags;
+                pvm.Thumb = thumbImg;
+
+                if (thumbImg == null) Output.Print($"Page thumbnail is null, page_id={p.Page.ID}");
 
                 Pages.Add(pvm);
+                ++index;
             }
         }
 
-        private async Task GalleryUpdatePageInfo()
+        private void GalleryUpdatePageInfo(PagesResult pagesRes)
         {
-            var phs = await _book.GetPageHeadersAsync();
-            _pageHeaderInfos.Clear();
-            _pageHeaderInfos.AddRange(phs);
-
+            _isInnerChange = true;
             if (CurrentGalleryPageSize <= 0)
                 Output.Print("GalleryPageSize invalid: " + CurrentGalleryPageSize);
 
             int pageSize = CurrentGalleryPageSize > 0 ? CurrentGalleryPageSize : DefaultPageSize;
-            int pageCount = (int)Math.Ceiling((double)phs.Length / pageSize);
+            int pageCount = (int)Math.Ceiling((double)pagesRes.Total / pageSize);
             if (GalleryPageIndexes.Count > pageCount)
             {
-                _isInnerChange = true;
                 if (CurrentGalleryPageIndex >= pageCount)
                     CurrentGalleryPageIndex = pageCount - 1;
 
-                _isInnerChange = false;
                 for (int i = GalleryPageIndexes.Count - 1; i >= pageCount; i--)
                     GalleryPageIndexes.RemoveAt(i);
             }
@@ -809,6 +798,7 @@ namespace H.BookLibrary.ViewModels
                 for (int i = GalleryPageIndexes.Count; i < pageCount; i++)
                     GalleryPageIndexes.Add(i);
             }
+            _isInnerChange = false;
 
             RaisePreGalleryPageCanExecuteChanged();
             RaiseNextGalleryPageCanExecuteChanged();
@@ -816,7 +806,7 @@ namespace H.BookLibrary.ViewModels
 
         private async Task UpdateBookHeader()
         {
-            var header = await _book.GetHeaderAsync();
+            var header = await _lib.GetBookAsync(_id);
             Names = header.Names;
             if (!string.IsNullOrEmpty(header.IetfLanguageTag))
                 Lang = LanguageHelper.IETFToZh(header.IetfLanguageTag);

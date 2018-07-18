@@ -16,13 +16,16 @@ namespace H.BookLibrary.ViewModels
     public class PageGalleryViewModel : ViewModelBase
     {
         #region fields
-        private IHBook _book;
+        private ILibraryService _lib;
+        private Guid _id;
+        private HBookHandle _handle;
         private List<IHPageHeader> _pageHeaders = new List<IHPageHeader>();
         #endregion
 
-        public PageGalleryViewModel(IHBook book, int currentPageIndex)
+        public PageGalleryViewModel(Guid id, int currentPageIndex)
         {
-            _book = book;
+            _lib = LibraryService.Instance;
+            _id = id;
             _currentPageIndex = currentPageIndex;
 
             _pageStretches.AddRange(new[] {
@@ -250,8 +253,12 @@ namespace H.BookLibrary.ViewModels
         {
             base.Init(view);
 
-            var phs = await _book.GetPageHeadersAsync();
-            if (phs != null) _pageHeaders.AddRange(phs);
+            _handle = await _lib.CreateAccessAsync(_id);
+            var pagesRes = await _lib.GetPagesAsync(_id, 0, int.MaxValue);
+            foreach (var p in pagesRes.Pages)
+            {
+                _pageHeaders.Add(p.Page);
+            }
 
             await LoadCurrentPageAsync();
             RaisePrePageCanExecuteChanged();
@@ -265,6 +272,12 @@ namespace H.BookLibrary.ViewModels
 
         public override void Release()
         {
+            if (_handle != null)
+            {
+                _lib.ReleaseAccessAsync(_handle);
+                _handle = null;
+            }
+
             base.Release();
         }
         #endregion
@@ -295,15 +308,8 @@ namespace H.BookLibrary.ViewModels
             pcm.Artist = ph.Artist;
             pcm.Characters = ph.Charachters;
             pcm.Tags = ph.Tags;
-
-            bool res = await _book.ReadPageAsync(ph.ID, async s =>
-            {
-                if (s == null)
-                    Output.Print($"Page stream is null, index={pcm.Index}");
-                else
-                    pcm.Content = await BookImageHelper.CreateImageAsync(s);
-            });
-            if (!res) Output.Print($"Get page image stream failed, ReadPageAsync return false, index={pcm.Index}");
+            pcm.Content = await _lib.GetPageAsync(_handle, ph.ID);
+            if (pcm.Content == null) Output.Print($"Page stream is null, index={pcm.Index}");
 
             CurrentPage = pcm;
         }

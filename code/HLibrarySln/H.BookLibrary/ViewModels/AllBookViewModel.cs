@@ -317,7 +317,7 @@ namespace H.BookLibrary.ViewModels
                 else
                 {
                     // Do command
-                    BookDetailViewModel vm = new BookDetailViewModel(e.Path);
+                    BookDetailViewModel vm = new BookDetailViewModel(e.ID);
                     vm.ViewManager = ViewManager;
                     BookDetailView view = new BookDetailView();
                     view.DataContext = vm;
@@ -387,24 +387,25 @@ namespace H.BookLibrary.ViewModels
             if (pageIndex != CurrentGalleryPageIndex)
                 Output.Print("CurrentGalleryPageIndex not in the valid range: " + CurrentGalleryPageIndex);
 
-            var booksRes = await _lib.GetBooksAsync(null, pageIndex * pageSize, pageSize);
+            int offset = pageIndex * pageSize;
+            var booksRes = await _lib.GetBooksAsync(null, offset, pageSize);
             if (booksRes == null || booksRes.Books == null)
                 Output.Print("GetBooksAsync result is null.");
             else
             {
+                GalleryUpdatePageInfo(booksRes);
+
                 for (int i = 0; i < booksRes.Books.Length; i++)
                 {
                     var bookHeader = booksRes.Books[1];
                     var coverThumbnail = await _lib.GetCoverThumbnailAsync(bookHeader.ID);
-                    BookMiniModel model = new BookMiniModel(i, bookHeader, coverThumbnail, null);
+                    BookMiniModel model = new BookMiniModel(offset + i, bookHeader, coverThumbnail);
                     Books.Add(model);
 
                     if (coverThumbnail == null)
                         Output.Print($"Page thumbnail is null, index={i}");
                 }
             }
-
-            GalleryUpdatePageInfo(booksRes);
         }
 
         private void GalleryUpdatePageInfo(BooksResult booksRes)

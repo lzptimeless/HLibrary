@@ -38,9 +38,7 @@ namespace H.Book
         private bool IsInitialized() { return Volatile.Read(ref _isInitialized) == 1; }
         private bool MakeInitialized() { return Interlocked.CompareExchange(ref _isInitialized, 1, 0) == 0; }
         private bool IsInitFailed() { return _loadEx != null || _createEx != null; }
-        private bool IsInitError() { return Volatile.Read(ref _isInitialized) != 1 || _loadEx != null || _createEx != null; }
         private Exception CreateInitFailedEx() { return new InitException("HBook load or create failed", _loadEx ?? _createEx); }
-        private Exception CreateInitErrorEx() { return IsInitFailed() ? CreateInitFailedEx() : new InitException("Not load or create", null); }
 
         private Exception _ioWriteEx;
         private bool IsIOWriteFailed() { return _ioWriteEx != null; }
@@ -83,120 +81,98 @@ namespace H.Book
             Dispose();
         }
 
-        public Task InitAsync([CallerFilePath] string callerFilePath = "", [CallerMemberName] string callerName = "")
+        private async Task InitIfNeedAsync()
         {
-            if (_mode == HBookMode.Create)
-                return CreateAsync(callerFilePath, callerName);
-            else if (_mode == HBookMode.Open)
-            {
-                return LoadAsync(callerFilePath, callerName);
-            }
-            else
-                throw new NotSupportedException($"Not supported mode:{_mode}");
-        }
+            if (IsInitialized()) return;
 
-        public async Task LoadAsync([CallerFilePath] string callerFilePath = "", [CallerMemberName] string callerName = "")
-        {
-            var wt = _lock.WaitAsync(true, Timeout.InfiniteTimeSpan, CancellationToken.None, CreateReceiver(callerFilePath, callerName));
-            await wt;
+            if (IsDisposed()) throw CreateDisposedEx();
+            if (IsInitFailed()) throw CreateInitFailedEx();
             try
             {
-                if (IsDisposed()) throw CreateDisposedEx();
-                if (IsInitFailed()) throw CreateInitFailedEx();
-                if (IsInitialized()) throw new ApplicationException("This HBook already initialized");
-
-                int readedLen = 0;
-                int cacheLen = !CanAccessCover() ? HMetadataConstant.BookCoverPosition : (!CanAccessPage() ? HMetadataConstant.PageHeaderListCountPosition : (HMetadataConstant.FirstPageHeaderListEndPosition + 1));
-                using (var cacheStream = await CreateMemoryCache(_stream, cacheLen))
+                if (_mode == HBookMode.Create)
+                    await CreateAsync();
+                else if (_mode == HBookMode.Open)
                 {
-                    // 验证文件头
-                    byte[] startCode = new byte[HMetadataConstant.StartCode.Length];
-                    readedLen = await cacheStream.ReadAsync(startCode, 0, startCode.Length);
-                    if (!startCode.SequenceEqual(HMetadataConstant.StartCode))
-                    {
-                        _stream.Dispose();
-                        _stream = null;
-                        throw new InvalidDataException("StartCode error, this is not a HBook");
-                    }
-                    // 读取头
-                    await _headerMetadata.LoadAsync(cacheStream);
-                    // 读取封面
-                    if (CanAccessCover()) await _coverMetadata.LoadAsync(cacheStream);
-                    // 读取页面头
-                    if (CanAccessPage())
-                    {
-                        // 验证当前读取位置是否符合预期
-                        if (cacheStream.Position != HMetadataConstant.PageHeaderListCountPosition)
-                            throw new InvalidDataException("Cover metadata not readed expect length");
-                        // 读取页头列表数量
-                        _pageHeaderListCount = cacheStream.ReadByte();
-                        if (_pageHeaderListCount < 1) throw new InvalidDataException($"Page header list count error:value={_pageHeaderListCount}, range=[1,255]");
-                        // 读取第一页头列表
-                        await ReadPageHeadersAsync(cacheStream);
-                        if (_pageHeaderListCount > 1)
-                        {
-                            // 读取后续页头列表
-                            int otherHeadersLen = HMetadataConstant.PageHeaderListLength * (_pageHeaderListCount - 1);
-                            using (var otherHeadersCacheS = await CreateMemoryCache(_stream, otherHeadersLen))
-                            {
-                                await ReadPageHeadersAsync(otherHeadersCacheS);
-                            }
-                        }
-                    }// if (access == HBookAccess.All)
-                }// using cacheStream
-
-                MakeInitialized();
+                    await LoadAsync();
+                }
+                else
+                    throw new NotSupportedException($"Not supported mode:{_mode}");
             }
             catch (Exception ex)
             {
-                if (!IsInitialized()) Interlocked.CompareExchange(ref _loadEx, ex, null);
+                if (_mode == HBookMode.Create)
+                    Interlocked.CompareExchange(ref _createEx, ex, null);
+                else
+                    Interlocked.CompareExchange(ref _loadEx, ex, null);
+
                 throw ex;
             }
-            finally
-            {
-                _lock.Release(wt);
-            }
+
+            MakeInitialized();
         }
 
-        public async Task CreateAsync([CallerFilePath] string callerFilePath = "", [CallerMemberName] string callerName = "")
+        private async Task LoadAsync()
         {
-            var wt = _lock.WaitAsync(true, Timeout.InfiniteTimeSpan, CancellationToken.None, CreateReceiver(callerFilePath, callerName));
-            await wt;
-            try
+            int readedLen = 0;
+            int cacheLen = !CanAccessCover() ? HMetadataConstant.BookCoverPosition : (!CanAccessPage() ? HMetadataConstant.PageHeaderListCountPosition : (HMetadataConstant.FirstPageHeaderListEndPosition + 1));
+            using (var cacheStream = await CreateMemoryCache(_stream, cacheLen))
             {
-                if (IsDisposed()) throw CreateDisposedEx();
-                if (IsInitFailed()) throw CreateInitFailedEx();
-                if (IsInitialized()) throw new ApplicationException("This HBook already initialized");
+                // 验证文件头
+                byte[] startCode = new byte[HMetadataConstant.StartCode.Length];
+                readedLen = await cacheStream.ReadAsync(startCode, 0, startCode.Length);
+                if (!startCode.SequenceEqual(HMetadataConstant.StartCode))
+                {
+                    _stream.Dispose();
+                    _stream = null;
+                    throw new InvalidDataException("StartCode error, this is not a HBook");
+                }
+                // 读取头
+                await _headerMetadata.LoadAsync(cacheStream);
+                // 读取封面
+                if (CanAccessCover()) await _coverMetadata.LoadAsync(cacheStream);
+                // 读取页面头
+                if (CanAccessPage())
+                {
+                    // 验证当前读取位置是否符合预期
+                    if (cacheStream.Position != HMetadataConstant.PageHeaderListCountPosition)
+                        throw new InvalidDataException("Cover metadata not readed expect length");
+                    // 读取页头列表数量
+                    _pageHeaderListCount = cacheStream.ReadByte();
+                    if (_pageHeaderListCount < 1) throw new InvalidDataException($"Page header list count error:value={_pageHeaderListCount}, range=[1,255]");
+                    // 读取第一页头列表
+                    await ReadPageHeadersAsync(cacheStream);
+                    if (_pageHeaderListCount > 1)
+                    {
+                        // 读取后续页头列表
+                        int otherHeadersLen = HMetadataConstant.PageHeaderListLength * (_pageHeaderListCount - 1);
+                        using (var otherHeadersCacheS = await CreateMemoryCache(_stream, otherHeadersLen))
+                        {
+                            await ReadPageHeadersAsync(otherHeadersCacheS);
+                        }
+                    }
+                }// if (access == HBookAccess.All)
+            }// using cacheStream
+        }
 
-                // 初始化
-                _headerMetadata.ID = Guid.NewGuid();
-                _headerMetadata.Version = 1;
-                // 写入起始码
-                await _stream.WriteAsync(HMetadataConstant.StartCode, 0, HMetadataConstant.StartCode.Length);
-                // 存储头
-                await _headerMetadata.SaveAsync(_stream, null, 0);
-                // 存储封面
-                await _coverMetadata.SaveAsync(_stream, null, 0);
-                // 写入页头列表数
-                if (_pageHeaderListCount < 1 || _pageHeaderListCount > byte.MaxValue)
-                    throw new ApplicationException($"Page header list count error:value={_pageHeaderListCount}, range=[1,255]");
+        private async Task CreateAsync()
+        {
+            // 初始化
+            _headerMetadata.ID = Guid.NewGuid();
+            _headerMetadata.Version = 1;
+            // 写入起始码
+            await _stream.WriteAsync(HMetadataConstant.StartCode, 0, HMetadataConstant.StartCode.Length);
+            // 存储头
+            await _headerMetadata.SaveAsync(_stream, null, 0);
+            // 存储封面
+            await _coverMetadata.SaveAsync(_stream, null, 0);
+            // 写入页头列表数
+            if (_pageHeaderListCount < 1 || _pageHeaderListCount > byte.MaxValue)
+                throw new ApplicationException($"Page header list count error:value={_pageHeaderListCount}, range=[1,255]");
 
-                await _stream.WriteByteAsync((byte)_pageHeaderListCount);
-                // 在页头列表区域填充空数据
-                int totalPageHeaderListLen = _pageHeaderListCount * HMetadataConstant.PageHeaderListLength;
-                await _stream.FillAsync(HMetadataConstant.CCFlag, totalPageHeaderListLen);
-
-                MakeInitialized();
-            }
-            catch (Exception ex)
-            {
-                if (!IsInitialized()) Interlocked.CompareExchange(ref _createEx, ex, null);
-                throw ex;
-            }
-            finally
-            {
-                _lock.Release(wt);
-            }
+            await _stream.WriteByteAsync((byte)_pageHeaderListCount);
+            // 在页头列表区域填充空数据
+            int totalPageHeaderListLen = _pageHeaderListCount * HMetadataConstant.PageHeaderListLength;
+            await _stream.FillAsync(HMetadataConstant.CCFlag, totalPageHeaderListLen);
         }
 
         public async Task<IHBookHeader> GetHeaderAsync([CallerFilePath] string callerFilePath = "", [CallerMemberName] string callerName = "")
@@ -205,8 +181,9 @@ namespace H.Book
             await wt;
             try
             {
+                await InitIfNeedAsync();
+
                 if (IsDisposed()) throw CreateDisposedEx();
-                if (IsInitError()) throw CreateInitErrorEx();
                 if (IsIOWriteFailed()) throw CreateIOWriteFailedEx();
 
                 return new HBookHeader(_headerMetadata);
@@ -223,8 +200,9 @@ namespace H.Book
             await wt;
             try
             {
+                await InitIfNeedAsync();
+
                 if (IsDisposed()) throw CreateDisposedEx();
-                if (IsInitError()) throw CreateInitErrorEx();
                 if (IsIOWriteFailed()) throw CreateIOWriteFailedEx();
 
                 var metadata = _headerMetadata;
@@ -274,8 +252,9 @@ namespace H.Book
             await wt;
             try
             {
+                await InitIfNeedAsync();
+
                 if (IsDisposed()) throw CreateDisposedEx();
-                if (IsInitError()) throw CreateInitErrorEx();
                 if (IsIOWriteFailed()) throw CreateIOWriteFailedEx();
                 if (!CanAccessCover()) throw CreateRequireCoverAccessEx();
 
@@ -301,8 +280,9 @@ namespace H.Book
             await wt;
             try
             {
+                await InitIfNeedAsync();
+
                 if (IsDisposed()) throw CreateDisposedEx();
-                if (IsInitError()) throw CreateInitErrorEx();
                 if (IsIOWriteFailed()) throw CreateIOWriteFailedEx();
                 if (!CanAccessCover()) throw CreateRequireCoverAccessEx();
 
@@ -335,8 +315,9 @@ namespace H.Book
             await wt;
             try
             {
+                await InitIfNeedAsync();
+
                 if (IsDisposed()) throw CreateDisposedEx();
-                if (IsInitError()) throw CreateInitErrorEx();
                 if (IsIOWriteFailed()) throw CreateIOWriteFailedEx();
                 if (!CanAccessCover()) throw CreateRequireCoverAccessEx();
 
@@ -362,8 +343,9 @@ namespace H.Book
             await wt;
             try
             {
+                await InitIfNeedAsync();
+
                 if (IsDisposed()) throw CreateDisposedEx();
-                if (IsInitError()) throw CreateInitErrorEx();
                 if (IsIOWriteFailed()) throw CreateIOWriteFailedEx();
                 if (!CanAccessCover()) throw CreateRequireCoverAccessEx();
 
@@ -389,8 +371,9 @@ namespace H.Book
             await wt;
             try
             {
+                await InitIfNeedAsync();
+
                 if (IsDisposed()) throw CreateDisposedEx();
-                if (IsInitError()) throw CreateInitErrorEx();
                 if (IsIOWriteFailed()) throw CreateIOWriteFailedEx();
                 if (!CanAccessCover()) throw CreateRequireCoverAccessEx();
 
@@ -417,8 +400,9 @@ namespace H.Book
             await wt;
             try
             {
+                await InitIfNeedAsync();
+
                 if (IsDisposed()) throw CreateDisposedEx();
-                if (IsInitError()) throw CreateInitErrorEx();
                 if (IsIOWriteFailed()) throw CreateIOWriteFailedEx();
                 if (!CanAccessPage()) throw CreateRequirePageAccessEx();
 
@@ -436,8 +420,9 @@ namespace H.Book
             await wt;
             try
             {
+                await InitIfNeedAsync();
+
                 if (IsDisposed()) throw CreateDisposedEx();
-                if (IsInitError()) throw CreateInitErrorEx();
                 if (IsIOWriteFailed()) throw CreateIOWriteFailedEx();
                 if (!CanAccessPage()) throw CreateRequirePageAccessEx();
 
@@ -470,8 +455,9 @@ namespace H.Book
             await wt;
             try
             {
+                await InitIfNeedAsync();
+
                 if (IsDisposed()) throw CreateDisposedEx();
-                if (IsInitError()) throw CreateInitErrorEx();
                 if (IsIOWriteFailed()) throw CreateIOWriteFailedEx();
                 if (!CanAccessPage()) throw CreateRequirePageAccessEx();
 
@@ -503,8 +489,9 @@ namespace H.Book
             await wt;
             try
             {
+                await InitIfNeedAsync();
+
                 if (IsDisposed()) throw CreateDisposedEx();
-                if (IsInitError()) throw CreateInitErrorEx();
                 if (IsIOWriteFailed()) throw CreateIOWriteFailedEx();
                 if (!CanAccessPage()) throw CreateRequirePageAccessEx();
 
@@ -537,8 +524,9 @@ namespace H.Book
             await wt;
             try
             {
+                await InitIfNeedAsync();
+
                 if (IsDisposed()) throw CreateDisposedEx();
-                if (IsInitError()) throw CreateInitErrorEx();
                 if (IsIOWriteFailed()) throw CreateIOWriteFailedEx();
                 if (!CanAccessPage()) throw CreateRequirePageAccessEx();
 
@@ -576,8 +564,9 @@ namespace H.Book
             await wt;
             try
             {
+                await InitIfNeedAsync();
+
                 if (IsDisposed()) throw CreateDisposedEx();
-                if (IsInitError()) throw CreateInitErrorEx();
                 if (IsIOWriteFailed()) throw CreateIOWriteFailedEx();
                 if (!CanAccessPage()) throw CreateRequirePageAccessEx();
                 // 写入页图像
@@ -640,8 +629,9 @@ namespace H.Book
             await wt;
             try
             {
+                await InitIfNeedAsync();
+
                 if (IsDisposed()) throw CreateDisposedEx();
-                if (IsInitError()) throw CreateInitErrorEx();
                 if (IsIOWriteFailed()) throw CreateIOWriteFailedEx();
                 if (!CanAccessPage()) throw CreateRequirePageAccessEx();
 
@@ -675,8 +665,9 @@ namespace H.Book
             await wt;
             try
             {
+                await InitIfNeedAsync();
+
                 if (IsDisposed()) throw CreateDisposedEx();
-                if (IsInitError()) throw CreateInitErrorEx();
                 if (IsIOWriteFailed()) throw CreateIOWriteFailedEx();
                 if (!CanAccessPage()) throw CreateRequirePageAccessEx();
 
@@ -896,7 +887,7 @@ namespace H.Book
         /// <returns></returns>
         /// <exception cref="ApplicationException">已经初始化了</exception>
         /// <exception cref="InvalidDataException">文件起始标识错误，或发现重复ID的页面，或发现不支持控制码</exception>
-        Task InitAsync([CallerFilePath] string callerFilePath = "", [CallerMemberName] string callerName = "");
+        //Task InitAsync([CallerFilePath] string callerFilePath = "", [CallerMemberName] string callerName = "");
         /// <summary>
         /// 获取头信息
         /// </summary>

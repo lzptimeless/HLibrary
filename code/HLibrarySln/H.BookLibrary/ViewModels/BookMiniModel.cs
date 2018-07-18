@@ -11,8 +11,9 @@ namespace H.BookLibrary.ViewModels
 {
     public class BookMiniModel : BindableBase
     {
-        public BookMiniModel(int index, IHBookHeader bookHeader, ImageSource coverThumbnail, HBookHandle handle)
+        public BookMiniModel(int index, IHBookHeader bookHeader, ImageSource coverThumbnail)
         {
+            ID = bookHeader.ID;
             Names = bookHeader.Names;
             Artists = bookHeader.Artists;
             Lang = bookHeader.IetfLanguageTag;
@@ -22,7 +23,6 @@ namespace H.BookLibrary.ViewModels
             Characters = bookHeader.Characters;
             Tags = bookHeader.Tags;
             CoverThumbnail = coverThumbnail;
-            Handle = handle;
         }
 
         #region properties
@@ -246,24 +246,24 @@ namespace H.BookLibrary.ViewModels
         }
         #endregion
 
-        #region Handle
+        #region ID
         /// <summary>
-        /// Property name of <see cref="Handle"/>
+        /// Property name of <see cref="ID"/>
         /// </summary>
-        public const string HandlePropertyName = "Handle";
-        private HBookHandle _handle;
+        public const string IDPropertyName = "ID";
+        private Guid _id;
         /// <summary>
-        /// Get or set <see cref="Handle"/>
+        /// Get or set <see cref="ID"/>
         /// </summary>
-        public HBookHandle Handle
+        public Guid ID
         {
-            get { return _handle; }
+            get { return _id; }
             set
             {
-                if (_handle == value) return;
+                if (_id == value) return;
 
-                _handle = value;
-                RaisePropertyChanged(HandlePropertyName);
+                _id = value;
+                RaisePropertyChanged(IDPropertyName);
             }
         }
         #endregion
