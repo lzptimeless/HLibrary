@@ -86,7 +86,7 @@ namespace H.BookLibrary
         public async Task ReadCoverAsync(Guid bookID, bool useAsyncStream, Func<Stream, Task> readAction)
         {
             if (bookID == Guid.Empty) throw new ArgumentException("bookID can not be empty");
-            if (readAction != null) throw new ArgumentNullException("readAction");
+            if (readAction == null) throw new ArgumentNullException("readAction");
 
             await _lock.WaitAsync(false);
             try
@@ -143,7 +143,7 @@ namespace H.BookLibrary
         public async Task ReadThumbnailAsync(Guid bookID, bool useAsyncStream, Func<Stream, Task> readAction)
         {
             if (bookID == Guid.Empty) throw new ArgumentException("bookID can not be empty");
-            if (readAction != null) throw new ArgumentNullException("readAction");
+            if (readAction == null) throw new ArgumentNullException("readAction");
 
             await _lock.WaitAsync(false);
             try
@@ -170,6 +170,8 @@ namespace H.BookLibrary
             if (bookID == Guid.Empty) throw new ArgumentException("bookID can not be empty");
 
             await _lock.WaitAsync(true);
+            EnsureDirectoryExist();
+
             bool result;
             try
             {
@@ -198,6 +200,8 @@ namespace H.BookLibrary
             if (bookID == Guid.Empty) throw new ArgumentException("bookID can not be empty");
 
             await _lock.WaitAsync(true);
+            EnsureDirectoryExist();
+
             bool result;
             try
             {
@@ -258,6 +262,11 @@ namespace H.BookLibrary
         #endregion
 
         #region private methods
+        private void EnsureDirectoryExist()
+        {
+            if (!Directory.Exists(_dir)) Directory.CreateDirectory(_dir);
+        }
+
         private static string GetCoverFileName(Guid bookID)
         {
             return $"{bookID.ToString("D")}.cover";

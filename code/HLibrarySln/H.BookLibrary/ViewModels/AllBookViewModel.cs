@@ -397,7 +397,7 @@ namespace H.BookLibrary.ViewModels
 
                 for (int i = 0; i < booksRes.Books.Length; i++)
                 {
-                    var bookHeader = booksRes.Books[1];
+                    var bookHeader = booksRes.Books[i];
                     var coverThumbnail = await _lib.GetCoverThumbnailAsync(bookHeader.ID);
                     BookMiniModel model = new BookMiniModel(offset + i, bookHeader, coverThumbnail);
                     Books.Add(model);
