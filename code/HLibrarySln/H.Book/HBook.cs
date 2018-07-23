@@ -33,16 +33,15 @@ namespace H.Book
         private Exception CreateDisposedEx() { return new ObjectDisposedException("HBook", "HBook has been disposed"); }
 
         private int _isInitialized;
-        private Exception _loadEx;
-        private Exception _createEx;
+        private Exception _initEx;
         private bool IsInitialized() { return Volatile.Read(ref _isInitialized) == 1; }
         private bool MakeInitialized() { return Interlocked.CompareExchange(ref _isInitialized, 1, 0) == 0; }
-        private bool IsInitFailed() { return _loadEx != null || _createEx != null; }
-        private Exception CreateInitFailedEx() { return new InitException("HBook load or create failed", _loadEx ?? _createEx); }
+        private bool IsInitFailed() { return Volatile.Read(ref _initEx) != null; }
+        private Exception CreateInitFailedEx() { return new InitException("HBook load or create failed", Volatile.Read(ref _initEx)); }
 
         private Exception _ioWriteEx;
-        private bool IsIOWriteFailed() { return _ioWriteEx != null; }
-        private Exception CreateIOWriteFailedEx() { return new IOWriteFailedException("A IO write error ocurred, data maybe damaged", _ioWriteEx); }
+        private bool IsIOWriteFailed() { return Volatile.Read(ref _ioWriteEx) != null; }
+        private Exception CreateIOWriteFailedEx() { return new IOWriteFailedException("A IO write error ocurred, data maybe damaged", Volatile.Read(ref _ioWriteEx)); }
         #endregion
         /// <summary>
         /// 打开或创建<see cref="HBook"/>
@@ -81,14 +80,21 @@ namespace H.Book
             Dispose();
         }
 
-        private async Task InitIfNeedAsync()
+        private async Task InitIfNeedAsync(string callerFilePath, string callerName)
         {
+            // 由于这个函数调用频繁在获取独占锁之前检测一次状态增加效率
             if (IsInitialized()) return;
-
             if (IsDisposed()) throw CreateDisposedEx();
             if (IsInitFailed()) throw CreateInitFailedEx();
+
+            var wt = _lock.WaitAsync(true, Timeout.InfiniteTimeSpan, CancellationToken.None, CreateReceiver(callerFilePath, callerName));
+            await wt;
             try
             {
+                if (IsInitialized()) return;
+                if (IsDisposed()) throw CreateDisposedEx();
+                if (IsInitFailed()) throw CreateInitFailedEx();
+
                 if (_mode == HBookMode.Create)
                     await CreateAsync();
                 else if (_mode == HBookMode.Open)
@@ -97,18 +103,18 @@ namespace H.Book
                 }
                 else
                     throw new NotSupportedException($"Not supported mode:{_mode}");
+
+                MakeInitialized();
             }
             catch (Exception ex)
             {
-                if (_mode == HBookMode.Create)
-                    Interlocked.CompareExchange(ref _createEx, ex, null);
-                else
-                    Interlocked.CompareExchange(ref _loadEx, ex, null);
-
+                Interlocked.CompareExchange(ref _initEx, ex, null);
                 throw ex;
             }
-
-            MakeInitialized();
+            finally
+            {
+                _lock.Release(wt);
+            }
         }
 
         private async Task LoadAsync()
@@ -177,12 +183,12 @@ namespace H.Book
 
         public async Task<IHBookHeader> GetHeaderAsync([CallerFilePath] string callerFilePath = "", [CallerMemberName] string callerName = "")
         {
+            await InitIfNeedAsync(callerFilePath, callerName);
+
             var wt = _lock.WaitAsync(false, Timeout.InfiniteTimeSpan, CancellationToken.None, CreateReceiver(callerFilePath, callerName));
             await wt;
             try
             {
-                await InitIfNeedAsync();
-
                 if (IsDisposed()) throw CreateDisposedEx();
                 if (IsIOWriteFailed()) throw CreateIOWriteFailedEx();
 
@@ -196,12 +202,12 @@ namespace H.Book
 
         public async Task<IHBookHeader> SetHeaderAsync(HBookHeaderSetting header, [CallerFilePath] string callerFilePath = "", [CallerMemberName] string callerName = "")
         {
+            await InitIfNeedAsync(callerFilePath, callerName);
+
             var wt = _lock.WaitAsync(true, Timeout.InfiniteTimeSpan, CancellationToken.None, CreateReceiver(callerFilePath, callerName));
             await wt;
             try
             {
-                await InitIfNeedAsync();
-
                 if (IsDisposed()) throw CreateDisposedEx();
                 if (IsIOWriteFailed()) throw CreateIOWriteFailedEx();
 
@@ -248,12 +254,12 @@ namespace H.Book
 
         public async Task ReadCoverAsync(Func<Stream, Task> readAction, [CallerFilePath] string callerFilePath = "", [CallerMemberName] string callerName = "")
         {
+            await InitIfNeedAsync(callerFilePath, callerName);
+
             var wt = _lock.WaitAsync(true, Timeout.InfiniteTimeSpan, CancellationToken.None, CreateReceiver(callerFilePath, callerName));
             await wt;
             try
             {
-                await InitIfNeedAsync();
-
                 if (IsDisposed()) throw CreateDisposedEx();
                 if (IsIOWriteFailed()) throw CreateIOWriteFailedEx();
                 if (!CanAccessCover()) throw CreateRequireCoverAccessEx();
@@ -276,12 +282,12 @@ namespace H.Book
 
         public async Task<Stream> GetCoverCopyAsync([CallerFilePath] string callerFilePath = "", [CallerMemberName] string callerName = "")
         {
+            await InitIfNeedAsync(callerFilePath, callerName);
+
             var wt = _lock.WaitAsync(true, Timeout.InfiniteTimeSpan, CancellationToken.None, CreateReceiver(callerFilePath, callerName));
             await wt;
             try
             {
-                await InitIfNeedAsync();
-
                 if (IsDisposed()) throw CreateDisposedEx();
                 if (IsIOWriteFailed()) throw CreateIOWriteFailedEx();
                 if (!CanAccessCover()) throw CreateRequireCoverAccessEx();
@@ -311,12 +317,12 @@ namespace H.Book
             if (cover != null && (cover.Length == 0 || cover.Length > int.MaxValue))
                 throw new ArgumentException($"cover is too big:expected=[1,{int.MaxValue}], value={cover.Length}", "cover");
 
+            await InitIfNeedAsync(callerFilePath, callerName);
+
             var wt = _lock.WaitAsync(true, Timeout.InfiniteTimeSpan, CancellationToken.None, CreateReceiver(callerFilePath, callerName));
             await wt;
             try
             {
-                await InitIfNeedAsync();
-
                 if (IsDisposed()) throw CreateDisposedEx();
                 if (IsIOWriteFailed()) throw CreateIOWriteFailedEx();
                 if (!CanAccessCover()) throw CreateRequireCoverAccessEx();
@@ -339,12 +345,12 @@ namespace H.Book
 
         public async Task ReadCoverThumbnailAsync(Func<Stream, Task> readerAction, [CallerFilePath] string callerFilePath = "", [CallerMemberName] string callerName = "")
         {
+            await InitIfNeedAsync(callerFilePath, callerName);
+
             var wt = _lock.WaitAsync(true, Timeout.InfiniteTimeSpan, CancellationToken.None, CreateReceiver(callerFilePath, callerName));
             await wt;
             try
             {
-                await InitIfNeedAsync();
-
                 if (IsDisposed()) throw CreateDisposedEx();
                 if (IsIOWriteFailed()) throw CreateIOWriteFailedEx();
                 if (!CanAccessCover()) throw CreateRequireCoverAccessEx();
@@ -367,12 +373,12 @@ namespace H.Book
 
         public async Task<Stream> GetCoverThumbnailCopyAsync([CallerFilePath] string callerFilePath = "", [CallerMemberName] string callerName = "")
         {
+            await InitIfNeedAsync(callerFilePath, callerName);
+
             var wt = _lock.WaitAsync(true, Timeout.InfiniteTimeSpan, CancellationToken.None, CreateReceiver(callerFilePath, callerName));
             await wt;
             try
             {
-                await InitIfNeedAsync();
-
                 if (IsDisposed()) throw CreateDisposedEx();
                 if (IsIOWriteFailed()) throw CreateIOWriteFailedEx();
                 if (!CanAccessCover()) throw CreateRequireCoverAccessEx();
@@ -396,12 +402,12 @@ namespace H.Book
 
         public async Task<IHPageHeader[]> GetPageHeadersAsync([CallerFilePath] string callerFilePath = "", [CallerMemberName] string callerName = "")
         {
+            await InitIfNeedAsync(callerFilePath, callerName);
+
             var wt = _lock.WaitAsync(false, Timeout.InfiniteTimeSpan, CancellationToken.None, CreateReceiver(callerFilePath, callerName));
             await wt;
             try
             {
-                await InitIfNeedAsync();
-
                 if (IsDisposed()) throw CreateDisposedEx();
                 if (IsIOWriteFailed()) throw CreateIOWriteFailedEx();
                 if (!CanAccessPage()) throw CreateRequirePageAccessEx();
@@ -416,12 +422,12 @@ namespace H.Book
 
         public async Task<bool> ReadPageAsync(Guid id, Func<Stream, Task> readerAction, [CallerFilePath] string callerFilePath = "", [CallerMemberName] string callerName = "")
         {
+            await InitIfNeedAsync(callerFilePath, callerName);
+
             var wt = _lock.WaitAsync(true, Timeout.InfiniteTimeSpan, CancellationToken.None, CreateReceiver(callerFilePath, callerName));
             await wt;
             try
             {
-                await InitIfNeedAsync();
-
                 if (IsDisposed()) throw CreateDisposedEx();
                 if (IsIOWriteFailed()) throw CreateIOWriteFailedEx();
                 if (!CanAccessPage()) throw CreateRequirePageAccessEx();
@@ -451,12 +457,12 @@ namespace H.Book
 
         public async Task<Stream> GetPageCopyAsync(Guid id, [CallerFilePath] string callerFilePath = "", [CallerMemberName] string callerName = "")
         {
+            await InitIfNeedAsync(callerFilePath, callerName);
+
             var wt = _lock.WaitAsync(true, Timeout.InfiniteTimeSpan, CancellationToken.None, CreateReceiver(callerFilePath, callerName));
             await wt;
             try
             {
-                await InitIfNeedAsync();
-
                 if (IsDisposed()) throw CreateDisposedEx();
                 if (IsIOWriteFailed()) throw CreateIOWriteFailedEx();
                 if (!CanAccessPage()) throw CreateRequirePageAccessEx();
@@ -485,12 +491,12 @@ namespace H.Book
 
         public async Task<bool> ReadThumbnailAsync(Guid id, Func<Stream, Task> readerAction, [CallerFilePath] string callerFilePath = "", [CallerMemberName] string callerName = "")
         {
+            await InitIfNeedAsync(callerFilePath, callerName);
+
             var wt = _lock.WaitAsync(true, Timeout.InfiniteTimeSpan, CancellationToken.None, CreateReceiver(callerFilePath, callerName));
             await wt;
             try
             {
-                await InitIfNeedAsync();
-
                 if (IsDisposed()) throw CreateDisposedEx();
                 if (IsIOWriteFailed()) throw CreateIOWriteFailedEx();
                 if (!CanAccessPage()) throw CreateRequirePageAccessEx();
@@ -520,12 +526,12 @@ namespace H.Book
 
         public async Task<Stream> GetThumbnailCopyAsync(Guid id, [CallerFilePath] string callerFilePath = "", [CallerMemberName] string callerName = "")
         {
+            await InitIfNeedAsync(callerFilePath, callerName);
+
             var wt = _lock.WaitAsync(true, Timeout.InfiniteTimeSpan, CancellationToken.None, CreateReceiver(callerFilePath, callerName));
             await wt;
             try
             {
-                await InitIfNeedAsync();
-
                 if (IsDisposed()) throw CreateDisposedEx();
                 if (IsIOWriteFailed()) throw CreateIOWriteFailedEx();
                 if (!CanAccessPage()) throw CreateRequirePageAccessEx();
@@ -560,12 +566,12 @@ namespace H.Book
             if (thumbnail != null && thumbnail.Length > int.MaxValue)
                 throw new ArgumentException($"thumbnail is too big:max={int.MaxValue}, value={thumbnail.Length}", "thumbnail");
 
+            await InitIfNeedAsync(callerFilePath, callerName);
+
             var wt = _lock.WaitAsync(true, Timeout.InfiniteTimeSpan, CancellationToken.None, CreateReceiver(callerFilePath, callerName));
             await wt;
             try
             {
-                await InitIfNeedAsync();
-
                 if (IsDisposed()) throw CreateDisposedEx();
                 if (IsIOWriteFailed()) throw CreateIOWriteFailedEx();
                 if (!CanAccessPage()) throw CreateRequirePageAccessEx();
@@ -625,12 +631,12 @@ namespace H.Book
 
         public async Task<bool> DeletePageAsync(Guid id, [CallerFilePath] string callerFilePath = "", [CallerMemberName] string callerName = "")
         {
+            await InitIfNeedAsync(callerFilePath, callerName);
+
             var wt = _lock.WaitAsync(true, Timeout.InfiniteTimeSpan, CancellationToken.None, CreateReceiver(callerFilePath, callerName));
             await wt;
             try
             {
-                await InitIfNeedAsync();
-
                 if (IsDisposed()) throw CreateDisposedEx();
                 if (IsIOWriteFailed()) throw CreateIOWriteFailedEx();
                 if (!CanAccessPage()) throw CreateRequirePageAccessEx();
@@ -661,12 +667,12 @@ namespace H.Book
 
         public async Task<IHPageHeader> SetPageHeaderAsync(Guid id, HPageHeaderSetting header, [CallerFilePath] string callerFilePath = "", [CallerMemberName] string callerName = "")
         {
+            await InitIfNeedAsync(callerFilePath, callerName);
+
             var wt = _lock.WaitAsync(true, Timeout.InfiniteTimeSpan, CancellationToken.None, CreateReceiver(callerFilePath, callerName));
             await wt;
             try
             {
-                await InitIfNeedAsync();
-
                 if (IsDisposed()) throw CreateDisposedEx();
                 if (IsIOWriteFailed()) throw CreateIOWriteFailedEx();
                 if (!CanAccessPage()) throw CreateRequirePageAccessEx();
