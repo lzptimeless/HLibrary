@@ -80,7 +80,7 @@ namespace H.BookLibrary
             DownloadItem item = new DownloadItem(id, downloader);
             _items.Add(item);
 
-            downloader.
+            
 
             return downloader.DownloadAsync();
         }
